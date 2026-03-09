@@ -1,21 +1,27 @@
-'use client';
-
-import router from "next/dist/shared/lib/router/router";
-import useAuth from "../hooks/useAuth";
-import { useRouter } from "next/navigation";
+import Navigation from "@/components/navigation";
+import Hero from "@/components/sections/hero";
+import About from "@/components/sections/about";
+import Skills from "@/components/sections/skills";
+import Experience from "@/components/sections/experience";
+import Projects from "@/components/sections/projects";
+import Achievements from "@/components/sections/achievements";
+import Contact from "@/components/sections/contact";
+import Footer from "@/components/footer";
 
 export default function Home() {
-
-  const { user, loading } = useAuth();
-
-  if (!loading && user){ 
-    router.push('/dashboard');
-    return null;
-  }
   return (
-    
-      <div> 
-      { loading ? <h1> Loading . . . </h1> : <h1> log in form </h1>}
-  </div>
+    <>
+      <Navigation />
+      <main>
+        <Hero />
+        <About />
+        <Skills />
+        <Experience />
+        <Projects />
+        <Achievements />
+        <Contact />
+      </main>
+      <Footer />
+    </>
   );
 }

@@ -25,7 +25,7 @@ function StatBar({
       <span className="w-24 text-right font-mono text-xs text-muted-foreground">
         {label}
       </span>
-      <div className="stat-bar-track flex-1 bg-foreground/5">
+      <div className="stat-bar-track flex-1 bg-foreground/10">
         <motion.div
           className="stat-bar-fill bg-linear-to-r from-primary/80 to-primary"
           initial={{ scaleX: 0 }}
@@ -88,8 +88,8 @@ export default function Hero() {
 
           <p className="mb-2 text-lg font-medium text-muted-foreground sm:text-xl">
             {personalInfo.role}
-            <span className="mx-2 text-border">·</span>
-            <span className="text-foreground/60">
+            <span className="mx-2 text-muted-foreground/50">·</span>
+            <span className="text-foreground/80">
               {personalInfo.school}
             </span>
           </p>

@@ -80,28 +80,33 @@
   --sidebar-accent-foreground: #1e293b;
   --sidebar-border: #e2e8f0;
   --sidebar-ring: #94a3b8;
+  /* Glass surface (light) */
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(15, 23, 42, 0.1);
+  --glass-shadow: 0 8px 24px -12px rgba(15, 23, 42, 0.18);
+  --grid-line: rgba(15, 23, 42, 0.04);
 }
 
 /* ========= DARK MODE — Deep Navy Pokemon-Inspired ========= */
 .dark {
-  --background: #060b18;
-  --foreground: #e2e8f0;
-  --card: #0f1629;
-  --card-foreground: #e2e8f0;
-  --popover: #0f1629;
-  --popover-foreground: #e2e8f0;
-  --primary: #f6c543;
-  --primary-foreground: #0f1629;
-  --secondary: #1a2332;
-  --secondary-foreground: #e2e8f0;
-  --muted: #1a2332;
-  --muted-foreground: #94a3b8;
-  --accent: #1a2332;
-  --accent-foreground: #e2e8f0;
+  --background: #070d1c;
+  --foreground: #eef2f8;
+  --card: #101a30;
+  --card-foreground: #eef2f8;
+  --popover: #101a30;
+  --popover-foreground: #eef2f8;
+  --primary: #fbcf4b;
+  --primary-foreground: #0a1120;
+  --secondary: #1a2540;
+  --secondary-foreground: #eef2f8;
+  --muted: #1a2540;
+  --muted-foreground: #a7b4c8;
+  --accent: #1e2a48;
+  --accent-foreground: #eef2f8;
   --destructive: #ef4444;
-  --border: rgba(255, 255, 255, 0.06);
-  --input: rgba(255, 255, 255, 0.06);
-  --ring: #f6c543;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: #fbcf4b;
   --chart-1: #3b82f6;
   --chart-2: #10b981;
   --chart-3: #f6c543;
@@ -113,8 +118,13 @@
   --sidebar-primary-foreground: #0f1629;
   --sidebar-accent: #1a2332;
   --sidebar-accent-foreground: #e2e8f0;
-  --sidebar-border: rgba(255, 255, 255, 0.06);
-  --sidebar-ring: #f6c543;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: #fbcf4b;
+  /* Glass surface (dark) */
+  --glass-bg: rgba(18, 27, 48, 0.78);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 12px 32px -16px rgba(0, 0, 0, 0.7);
+  --grid-line: rgba(255, 255, 255, 0.02);
 }
 
 /* ========= BASE STYLES ========= */
@@ -130,26 +140,25 @@
   }
 }
 
-/* ========= GRID BACKGROUND (dark mode) ========= */
-.dark body,
+/* ========= GRID BACKGROUND ========= */
+body,
 .grid-bg {
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
   background-size: 64px 64px;
 }
 
-/* ========= GLASSMORPHIC CARD ========= */
+/* ========= GLASSMORPHIC CARD =========
+   Token-driven so dark mode actually wins (previously a `:root .glass-card`
+   override beat the dark rule on specificity, forcing a near-white surface
+   in dark mode → unreadable). */
 .glass-card {
-  background: rgba(15, 22, 41, 0.6);
+  background: var(--glass-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-:root .glass-card {
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
 }
 
 /* ========= TRAINER CARD ========= */

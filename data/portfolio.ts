@@ -226,7 +226,7 @@ export const projectsData: Project[] = [
     featured: true,
     demoUrl: "",
     repoUrl: "https://github.com/Romeo-04/citysense-live-geo",
-    image: "/images/projects/citysense-placeholder.jpg",
+    image: "/city-sense.png",
   },
   {
     id: 2,
@@ -255,7 +255,7 @@ export const projectsData: Project[] = [
     featured: true,
     demoUrl: "",
     repoUrl: "",
-    image: "/images/projects/acmx-merch-placeholder.jpg",
+    image: "/merchandise-shop.png",
   },
   {
     id: 3,
@@ -284,7 +284,7 @@ export const projectsData: Project[] = [
     featured: true,
     demoUrl: "https://smart-habit-tracker-fawn.vercel.app",
     repoUrl: "https://github.com/Romeo-04/smart-habit-tracker",
-    image: "/images/projects/trackhab-placeholder.jpg",
+    image: "/trackhab.png",
   },
   {
     id: 4,
@@ -304,7 +304,7 @@ export const projectsData: Project[] = [
     featured: false,
     demoUrl: "",
     repoUrl: "https://github.com/Romeo-04/iJoin",
-    image: "/images/projects/ijoin-placeholder.jpg",
+    image: "",
   },
   {
     id: 5,
@@ -324,7 +324,7 @@ export const projectsData: Project[] = [
     featured: false,
     demoUrl: "",
     repoUrl: "https://github.com/Romeo-04/chichen-itza",
-    image: "/images/projects/chichen-itza-placeholder.jpg",
+    image: "/chichen-itza.png",
   },
 ];
 

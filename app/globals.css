@@ -121,7 +121,7 @@
   --sidebar-border: rgba(255, 255, 255, 0.08);
   --sidebar-ring: #fbcf4b;
   /* Glass surface (dark) */
-  --glass-bg: rgba(18, 27, 48, 0.78);
+  --glass-bg: rgba(18, 27, 48, 0.9);
   --glass-border: rgba(255, 255, 255, 0.1);
   --glass-shadow: 0 12px 32px -16px rgba(0, 0, 0, 0.7);
   --grid-line: rgba(255, 255, 255, 0.02);

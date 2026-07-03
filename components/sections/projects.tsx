@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ExternalLink,
@@ -26,11 +27,21 @@ function ProjectCard({ project }: { project: Project }) {
       layout
       className="glass-card group relative overflow-hidden rounded-2xl border border-border transition-shadow hover:shadow-lg hover:shadow-primary/5"
     >
-      {/* Image placeholder */}
+      {/* Project image (falls back to an icon when no screenshot exists) */}
       <div className="relative aspect-video overflow-hidden bg-muted/30">
-        <div className="flex h-full items-center justify-center">
-          <ImageIcon className="h-10 w-10 text-muted-foreground/20" />
-        </div>
+        {project.image ? (
+          <Image
+            src={project.image}
+            alt={`${project.title} screenshot`}
+            fill
+            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center">
+            <ImageIcon className="h-10 w-10 text-muted-foreground/20" />
+          </div>
+        )}
         {/* Dex entry number */}
         <div className="absolute top-3 left-3 rounded-lg border border-border bg-background/80 px-2.5 py-1 font-mono text-xs font-bold backdrop-blur-sm">
           #{entryNum}

@@ -110,24 +110,28 @@ function ProjectCard({ project }: { project: Project }) {
               className={`h-3 w-3 transition-transform ${expanded ? "rotate-180" : ""}`}
             />
           </button>
-          <a
-            href={project.repoUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-border transition-colors hover:bg-accent"
-            aria-label="GitHub Repository"
-          >
-            <Github className="h-3.5 w-3.5" />
-          </a>
-          <a
-            href={project.demoUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-border transition-colors hover:bg-accent"
-            aria-label="Live Demo"
-          >
-            <ExternalLink className="h-3.5 w-3.5" />
-          </a>
+          {project.repoUrl && (
+            <a
+              href={project.repoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-border transition-colors hover:bg-accent"
+              aria-label="GitHub Repository"
+            >
+              <Github className="h-3.5 w-3.5" />
+            </a>
+          )}
+          {project.demoUrl && (
+            <a
+              href={project.demoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-border transition-colors hover:bg-accent"
+              aria-label="Live Demo"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+            </a>
+          )}
         </div>
       </div>
     </motion.div>

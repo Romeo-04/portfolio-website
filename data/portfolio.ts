@@ -32,9 +32,9 @@ export const personalInfo = {
   trainerId: "2024-JT",
   heroImage: "/images/profile-placeholder.jpg", // Replace: recommended 400×400 JPG/PNG
   resumeUrl: "/resume.pdf", // Place your resume PDF in /public/resume.pdf
-  email: "ADD_EMAIL_HERE", // e.g., "jhezra@example.com"
-  github: "ADD_GITHUB_URL_HERE", // e.g., "https://github.com/jhezra"
-  linkedin: "ADD_LINKEDIN_URL_HERE", // e.g., "https://linkedin.com/in/jhezra"
+  email: "jhezraang@gmail.com", // e.g., "jhezra@example.com"
+  github: "https://github.com/Romeo-04", // e.g., "https://github.com/jhezra"
+  linkedin: "https://www.linkedin.com/in/jhezra-tolentino-513780287/", // e.g., "https://linkedin.com/in/jhezra"
 };
 
 // --- About Section ---
@@ -224,8 +224,8 @@ export const projectsData: Project[] = [
     category: "Web App",
     role: "Full-Stack Developer",
     featured: true,
-    demoUrl: "ADD_DEMO_URL_HERE",
-    repoUrl: "ADD_REPO_URL_HERE",
+    demoUrl: "",
+    repoUrl: "https://github.com/Romeo-04/citysense-live-geo",
     image: "/images/projects/citysense-placeholder.jpg",
   },
   {
@@ -253,8 +253,8 @@ export const projectsData: Project[] = [
     category: "E-Commerce",
     role: "Lead Full-Stack Developer",
     featured: true,
-    demoUrl: "ADD_DEMO_URL_HERE",
-    repoUrl: "ADD_REPO_URL_HERE",
+    demoUrl: "",
+    repoUrl: "",
     image: "/images/projects/acmx-merch-placeholder.jpg",
   },
   {
@@ -282,8 +282,8 @@ export const projectsData: Project[] = [
     category: "Productivity",
     role: "Full-Stack Developer",
     featured: true,
-    demoUrl: "ADD_DEMO_URL_HERE",
-    repoUrl: "ADD_REPO_URL_HERE",
+    demoUrl: "https://smart-habit-tracker-fawn.vercel.app",
+    repoUrl: "https://github.com/Romeo-04/smart-habit-tracker",
     image: "/images/projects/trackhab-placeholder.jpg",
   },
   {
@@ -302,8 +302,8 @@ export const projectsData: Project[] = [
     category: "Web App",
     role: "Backend Developer",
     featured: false,
-    demoUrl: "ADD_DEMO_URL_HERE",
-    repoUrl: "ADD_REPO_URL_HERE",
+    demoUrl: "",
+    repoUrl: "https://github.com/Romeo-04/iJoin",
     image: "/images/projects/ijoin-placeholder.jpg",
   },
   {
@@ -322,8 +322,8 @@ export const projectsData: Project[] = [
     category: "Graphics",
     role: "Developer",
     featured: false,
-    demoUrl: "ADD_DEMO_URL_HERE",
-    repoUrl: "ADD_REPO_URL_HERE",
+    demoUrl: "",
+    repoUrl: "https://github.com/Romeo-04/chichen-itza",
     image: "/images/projects/chichen-itza-placeholder.jpg",
   },
 ];
@@ -400,6 +400,33 @@ export const achievementsData: Achievement[] = [
   },
 ];
 
+// --- Certifications (from LinkedIn) ---
+// LinkedIn cannot be scraped programmatically (login wall + anti-bot 999
+// responses + ToS), so paste your certifications here manually. Copy each
+// one from LinkedIn → "Licenses & certifications". credentialUrl is optional
+// (the "Show credential" link). Once you add entries, the Certifications
+// section renders automatically; while this is empty it stays hidden.
+export interface Certification {
+  title: string;
+  issuer: string;
+  issued: string; // e.g. "Mar 2025"
+  credentialId?: string;
+  credentialUrl?: string;
+  skills?: string[];
+}
+
+export const certificationsData: Certification[] = [
+  // Example (delete and replace with your real LinkedIn certifications):
+  // {
+  //   title: "Machine Learning Specialization",
+  //   issuer: "DeepLearning.AI",
+  //   issued: "Aug 2024",
+  //   credentialId: "ABCD-1234",
+  //   credentialUrl: "https://coursera.org/verify/...",
+  //   skills: ["Supervised Learning", "TensorFlow"],
+  // },
+];
+
 // --- Navigation Links ---
 export const navLinks = [
   { label: "Home", href: "#home" },
@@ -407,7 +434,10 @@ export const navLinks = [
   { label: "Skills", href: "#skills" },
   { label: "Experience", href: "#experience" },
   { label: "Projects", href: "#projects" },
+  { label: "GitHub", href: "#github" },
   { label: "Achievements", href: "#achievements" },
+  // Uncomment once you add entries to certificationsData:
+  // { label: "Certifications", href: "#certifications" },
   { label: "Contact", href: "#contact" },
 ];
 

@@ -326,6 +326,32 @@ export const projectsData: Project[] = [
     repoUrl: "https://github.com/Romeo-04/chichen-itza",
     image: "/chichen-itza.png",
   },
+  {
+    id: 6,
+    title: "Archeon",
+    slug: "archeon",
+    pitch:
+      "AI-powered architectural memory that reconstructs the reasoning behind engineering decisions — answering not just what changed, but why.",
+    description: [
+      "Built an ingestion pipeline that extracts decision context from git commits, PRs, issues, READMEs, and architectural decision records",
+      "Engineered a two-pass query engine combining graph completion with semantic search to answer questions with source attribution",
+      "Implemented confidence scoring that tags results as cited, inferred, or unknown to surface evidence gaps",
+      "Added lifecycle management with orphan detection, ADR recovery, forget-on-delete, and a keyless extraction mode",
+    ],
+    techStack: [
+      "Python",
+      "Cognee",
+      "Knowledge Graphs",
+      "GitHub API",
+      "LLM",
+    ],
+    category: "Developer Tool",
+    role: "Developer",
+    featured: true,
+    demoUrl: "",
+    repoUrl: "https://github.com/kishiagaytano/archeon",
+    image: "",
+  },
 ];
 
 // --- Achievements ---

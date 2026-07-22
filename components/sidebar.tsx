@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Menu,
@@ -139,8 +140,14 @@ function SocialRow() {
 function Identity() {
   return (
     <div className="flex items-center gap-3 border-b border-border pb-5">
-      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-linear-to-br from-primary to-primary-accent font-display text-xl font-extrabold text-white">
-        {personalInfo.firstName[0]}
+      <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-[14px]">
+        <Image
+          src={personalInfo.heroImage}
+          alt={personalInfo.name}
+          fill
+          sizes="44px"
+          className="object-cover"
+        />
       </div>
       <div className="min-w-0">
         <p className="font-display truncate text-[15px] font-extrabold tracking-tight">
@@ -181,8 +188,14 @@ export default function Sidebar() {
       <header className="sticky top-0 z-50 lg:hidden">
         <div className="flex items-center justify-between border-b border-border bg-card/95 px-4 py-3 backdrop-blur-md">
           <a href="#home" className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-[11px] bg-linear-to-br from-primary to-primary-accent font-display text-base font-extrabold text-white">
-              {personalInfo.firstName[0]}
+            <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-[11px]">
+              <Image
+                src={personalInfo.heroImage}
+                alt={personalInfo.name}
+                fill
+                sizes="36px"
+                className="object-cover"
+              />
             </div>
             <span className="font-display text-sm font-bold">
               {personalInfo.firstName}

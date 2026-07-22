@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { MapPin, BookOpen, Rocket, Compass } from "lucide-react";
+import { MapPin, BookOpen, Rocket, Compass, GraduationCap } from "lucide-react";
 import SectionReveal, { childVariants } from "@/components/section-reveal";
 import { aboutData, personalInfo } from "@/data/portfolio";
 
@@ -62,7 +62,7 @@ export default function About() {
           {/* Quick identity card */}
           <div className="surface-card mt-7 inline-flex items-center gap-4 rounded-[16px] px-5 py-3.5">
             <div className="flex h-10 w-10 items-center justify-center rounded-[11px] bg-accent">
-              <span className="text-lg">🎓</span>
+              <GraduationCap className="h-5 w-5 text-primary" />
             </div>
             <div>
               <p className="text-sm font-semibold">{personalInfo.program}</p>

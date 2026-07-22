@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 import {
   Github,
@@ -7,7 +8,6 @@ import {
   Mail,
   Download,
   ChevronDown,
-  User,
 } from "lucide-react";
 import { personalInfo, skillStats } from "@/data/portfolio";
 
@@ -122,7 +122,7 @@ export default function Hero() {
               href="#projects"
               className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-bold text-primary transition-transform hover:scale-[1.02] active:scale-[0.98]"
             >
-              View My Work →
+              View My Work
             </a>
             <a
               href="#contact"
@@ -176,8 +176,14 @@ export default function Hero() {
           <div className="w-full max-w-md rounded-2xl border border-white/15 bg-[#09122c]/55 p-6 backdrop-blur-md sm:p-8">
             {/* Profile row */}
             <div className="mb-6 flex items-center gap-4">
-              <div className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/15 bg-white/5">
-                <User className="h-8 w-8 text-white/40" />
+              <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-white/15 bg-white/5">
+                <Image
+                  src={personalInfo.heroImage}
+                  alt={personalInfo.name}
+                  fill
+                  sizes="80px"
+                  className="object-cover"
+                />
               </div>
               <div>
                 <h2 className="font-display text-lg font-bold tracking-tight">

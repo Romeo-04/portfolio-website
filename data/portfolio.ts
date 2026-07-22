@@ -27,7 +27,7 @@ export const personalInfo = {
     "Championing systems that blend logic, creativity, and impact.",
   school: "FEU Tech",
   program: "Computer Science",
-  heroImage: "/images/profile-placeholder.jpg", // Replace: recommended 400×400 JPG/PNG
+  heroImage: "/Tolentino_Jhezra_1x1Photo.png",
   resumeUrl: "/resume.pdf", // Place your resume PDF in /public/resume.pdf
   email: "jhezraang@gmail.com", // e.g., "jhezra@example.com"
   github: "https://github.com/Romeo-04", // e.g., "https://github.com/jhezra"
@@ -91,9 +91,7 @@ export const skillsData: SkillCategory[] = [
       { name: "JavaScript", level: 85 },
       { name: "C++", level: 75 },
       { name: "Java", level: 70 },
-      { name: "PHP", level: 70 },
       { name: "SQL", level: 80 },
-      { name: "Assembly (x86)", level: 50 },
     ],
   },
   {
@@ -113,7 +111,6 @@ export const skillsData: SkillCategory[] = [
     icon: "server",
     skills: [
       { name: "Node.js", level: 82 },
-      { name: "Laravel", level: 75 },
       { name: "Prisma ORM", level: 80 },
     ],
   },
@@ -147,8 +144,6 @@ export const skillsData: SkillCategory[] = [
     skills: [
       { name: "Git / GitHub", level: 90 },
       { name: "Vercel", level: 85 },
-      { name: "WSL", level: 75 },
-      { name: "NVIDIA HPC SDK", level: 55 },
       { name: "Jupyter Notebook", level: 80 },
       { name: "MATLAB", level: 60 },
     ],
@@ -164,6 +159,17 @@ export interface Experience {
 }
 
 export const experienceData: Experience[] = [
+  {
+    title: "Software Engineering Intern",
+    organization: "ED3N Ventures",
+    period: "June 2026 – August 2026", // e.g., "June 2026 – August 2026" — placed first, reorder if not most recent
+    description: [
+      "Contributed to the design and development of full-stack features using Next.js, TypeScript, and PostgreSQL under the guidance of senior engineers",
+      "Collaborated with product and design stakeholders to scope, build, and ship new functionality in an agile sprint cycle",
+      "Wrote automated tests and technical documentation to support code quality and long-term maintainability",
+      "Participated in code reviews and deployment workflows, gaining hands-on exposure to production engineering practices",
+    ],
+  },
   {
     title: "Lead Developer — ACMX Web Dev Team",
     organization: "FEU Tech ACM Student Chapter",
@@ -428,6 +434,20 @@ export const achievementsData: Achievement[] = [
       "Achieved 3rd runner-up position in First Gen Code Green hackathon",
     tier: "bronze",
   },
+  {
+    title: "3rd Place — OpenAI Campus Hackathon 2026",
+    year: "2026",
+    description:
+      "Secured 3rd place in the Campus Hackathon, a collaboration between FEU Tech and OpenAI",
+    tier: "bronze",
+  },
+  {
+    title: "Champion — Cyber Xploit 2026",
+    year: "2026",
+    description:
+      "Won 1st place in the Cyber Xploit Capture the Flag (CTF) competition",
+    tier: "gold",
+  },
 ];
 
 // --- Certifications (from LinkedIn) ---
@@ -487,9 +507,9 @@ export const categoryColors: Record<
 
 // --- Skill Stats (for the hero snapshot bars) ---
 export const skillStats = [
-  { label: "Frontend", value: 88 },
-  { label: "Backend", value: 78 },
-  { label: "ML / AI", value: 72 },
-  { label: "Leadership", value: 85 },
-  { label: "Problem Solving", value: 82 },
+  { label: "Frontend", value: 82 },
+  { label: "Backend", value: 85 },
+  { label: "ML / AI", value: 86 },
+  { label: "Leadership", value: 90 },
+  { label: "Problem Solving", value: 95 },
 ];

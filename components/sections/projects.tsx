@@ -8,6 +8,7 @@ import {
   Github,
   ChevronDown,
   Image as ImageIcon,
+  Star,
 } from "lucide-react";
 import SectionReveal, { childVariants } from "@/components/section-reveal";
 import { projectsData, type Project } from "@/data/portfolio";
@@ -72,8 +73,9 @@ function ProjectCard({ project }: { project: Project }) {
         <div className="mb-2 flex items-start justify-between gap-2">
           <h3 className="text-lg font-bold leading-tight">{project.title}</h3>
           {project.featured && (
-            <span className="shrink-0 rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold tracking-wider text-amber-700 uppercase">
-              ★ Featured
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold tracking-wider text-amber-700 uppercase">
+              <Star className="h-2.5 w-2.5 fill-current" />
+              Featured
             </span>
           )}
         </div>

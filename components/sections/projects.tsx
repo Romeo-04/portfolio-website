@@ -24,6 +24,9 @@ function ProjectCard({ project }: { project: Project }) {
   return (
     <motion.div
       variants={childVariants}
+      initial="hidden"
+      animate="visible"
+      exit="hidden"
       layout
       onMouseMove={(e) => {
         const el = e.currentTarget;

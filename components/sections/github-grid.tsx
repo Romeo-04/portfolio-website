@@ -25,6 +25,9 @@ function RepoCard({ repo }: { repo: GithubRepo }) {
   return (
     <motion.a
       variants={childVariants}
+      initial="hidden"
+      animate="visible"
+      exit="hidden"
       layout
       href={repo.url}
       target="_blank"

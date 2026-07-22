@@ -2,8 +2,26 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
+import {
+  Code2,
+  LayoutGrid,
+  Server,
+  Database,
+  BrainCircuit,
+  Wrench,
+  type LucideIcon,
+} from "lucide-react";
 import SectionReveal, { childVariants } from "@/components/section-reveal";
-import { skillsData, typeColors } from "@/data/portfolio";
+import { skillsData, categoryColors, type CategoryIcon } from "@/data/portfolio";
+
+const categoryIcons: Record<CategoryIcon, LucideIcon> = {
+  code: Code2,
+  layout: LayoutGrid,
+  server: Server,
+  database: Database,
+  brain: BrainCircuit,
+  wrench: Wrench,
+};
 
 function SkillBar({
   name,
@@ -58,15 +76,15 @@ export default function Skills() {
           Tech Stack &amp; Specializations
         </h2>
         <p className="mt-3 max-w-2xl text-[15px] text-muted-foreground">
-          Core competencies organized by domain — each representing a type
-          affinity in my development toolkit.
+          Core competencies organized by domain, from languages to tooling.
         </p>
       </motion.div>
 
       {/* Skills grid */}
       <div ref={gridRef} className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {skillsData.map((category, catIdx) => {
-          const colors = typeColors[category.type];
+          const colors = categoryColors[category.color];
+          const Icon = categoryIcons[category.icon];
           return (
             <motion.div
               key={category.title}
@@ -78,16 +96,9 @@ export default function Skills() {
                 <div
                   className={`flex h-11 w-11 items-center justify-center rounded-[14px] ${colors.bg}`}
                 >
-                  <span className="text-lg">{category.icon}</span>
+                  <Icon className={`h-5 w-5 ${colors.text}`} />
                 </div>
-                <div>
-                  <h3 className="text-sm font-bold">{category.title}</h3>
-                  <p
-                    className={`text-[10px] font-semibold tracking-wider uppercase ${colors.text}`}
-                  >
-                    {category.type} type
-                  </p>
-                </div>
+                <h3 className="text-sm font-bold">{category.title}</h3>
               </div>
 
               {/* Skill bars */}

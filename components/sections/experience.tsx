@@ -17,7 +17,7 @@ export default function Experience() {
           Experience
         </span>
         <h2 className="font-display mt-2 text-[28px] font-extrabold tracking-tight">
-          Leadership &amp; Evolution Path
+          Leadership &amp; Experience
         </h2>
         <p className="mt-3 max-w-2xl text-[15px] text-muted-foreground">
           Key milestones in my journey — from academic foundations to leading
@@ -75,14 +75,6 @@ export default function Experience() {
                     </li>
                   ))}
                 </ul>
-
-                {/* Badge tag */}
-                <div className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-amber-500/25 bg-amber-500/10 px-3 py-1">
-                  <Shield className="h-3 w-3 text-amber-600" />
-                  <span className="text-[10px] font-semibold tracking-wider text-amber-700 uppercase">
-                    {exp.badge}
-                  </span>
-                </div>
               </div>
             </motion.div>
           ))}

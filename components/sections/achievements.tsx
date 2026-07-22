@@ -52,7 +52,7 @@ export default function Achievements() {
           Achievements
         </span>
         <h2 className="font-display mt-2 text-[28px] font-extrabold tracking-tight">
-          Badges &amp; Milestones
+          Achievements &amp; Milestones
         </h2>
         <p className="mt-3 max-w-2xl text-[15px] text-muted-foreground">
           Academic honors, competition placements, and recognitions earned

@@ -133,50 +133,7 @@ body,
   border: 1px solid var(--surface-border);
 }
 
-/* ========= TRAINER CARD ========= */
-.trainer-card {
-  position: relative;
-  overflow: hidden;
-}
-
-.trainer-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  padding: 1px;
-  background: linear-gradient(
-    135deg,
-    rgba(122, 162, 255, 0.6),
-    rgba(147, 113, 255, 0.35),
-    rgba(122, 162, 255, 0.2)
-  );
-  border-radius: inherit;
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-}
-
-.trainer-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(122, 162, 255, 0.06) 50%,
-    transparent 100%
-  );
-  animation: scanLine 4s ease-in-out infinite;
-  pointer-events: none;
-}
-
 /* ========= ANIMATIONS ========= */
-@keyframes scanLine {
-  0%, 100% { transform: translateY(-100%); }
-  50% { transform: translateY(100%); }
-}
-
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
@@ -276,7 +233,6 @@ body,
 
 /* ========= REDUCED MOTION ========= */
 @media (prefers-reduced-motion: reduce) {
-  .trainer-card::after,
   .animate-shimmer,
   .animate-glow-pulse,
   .animate-float,

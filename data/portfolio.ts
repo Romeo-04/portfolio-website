@@ -27,9 +27,6 @@ export const personalInfo = {
     "Championing systems that blend logic, creativity, and impact.",
   school: "FEU Tech",
   program: "Computer Science",
-  // Pokemon-inspired flavor
-  trainerClass: "Elite Developer",
-  trainerId: "2024-JT",
   heroImage: "/images/profile-placeholder.jpg", // Replace: recommended 400×400 JPG/PNG
   resumeUrl: "/resume.pdf", // Place your resume PDF in /public/resume.pdf
   email: "jhezraang@gmail.com", // e.g., "jhezra@example.com"
@@ -52,14 +49,24 @@ export const aboutData = {
   },
 };
 
-// --- Skill Type System (Pokemon-inspired categorization) ---
-export type SkillType =
-  | "electric"
-  | "water"
-  | "fire"
-  | "ground"
-  | "psychic"
-  | "steel";
+// --- Skill Categories ---
+export type CategoryColor =
+  | "amber"
+  | "blue"
+  | "rose"
+  | "orange"
+  | "violet"
+  | "slate";
+
+// One of the semantic icon keys mapped to a lucide-react component in
+// components/sections/skills.tsx.
+export type CategoryIcon =
+  | "code"
+  | "layout"
+  | "server"
+  | "database"
+  | "brain"
+  | "wrench";
 
 export interface Skill {
   name: string;
@@ -68,16 +75,16 @@ export interface Skill {
 
 export interface SkillCategory {
   title: string;
-  type: SkillType;
-  icon: string;
+  color: CategoryColor;
+  icon: CategoryIcon;
   skills: Skill[];
 }
 
 export const skillsData: SkillCategory[] = [
   {
     title: "Languages",
-    type: "electric",
-    icon: "⚡",
+    color: "amber",
+    icon: "code",
     skills: [
       { name: "Python", level: 90 },
       { name: "TypeScript", level: 85 },
@@ -91,8 +98,8 @@ export const skillsData: SkillCategory[] = [
   },
   {
     title: "Frontend",
-    type: "water",
-    icon: "💧",
+    color: "blue",
+    icon: "layout",
     skills: [
       { name: "React.js", level: 90 },
       { name: "Next.js", level: 88 },
@@ -102,8 +109,8 @@ export const skillsData: SkillCategory[] = [
   },
   {
     title: "Backend & API",
-    type: "fire",
-    icon: "🔥",
+    color: "rose",
+    icon: "server",
     skills: [
       { name: "Node.js", level: 82 },
       { name: "Laravel", level: 75 },
@@ -112,8 +119,8 @@ export const skillsData: SkillCategory[] = [
   },
   {
     title: "Databases",
-    type: "ground",
-    icon: "🪨",
+    color: "orange",
+    icon: "database",
     skills: [
       { name: "PostgreSQL", level: 82 },
       { name: "MySQL", level: 78 },
@@ -123,8 +130,8 @@ export const skillsData: SkillCategory[] = [
   },
   {
     title: "Machine Learning",
-    type: "psychic",
-    icon: "🔮",
+    color: "violet",
+    icon: "brain",
     skills: [
       { name: "PyTorch", level: 72 },
       { name: "Scikit-learn", level: 75 },
@@ -135,8 +142,8 @@ export const skillsData: SkillCategory[] = [
   },
   {
     title: "Tools & Platforms",
-    type: "steel",
-    icon: "⚙️",
+    color: "slate",
+    icon: "wrench",
     skills: [
       { name: "Git / GitHub", level: 90 },
       { name: "Vercel", level: 85 },
@@ -154,7 +161,6 @@ export interface Experience {
   organization: string;
   period: string;
   description: string[];
-  badge: string; // Pokemon badge flavor
 }
 
 export const experienceData: Experience[] = [
@@ -168,7 +174,6 @@ export const experienceData: Experience[] = [
       "Mentor team members on modern web development practices and collaborative workflows",
       "Drive technical decisions on stack selection, code quality, and deployment strategy",
     ],
-    badge: "Thunder Badge",
   },
   {
     title: "Director for Academics",
@@ -180,7 +185,6 @@ export const experienceData: Experience[] = [
       "Designed and implemented technical competitions within the institute",
       "Addressed student concerns in courses and fostered engagement and academic performance",
     ],
-    badge: "Knowledge Badge",
   },
 ];
 
@@ -467,58 +471,22 @@ export const navLinks = [
   { label: "Contact", href: "#contact" },
 ];
 
-// --- Type Color Map (for themed UI elements) ---
+// --- Category Color Map (for skill category cards) ---
 // Shades tuned for readability on light card surfaces.
-export const typeColors: Record<
-  SkillType,
-  { bg: string; text: string; border: string; glow: string; bar: string }
+export const categoryColors: Record<
+  CategoryColor,
+  { bg: string; text: string }
 > = {
-  electric: {
-    bg: "bg-yellow-500/15",
-    text: "text-yellow-700",
-    border: "border-yellow-500/30",
-    glow: "shadow-yellow-500/20",
-    bar: "bg-yellow-500",
-  },
-  water: {
-    bg: "bg-blue-500/15",
-    text: "text-blue-700",
-    border: "border-blue-500/30",
-    glow: "shadow-blue-500/20",
-    bar: "bg-blue-500",
-  },
-  fire: {
-    bg: "bg-red-500/15",
-    text: "text-red-700",
-    border: "border-red-500/30",
-    glow: "shadow-red-500/20",
-    bar: "bg-red-500",
-  },
-  ground: {
-    bg: "bg-amber-500/15",
-    text: "text-amber-700",
-    border: "border-amber-500/30",
-    glow: "shadow-amber-500/20",
-    bar: "bg-amber-500",
-  },
-  psychic: {
-    bg: "bg-purple-500/15",
-    text: "text-purple-700",
-    border: "border-purple-500/30",
-    glow: "shadow-purple-500/20",
-    bar: "bg-purple-500",
-  },
-  steel: {
-    bg: "bg-slate-500/15",
-    text: "text-slate-600",
-    border: "border-slate-500/30",
-    glow: "shadow-slate-500/20",
-    bar: "bg-slate-500",
-  },
+  amber: { bg: "bg-amber-500/15", text: "text-amber-700" },
+  blue: { bg: "bg-blue-500/15", text: "text-blue-700" },
+  rose: { bg: "bg-rose-500/15", text: "text-rose-700" },
+  orange: { bg: "bg-orange-500/15", text: "text-orange-700" },
+  violet: { bg: "bg-violet-500/15", text: "text-violet-700" },
+  slate: { bg: "bg-slate-500/15", text: "text-slate-600" },
 };
 
-// --- Trainer Stats (for hero card radar/bars) ---
-export const trainerStats = [
+// --- Skill Stats (for the hero snapshot bars) ---
+export const skillStats = [
   { label: "Frontend", value: 88 },
   { label: "Backend", value: 78 },
   { label: "ML / AI", value: 72 },

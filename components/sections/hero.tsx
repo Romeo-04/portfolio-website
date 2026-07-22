@@ -9,7 +9,7 @@ import {
   ChevronDown,
   User,
 } from "lucide-react";
-import { personalInfo, trainerStats } from "@/data/portfolio";
+import { personalInfo, skillStats } from "@/data/portfolio";
 
 function StatBar({
   label,
@@ -102,7 +102,7 @@ export default function Hero() {
             {personalInfo.tagline}
           </p>
 
-          {/* Type badges */}
+          {/* Focus areas */}
           <div className="mt-5 flex flex-wrap gap-2">
             {["Web Development", "Machine Learning", "Full-Stack"].map(
               (tag) => (
@@ -166,27 +166,14 @@ export default function Hero() {
           </div>
         </motion.div>
 
-        {/* Right — Trainer Card */}
+        {/* Right — Profile snapshot */}
         <motion.div
           className="flex items-center justify-center lg:justify-end"
           initial={{ opacity: 0, x: 30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.7, delay: 0.2, ease: [0.25, 0.4, 0.25, 1] }}
         >
-          <div className="trainer-card w-full max-w-md rounded-2xl border border-white/15 bg-[#09122c]/55 p-6 backdrop-blur-md sm:p-8">
-            {/* Card header */}
-            <div className="mb-5 flex items-center justify-between">
-              <span className="flex items-center gap-2 text-xs font-bold tracking-widest text-white/60 uppercase">
-                <span className="animate-glow-pulse inline-block h-2 w-2 rounded-full bg-[#8fb0ff]" />
-                Trainer Card
-              </span>
-              <span className="font-mono text-xs text-white/50">
-                ID: {personalInfo.trainerId}
-              </span>
-            </div>
-
-            <div className="mb-5 h-px bg-linear-to-r from-transparent via-white/20 to-transparent" />
-
+          <div className="w-full max-w-md rounded-2xl border border-white/15 bg-[#09122c]/55 p-6 backdrop-blur-md sm:p-8">
             {/* Profile row */}
             <div className="mb-6 flex items-center gap-4">
               <div className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/15 bg-white/5">
@@ -199,40 +186,27 @@ export default function Hero() {
                 <p className="text-sm font-medium text-[#8fb0ff]">
                   {personalInfo.role}
                 </p>
-                <p className="text-xs text-white/60">
-                  {personalInfo.trainerClass} · {personalInfo.school}
-                </p>
+                <p className="text-xs text-white/60">{personalInfo.school}</p>
               </div>
             </div>
 
-            {/* Type affinities */}
+            {/* Focus areas */}
             <div className="mb-6 flex flex-wrap gap-1.5">
-              {[
-                { label: "Web Dev", color: "bg-blue-400/15 text-blue-200 border-blue-300/25" },
-                { label: "ML / AI", color: "bg-purple-400/15 text-purple-200 border-purple-300/25" },
-                { label: "Full-Stack", color: "bg-red-400/15 text-red-200 border-red-300/25" },
-                { label: "Leadership", color: "bg-yellow-400/15 text-yellow-200 border-yellow-300/25" },
-              ].map((t) => (
-                <span
-                  key={t.label}
-                  className={`rounded-full border px-2.5 py-0.5 text-[10px] font-semibold ${t.color}`}
-                >
-                  {t.label}
-                </span>
-              ))}
+              {["Web Dev", "ML / AI", "Full-Stack", "Leadership"].map(
+                (label) => (
+                  <span
+                    key={label}
+                    className="rounded-full border border-white/20 bg-white/10 px-2.5 py-0.5 text-[10px] font-semibold text-white/85"
+                  >
+                    {label}
+                  </span>
+                )
+              )}
             </div>
 
-            {/* Stat bars */}
-            <div className="mb-4 flex items-center gap-2">
-              <span className="h-px flex-1 bg-linear-to-r from-transparent via-white/20 to-transparent" />
-              <span className="text-[10px] font-bold tracking-widest text-white/50 uppercase">
-                Stats
-              </span>
-              <span className="h-px flex-1 bg-linear-to-r from-transparent via-white/20 to-transparent" />
-            </div>
-
+            {/* Skill snapshot */}
             <div className="flex flex-col gap-2.5">
-              {trainerStats.map((stat, i) => (
+              {skillStats.map((stat, i) => (
                 <StatBar
                   key={stat.label}
                   label={stat.label}

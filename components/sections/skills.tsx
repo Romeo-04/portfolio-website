@@ -8,13 +8,11 @@ import { skillsData, typeColors } from "@/data/portfolio";
 function SkillBar({
   name,
   level,
-  barColor,
   delay,
   inView,
 }: {
   name: string;
   level: number;
-  barColor: string;
   delay: number;
   inView: boolean;
 }) {
@@ -23,9 +21,9 @@ function SkillBar({
       <span className="w-28 truncate text-sm text-muted-foreground">
         {name}
       </span>
-      <div className="stat-bar-track flex-1 bg-foreground/5">
+      <div className="stat-bar-track flex-1">
         <motion.div
-          className={`stat-bar-fill ${barColor}`}
+          className="stat-bar-fill"
           initial={{ scaleX: 0 }}
           animate={inView ? { scaleX: level / 100 } : { scaleX: 0 }}
           transition={{
@@ -47,72 +45,66 @@ export default function Skills() {
   const inView = useInView(gridRef, { once: true, amount: 0.2 });
 
   return (
-    <SectionReveal id="skills" className="py-24 sm:py-32">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        {/* Section header */}
-        <motion.div variants={childVariants} className="mb-16">
-          <div className="flex items-center gap-3 mb-3">
-            <span className="h-px w-8 bg-primary" />
-            <span className="text-xs font-bold tracking-widest text-primary uppercase">
-              Skills
-            </span>
-          </div>
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            Tech Stack & Specializations
-          </h2>
-          <p className="mt-3 max-w-2xl text-muted-foreground">
-            Core competencies organized by domain — each representing a type
-            affinity in my development toolkit.
-          </p>
-        </motion.div>
+    <SectionReveal
+      id="skills"
+      className="rounded-3xl border border-border bg-card p-6 shadow-[0_18px_40px_-32px_rgba(23,42,99,0.35)] sm:p-8 lg:p-9"
+    >
+      {/* Section header */}
+      <motion.div variants={childVariants} className="mb-10">
+        <span className="text-[11px] font-bold tracking-[2px] text-primary-accent uppercase">
+          Skills
+        </span>
+        <h2 className="font-display mt-2 text-[28px] font-extrabold tracking-tight">
+          Tech Stack &amp; Specializations
+        </h2>
+        <p className="mt-3 max-w-2xl text-[15px] text-muted-foreground">
+          Core competencies organized by domain — each representing a type
+          affinity in my development toolkit.
+        </p>
+      </motion.div>
 
-        {/* Skills grid */}
-        <div
-          ref={gridRef}
-          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-        >
-          {skillsData.map((category, catIdx) => {
-            const colors = typeColors[category.type];
-            return (
-              <motion.div
-                key={category.title}
-                variants={childVariants}
-                className={`glass-card group rounded-2xl border p-6 transition-shadow hover:shadow-lg ${colors.border} ${colors.glow}`}
-              >
-                {/* Category header */}
-                <div className="mb-5 flex items-center gap-3">
-                  <div
-                    className={`flex h-9 w-9 items-center justify-center rounded-lg ${colors.bg}`}
+      {/* Skills grid */}
+      <div ref={gridRef} className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {skillsData.map((category, catIdx) => {
+          const colors = typeColors[category.type];
+          return (
+            <motion.div
+              key={category.title}
+              variants={childVariants}
+              className="surface-card group rounded-2xl p-6 transition-shadow hover:shadow-lg"
+            >
+              {/* Category header */}
+              <div className="mb-5 flex items-center gap-3">
+                <div
+                  className={`flex h-11 w-11 items-center justify-center rounded-[14px] ${colors.bg}`}
+                >
+                  <span className="text-lg">{category.icon}</span>
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold">{category.title}</h3>
+                  <p
+                    className={`text-[10px] font-semibold tracking-wider uppercase ${colors.text}`}
                   >
-                    <span className="text-base">{category.icon}</span>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold">{category.title}</h3>
-                    <p
-                      className={`text-[10px] font-semibold tracking-wider uppercase ${colors.text}`}
-                    >
-                      {category.type} type
-                    </p>
-                  </div>
+                    {category.type} type
+                  </p>
                 </div>
+              </div>
 
-                {/* Skill bars */}
-                <div className="flex flex-col gap-2.5">
-                  {category.skills.map((skill, skillIdx) => (
-                    <SkillBar
-                      key={skill.name}
-                      name={skill.name}
-                      level={skill.level}
-                      barColor={colors.bar}
-                      delay={catIdx * 0.08 + skillIdx * 0.05}
-                      inView={inView}
-                    />
-                  ))}
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
+              {/* Skill bars */}
+              <div className="flex flex-col gap-2.5">
+                {category.skills.map((skill, skillIdx) => (
+                  <SkillBar
+                    key={skill.name}
+                    name={skill.name}
+                    level={skill.level}
+                    delay={catIdx * 0.08 + skillIdx * 0.05}
+                    inView={inView}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          );
+        })}
       </div>
     </SectionReveal>
   );

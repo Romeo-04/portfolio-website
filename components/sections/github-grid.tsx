@@ -29,10 +29,10 @@ function RepoCard({ repo }: { repo: GithubRepo }) {
       href={repo.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="glass-card group relative flex flex-col rounded-2xl border border-border p-5 transition-shadow hover:shadow-lg hover:shadow-primary/5"
+      className="surface-card group relative flex flex-col rounded-2xl p-5 transition-shadow hover:shadow-lg hover:shadow-primary-accent/10"
     >
       <div className="mb-2 flex items-start justify-between gap-2">
-        <div className="flex items-center gap-2 min-w-0">
+        <div className="flex min-w-0 items-center gap-2">
           <Github className="h-4 w-4 shrink-0 text-muted-foreground" />
           <h3 className="truncate text-base font-bold leading-tight">
             {repo.displayName}
@@ -50,7 +50,7 @@ function RepoCard({ repo }: { repo: GithubRepo }) {
           {repo.topics.slice(0, 4).map((topic) => (
             <span
               key={topic}
-              className="rounded-md border border-border bg-muted/50 px-2 py-0.5 text-[11px] font-medium text-muted-foreground"
+              className="rounded-md border border-border bg-card px-2 py-0.5 text-[11px] font-medium text-muted-foreground"
             >
               {topic}
             </span>
@@ -98,7 +98,7 @@ function RepoCard({ repo }: { repo: GithubRepo }) {
               window.open(repo.homepage!, "_blank", "noopener,noreferrer");
             }
           }}
-          className="mt-3 inline-flex w-fit items-center gap-1 rounded-lg border border-primary/20 bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
+          className="mt-3 inline-flex w-fit items-center gap-1 rounded-lg border border-primary-accent/20 bg-primary-accent/10 px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary-accent/20"
         >
           <ExternalLink className="h-3 w-3" />
           Live demo
@@ -114,10 +114,7 @@ export default function GithubGrid({ repos }: { repos: GithubRepo[] }) {
 
   return (
     <>
-      <motion.div
-        layout
-        className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
-      >
+      <motion.div layout className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         <AnimatePresence mode="popLayout">
           {visible.map((repo) => (
             <RepoCard key={repo.id} repo={repo} />
@@ -129,11 +126,9 @@ export default function GithubGrid({ repos }: { repos: GithubRepo[] }) {
         <motion.div variants={childVariants} className="mt-8 flex justify-center">
           <button
             onClick={() => setShowAll((v) => !v)}
-            className="rounded-lg border border-border bg-card/50 px-5 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            className="rounded-lg border border-border bg-secondary px-5 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
           >
-            {showAll
-              ? "Show less"
-              : `Show all ${repos.length} repositories`}
+            {showAll ? "Show less" : `Show all ${repos.length} repositories`}
           </button>
         </motion.div>
       )}

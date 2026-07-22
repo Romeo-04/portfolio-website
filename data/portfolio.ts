@@ -468,51 +468,52 @@ export const navLinks = [
 ];
 
 // --- Type Color Map (for themed UI elements) ---
+// Shades tuned for readability on light card surfaces.
 export const typeColors: Record<
   SkillType,
   { bg: string; text: string; border: string; glow: string; bar: string }
 > = {
   electric: {
-    bg: "bg-yellow-500/10",
-    text: "text-yellow-400",
+    bg: "bg-yellow-500/15",
+    text: "text-yellow-700",
     border: "border-yellow-500/30",
     glow: "shadow-yellow-500/20",
-    bar: "bg-yellow-400",
+    bar: "bg-yellow-500",
   },
   water: {
-    bg: "bg-blue-500/10",
-    text: "text-blue-400",
+    bg: "bg-blue-500/15",
+    text: "text-blue-700",
     border: "border-blue-500/30",
     glow: "shadow-blue-500/20",
-    bar: "bg-blue-400",
+    bar: "bg-blue-500",
   },
   fire: {
-    bg: "bg-red-500/10",
-    text: "text-red-400",
+    bg: "bg-red-500/15",
+    text: "text-red-700",
     border: "border-red-500/30",
     glow: "shadow-red-500/20",
-    bar: "bg-red-400",
+    bar: "bg-red-500",
   },
   ground: {
-    bg: "bg-amber-500/10",
-    text: "text-amber-400",
+    bg: "bg-amber-500/15",
+    text: "text-amber-700",
     border: "border-amber-500/30",
     glow: "shadow-amber-500/20",
-    bar: "bg-amber-400",
+    bar: "bg-amber-500",
   },
   psychic: {
-    bg: "bg-purple-500/10",
-    text: "text-purple-400",
+    bg: "bg-purple-500/15",
+    text: "text-purple-700",
     border: "border-purple-500/30",
     glow: "shadow-purple-500/20",
-    bar: "bg-purple-400",
+    bar: "bg-purple-500",
   },
   steel: {
-    bg: "bg-slate-400/10",
-    text: "text-slate-300",
-    border: "border-slate-400/30",
-    glow: "shadow-slate-400/20",
-    bar: "bg-slate-400",
+    bg: "bg-slate-500/15",
+    text: "text-slate-600",
+    border: "border-slate-500/30",
+    glow: "shadow-slate-500/20",
+    bar: "bg-slate-500",
   },
 };
 

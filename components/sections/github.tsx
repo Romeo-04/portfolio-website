@@ -11,39 +11,35 @@ export default async function GithubSection() {
   if (repos.length === 0) return null; // graceful: hide on API failure
 
   return (
-    <SectionReveal id="github" className="py-24 sm:py-32">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        {/* Section header */}
-        <div className="mb-12">
-          <div className="mb-3 flex items-center gap-3">
-            <span className="h-px w-8 bg-primary" />
-            <span className="text-xs font-bold uppercase tracking-widest text-primary">
-              Open Source
-            </span>
-          </div>
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-                From GitHub
-              </h2>
-              <p className="mt-3 max-w-2xl text-muted-foreground">
-                Pulled live from my GitHub — public repositories, sorted by
-                stars and recent activity.
-              </p>
-            </div>
-            <a
-              href={`https://github.com/${GITHUB_USERNAME}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium transition-colors hover:bg-accent"
-            >
-              <Github className="h-4 w-4" />@{GITHUB_USERNAME}
-            </a>
-          </div>
+    <SectionReveal
+      id="github"
+      className="rounded-3xl border border-border bg-card p-6 shadow-[0_18px_40px_-32px_rgba(23,42,99,0.35)] sm:p-8 lg:p-9"
+    >
+      {/* Section header */}
+      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <span className="text-[11px] font-bold tracking-[2px] text-primary-accent uppercase">
+            Open Source
+          </span>
+          <h2 className="font-display mt-2 text-[28px] font-extrabold tracking-tight">
+            From GitHub
+          </h2>
+          <p className="mt-3 max-w-2xl text-[15px] text-muted-foreground">
+            Pulled live from my GitHub — public repositories, sorted by
+            stars and recent activity.
+          </p>
         </div>
-
-        <GithubGrid repos={repos} />
+        <a
+          href={`https://github.com/${GITHUB_USERNAME}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 rounded-lg border border-border bg-secondary px-4 py-2 text-sm font-medium transition-colors hover:bg-accent"
+        >
+          <Github className="h-4 w-4" />@{GITHUB_USERNAME}
+        </a>
       </div>
+
+      <GithubGrid repos={repos} />
     </SectionReveal>
   );
 }

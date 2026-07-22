@@ -6,8 +6,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter);
-  --font-mono: var(--font-jetbrains-mono);
+  --font-sans: var(--font-dm-sans);
+  --font-display: var(--font-jakarta);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -33,12 +33,13 @@
   --color-secondary: var(--secondary);
   --color-primary-foreground: var(--primary-foreground);
   --color-primary: var(--primary);
+  --color-primary-accent: var(--primary-accent);
   --color-popover-foreground: var(--popover-foreground);
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 3px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --radius-2xl: calc(var(--radius) + 8px);
@@ -46,85 +47,48 @@
   --radius-4xl: calc(var(--radius) + 16px);
 }
 
-/* ========= LIGHT MODE ========= */
+/* ========= LIGHT THEME — Dark Blue ========= */
 :root {
-  --radius: 0.75rem;
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --radius: 1.1rem;
+  --background: #eef1f8;
+  --foreground: #101a3a;
   --card: #ffffff;
-  --card-foreground: #0f172a;
+  --card-foreground: #101a3a;
   --popover: #ffffff;
-  --popover-foreground: #0f172a;
-  --primary: #1e293b;
-  --primary-foreground: #f8fafc;
-  --secondary: #f1f5f9;
-  --secondary-foreground: #1e293b;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --accent: #f1f5f9;
-  --accent-foreground: #1e293b;
+  --popover-foreground: #101a3a;
+  --primary: #1e3a8a;
+  --primary-accent: #2563eb;
+  --primary-foreground: #ffffff;
+  --secondary: #f4f6fb;
+  --secondary-foreground: #1e3a8a;
+  --muted: #f4f6fb;
+  --muted-foreground: #6d7592;
+  --accent: #eaf0fd;
+  --accent-foreground: #1e3a8a;
   --destructive: #ef4444;
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #94a3b8;
-  --chart-1: #f59e0b;
-  --chart-2: #3b82f6;
-  --chart-3: #8b5cf6;
-  --chart-4: #10b981;
+  --border: #e3e8f4;
+  --input: #e2e8f5;
+  --ring: #2563eb;
+  --chart-1: #2563eb;
+  --chart-2: #7c3aed;
+  --chart-3: #10b981;
+  --chart-4: #f59e0b;
   --chart-5: #ef4444;
-  --sidebar: #f8fafc;
-  --sidebar-foreground: #0f172a;
-  --sidebar-primary: #1e293b;
-  --sidebar-primary-foreground: #f8fafc;
-  --sidebar-accent: #f1f5f9;
-  --sidebar-accent-foreground: #1e293b;
-  --sidebar-border: #e2e8f0;
-  --sidebar-ring: #94a3b8;
-  /* Glass surface (light) */
-  --glass-bg: rgba(255, 255, 255, 0.72);
-  --glass-border: rgba(15, 23, 42, 0.1);
-  --glass-shadow: 0 8px 24px -12px rgba(15, 23, 42, 0.18);
-  --grid-line: rgba(15, 23, 42, 0.04);
-}
-
-/* ========= DARK MODE — Deep Navy Pokemon-Inspired ========= */
-.dark {
-  --background: #070d1c;
-  --foreground: #eef2f8;
-  --card: #101a30;
-  --card-foreground: #eef2f8;
-  --popover: #101a30;
-  --popover-foreground: #eef2f8;
-  --primary: #fbcf4b;
-  --primary-foreground: #0a1120;
-  --secondary: #1a2540;
-  --secondary-foreground: #eef2f8;
-  --muted: #1a2540;
-  --muted-foreground: #a7b4c8;
-  --accent: #1e2a48;
-  --accent-foreground: #eef2f8;
-  --destructive: #ef4444;
-  --border: rgba(255, 255, 255, 0.1);
-  --input: rgba(255, 255, 255, 0.1);
-  --ring: #fbcf4b;
-  --chart-1: #3b82f6;
-  --chart-2: #10b981;
-  --chart-3: #f6c543;
-  --chart-4: #a855f7;
-  --chart-5: #ef4444;
-  --sidebar: #0a1020;
-  --sidebar-foreground: #e2e8f0;
-  --sidebar-primary: #f6c543;
-  --sidebar-primary-foreground: #0f1629;
-  --sidebar-accent: #1a2332;
-  --sidebar-accent-foreground: #e2e8f0;
-  --sidebar-border: rgba(255, 255, 255, 0.08);
-  --sidebar-ring: #fbcf4b;
-  /* Glass surface (dark) */
-  --glass-bg: rgba(18, 27, 48, 0.9);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-shadow: 0 12px 32px -16px rgba(0, 0, 0, 0.7);
-  --grid-line: rgba(255, 255, 255, 0.02);
+  --sidebar: #ffffff;
+  --sidebar-foreground: #101a3a;
+  --sidebar-primary: #1e3a8a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f4f6fb;
+  --sidebar-accent-foreground: #1e3a8a;
+  --sidebar-border: #e3e8f4;
+  --sidebar-ring: #2563eb;
+  /* Card surface (light, opaque — replaces the old glass-on-dark treatment) */
+  --glass-bg: #ffffff;
+  --glass-border: #e3e8f4;
+  --glass-shadow: 0 18px 40px -32px rgba(23, 42, 99, 0.35);
+  --surface-bg: #f6f8fd;
+  --surface-border: #e6ebf6;
+  --grid-line: rgba(30, 58, 138, 0.04);
 }
 
 /* ========= BASE STYLES ========= */
@@ -137,6 +101,10 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
+    font-family: var(--font-dm-sans), sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-jakarta), sans-serif;
   }
 }
 
@@ -149,16 +117,20 @@ body,
   background-size: 64px 64px;
 }
 
-/* ========= GLASSMORPHIC CARD =========
-   Token-driven so dark mode actually wins (previously a `:root .glass-card`
-   override beat the dark rule on specificity, forcing a near-white surface
-   in dark mode → unreadable). */
+/* ========= CARD SURFACE =========
+   Opaque white section-level card (formerly a translucent glass panel on a
+   dark background — the light theme just needs a clean elevated surface). */
 .glass-card {
   background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);
+}
+
+/* Inner tinted card used inside a .glass-card section (skill/project/repo
+   tiles, etc.) — a step down in elevation from the white section card. */
+.surface-card {
+  background: var(--surface-bg);
+  border: 1px solid var(--surface-border);
 }
 
 /* ========= TRAINER CARD ========= */
@@ -174,10 +146,9 @@ body,
   padding: 1px;
   background: linear-gradient(
     135deg,
-    rgba(246, 197, 67, 0.6),
-    rgba(59, 130, 246, 0.3),
-    rgba(168, 85, 247, 0.4),
-    rgba(246, 197, 67, 0.2)
+    rgba(122, 162, 255, 0.6),
+    rgba(147, 113, 255, 0.35),
+    rgba(122, 162, 255, 0.2)
   );
   border-radius: inherit;
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -193,7 +164,7 @@ body,
   background: linear-gradient(
     to bottom,
     transparent 0%,
-    rgba(246, 197, 67, 0.03) 50%,
+    rgba(122, 162, 255, 0.06) 50%,
     transparent 100%
   );
   animation: scanLine 4s ease-in-out infinite;
@@ -221,6 +192,19 @@ body,
   50% { transform: translateY(-8px); }
 }
 
+@keyframes heroAura {
+  0%   { transform: translate(0,0) scale(1);      opacity: .85; }
+  33%  { transform: translate(-40px,30px) scale(1.15); opacity: 1; }
+  66%  { transform: translate(30px,-20px) scale(.95); opacity: .7; }
+  100% { transform: translate(0,0) scale(1);      opacity: .85; }
+}
+
+@keyframes heroAura2 {
+  0%   { transform: translate(0,0) scale(1);      opacity: .6; }
+  50%  { transform: translate(50px,40px) scale(1.25); opacity: .9; }
+  100% { transform: translate(0,0) scale(1);      opacity: .6; }
+}
+
 .animate-shimmer {
   background-size: 200% 100%;
   animation: shimmer 3s linear infinite;
@@ -234,11 +218,24 @@ body,
   animation: float 6s ease-in-out infinite;
 }
 
+.animate-hero-aura {
+  animation: heroAura 14s ease-in-out infinite;
+}
+
+.animate-hero-aura2 {
+  animation: heroAura2 18s ease-in-out infinite;
+}
+
+.animate-hero-aura-reverse {
+  animation: heroAura 20s ease-in-out infinite reverse;
+}
+
 /* ========= STAT BAR ========= */
 .stat-bar-track {
   height: 6px;
   border-radius: 3px;
   overflow: hidden;
+  background: rgba(30, 58, 138, 0.08);
 }
 
 .stat-bar-fill {
@@ -246,6 +243,7 @@ body,
   border-radius: 3px;
   transform-origin: left;
   transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(90deg, var(--primary), var(--primary-accent));
 }
 
 /* ========= BADGE GLOW ========= */
@@ -267,13 +265,13 @@ body,
 }
 
 /* Achievement tier glows */
-.tier-gold { --glow-color: rgba(246, 197, 67, 0.3); }
-.tier-silver { --glow-color: rgba(148, 163, 184, 0.3); }
-.tier-bronze { --glow-color: rgba(217, 119, 6, 0.3); }
-.tier-special { --glow-color: rgba(168, 85, 247, 0.3); }
+.tier-gold { --glow-color: rgba(217, 160, 15, 0.22); }
+.tier-silver { --glow-color: rgba(100, 116, 139, 0.2); }
+.tier-bronze { --glow-color: rgba(180, 83, 9, 0.22); }
+.tier-special { --glow-color: rgba(124, 58, 237, 0.22); }
 
 .badge-glow:hover {
-  box-shadow: 0 0 20px var(--glow-color, rgba(246, 197, 67, 0.2));
+  box-shadow: 0 0 20px var(--glow-color, rgba(37, 99, 235, 0.15));
 }
 
 /* ========= REDUCED MOTION ========= */
@@ -281,7 +279,10 @@ body,
   .trainer-card::after,
   .animate-shimmer,
   .animate-glow-pulse,
-  .animate-float {
+  .animate-float,
+  .animate-hero-aura,
+  .animate-hero-aura2,
+  .animate-hero-aura-reverse {
     animation: none;
   }
   html {

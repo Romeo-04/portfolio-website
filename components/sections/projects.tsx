@@ -25,10 +25,22 @@ function ProjectCard({ project }: { project: Project }) {
     <motion.div
       variants={childVariants}
       layout
-      className="glass-card group relative overflow-hidden rounded-2xl border border-border transition-shadow hover:shadow-lg hover:shadow-primary/5"
+      onMouseMove={(e) => {
+        const el = e.currentTarget;
+        const r = el.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5;
+        const py = (e.clientY - r.top) / r.height - 0.5;
+        el.style.transform = `perspective(900px) rotateY(${px * 6}deg) rotateX(${-py * 6}deg)`;
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform =
+          "perspective(900px) rotateY(0deg) rotateX(0deg)";
+      }}
+      style={{ transition: "transform .15s ease", willChange: "transform" }}
+      className="surface-card group relative overflow-hidden rounded-2xl transition-shadow hover:shadow-lg hover:shadow-primary-accent/10"
     >
       {/* Project image (falls back to an icon when no screenshot exists) */}
-      <div className="relative aspect-video overflow-hidden bg-muted/30">
+      <div className="relative aspect-video overflow-hidden bg-accent/40">
         {project.image ? (
           <Image
             src={project.image}
@@ -39,19 +51,17 @@ function ProjectCard({ project }: { project: Project }) {
           />
         ) : (
           <div className="flex h-full items-center justify-center">
-            <ImageIcon className="h-10 w-10 text-muted-foreground/20" />
+            <ImageIcon className="h-10 w-10 text-muted-foreground/25" />
           </div>
         )}
         {/* Dex entry number */}
-        <div className="absolute top-3 left-3 rounded-lg border border-border bg-background/80 px-2.5 py-1 font-mono text-xs font-bold backdrop-blur-sm">
+        <div className="absolute top-3 left-3 rounded-lg border border-border bg-card/90 px-2.5 py-1 font-mono text-xs font-bold backdrop-blur-sm">
           #{entryNum}
         </div>
         {/* Category tag */}
-        <div className="absolute top-3 right-3 rounded-lg border border-primary/20 bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary backdrop-blur-sm">
+        <div className="absolute top-3 right-3 rounded-lg border border-primary-accent/20 bg-primary-accent/10 px-2.5 py-1 text-xs font-semibold text-primary backdrop-blur-sm">
           {project.category}
         </div>
-        {/* Hover overlay */}
-        <div className="absolute inset-0 bg-linear-to-t from-background/80 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
       </div>
 
       {/* Content */}
@@ -59,7 +69,7 @@ function ProjectCard({ project }: { project: Project }) {
         <div className="mb-2 flex items-start justify-between gap-2">
           <h3 className="text-lg font-bold leading-tight">{project.title}</h3>
           {project.featured && (
-            <span className="shrink-0 rounded-full bg-yellow-500/10 px-2 py-0.5 text-[10px] font-bold text-yellow-400 uppercase tracking-wider">
+            <span className="shrink-0 rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold tracking-wider text-amber-700 uppercase">
               ★ Featured
             </span>
           )}
@@ -78,7 +88,7 @@ function ProjectCard({ project }: { project: Project }) {
           {project.techStack.map((tech) => (
             <span
               key={tech}
-              className="rounded-md border border-border bg-muted/50 px-2 py-0.5 text-[11px] font-medium text-muted-foreground"
+              className="rounded-md border border-border bg-card px-2 py-0.5 text-[11px] font-medium text-muted-foreground"
             >
               {tech}
             </span>
@@ -101,7 +111,7 @@ function ProjectCard({ project }: { project: Project }) {
                     key={j}
                     className="flex items-start gap-2 text-sm text-muted-foreground"
                   >
-                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-primary/60" />
+                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-primary-accent/60" />
                     {point}
                   </li>
                 ))}
@@ -114,7 +124,7 @@ function ProjectCard({ project }: { project: Project }) {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setExpanded(!expanded)}
-            className="flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-accent"
+            className="flex items-center gap-1 rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-medium transition-colors hover:bg-accent"
           >
             {expanded ? "Less" : "Details"}
             <ChevronDown
@@ -126,7 +136,7 @@ function ProjectCard({ project }: { project: Project }) {
               href={project.repoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-border transition-colors hover:bg-accent"
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card transition-colors hover:bg-accent"
               aria-label="GitHub Repository"
             >
               <Github className="h-3.5 w-3.5" />
@@ -137,7 +147,7 @@ function ProjectCard({ project }: { project: Project }) {
               href={project.demoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-border transition-colors hover:bg-accent"
+              className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card transition-colors hover:bg-accent"
               aria-label="Live Demo"
             >
               <ExternalLink className="h-3.5 w-3.5" />
@@ -158,51 +168,49 @@ export default function Projects() {
       : projectsData.filter((p) => p.category === filter);
 
   return (
-    <SectionReveal id="projects" className="py-24 sm:py-32">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        {/* Section header */}
-        <motion.div variants={childVariants} className="mb-12">
-          <div className="flex items-center gap-3 mb-3">
-            <span className="h-px w-8 bg-primary" />
-            <span className="text-xs font-bold tracking-widest text-primary uppercase">
-              Projects
-            </span>
-          </div>
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            Featured Builds
-          </h2>
-          <p className="mt-3 max-w-2xl text-muted-foreground">
-            A curated collection of projects — full-stack applications,
-            intelligence systems, and creative engineering.
-          </p>
-        </motion.div>
+    <SectionReveal
+      id="projects"
+      className="rounded-3xl border border-border bg-card p-6 shadow-[0_18px_40px_-32px_rgba(23,42,99,0.35)] sm:p-8 lg:p-9"
+    >
+      {/* Section header */}
+      <motion.div variants={childVariants} className="mb-8">
+        <span className="text-[11px] font-bold tracking-[2px] text-primary-accent uppercase">
+          Projects
+        </span>
+        <h2 className="font-display mt-2 text-[28px] font-extrabold tracking-tight">
+          Featured Builds
+        </h2>
+        <p className="mt-3 max-w-2xl text-[15px] text-muted-foreground">
+          A curated collection of projects — full-stack applications,
+          intelligence systems, and creative engineering.
+        </p>
+      </motion.div>
 
-        {/* Filter tabs */}
-        <motion.div variants={childVariants} className="mb-8 flex flex-wrap gap-2">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setFilter(cat)}
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                filter === cat
-                  ? "bg-primary text-primary-foreground"
-                  : "border border-border bg-card/50 text-muted-foreground hover:bg-accent hover:text-foreground"
-              }`}
-            >
-              {cat}
-            </button>
+      {/* Filter tabs */}
+      <motion.div variants={childVariants} className="mb-8 flex flex-wrap gap-2">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => setFilter(cat)}
+            className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+              filter === cat
+                ? "bg-linear-to-br from-primary to-primary-accent text-white"
+                : "border border-border bg-secondary text-muted-foreground hover:bg-accent hover:text-foreground"
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
+      </motion.div>
+
+      {/* Project grid */}
+      <motion.div layout className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <AnimatePresence mode="popLayout">
+          {filtered.map((project) => (
+            <ProjectCard key={project.id} project={project} />
           ))}
-        </motion.div>
-
-        {/* Project grid */}
-        <motion.div layout className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          <AnimatePresence mode="popLayout">
-            {filtered.map((project) => (
-              <ProjectCard key={project.id} project={project} />
-            ))}
-          </AnimatePresence>
-        </motion.div>
-      </div>
+        </AnimatePresence>
+      </motion.div>
     </SectionReveal>
   );
 }

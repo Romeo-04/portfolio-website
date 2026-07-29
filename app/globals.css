@@ -183,6 +183,28 @@ body,
   animation: heroAura2 18s ease-in-out infinite;
 }
 
+/* ========= CURSOR SPOTLIGHT =========
+   Presentational overlay driven by --spot-x/--spot-y/--spot-opacity, set
+   imperatively (not via React state) by lib/spotlight.ts's mouse handlers
+   on the positioned ancestor — see components/spotlight.tsx. */
+.spotlight {
+  opacity: var(--spot-opacity, 0);
+  transition: opacity 0.3s ease;
+  background: radial-gradient(
+    var(--spot-size, 550px) circle at var(--spot-x, 50%) var(--spot-y, 50%),
+    rgba(255, 255, 255, 0.16),
+    transparent 60%
+  );
+  mix-blend-mode: soft-light;
+}
+
+/* No persistent cursor on touch devices — nothing to react to. */
+@media (hover: none) {
+  .spotlight {
+    display: none;
+  }
+}
+
 .animate-hero-aura-reverse {
   animation: heroAura 20s ease-in-out infinite reverse;
 }
@@ -233,6 +255,9 @@ body,
 
 /* ========= REDUCED MOTION ========= */
 @media (prefers-reduced-motion: reduce) {
+  .spotlight {
+    transition: none;
+  }
   .animate-shimmer,
   .animate-glow-pulse,
   .animate-float,

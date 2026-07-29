@@ -10,6 +10,8 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { personalInfo, skillStats } from "@/data/portfolio";
+import Spotlight from "@/components/spotlight";
+import { handleSpotlightMove, handleSpotlightLeave } from "@/lib/spotlight";
 
 function StatBar({
   label,
@@ -47,6 +49,8 @@ export default function Hero() {
   return (
     <section
       id="home"
+      onMouseMove={handleSpotlightMove}
+      onMouseLeave={handleSpotlightLeave}
       className="relative overflow-hidden rounded-3xl bg-linear-to-br from-[#12224e] via-[#1e3a8a] to-[#2a4bb0] p-6 text-white shadow-[0_30px_60px_-34px_rgba(23,42,99,0.6)] sm:p-8 lg:p-11"
     >
       {/* Aura blobs */}
@@ -73,6 +77,8 @@ export default function Hero() {
           }}
         />
       </div>
+
+      <Spotlight size={650} />
 
       <div className="relative grid gap-10 lg:grid-cols-[1.1fr_.9fr] lg:gap-8">
         {/* Left — Text Content */}

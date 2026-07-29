@@ -12,6 +12,8 @@ import {
   Send,
 } from "lucide-react";
 import SectionReveal, { childVariants } from "@/components/section-reveal";
+import Spotlight from "@/components/spotlight";
+import { handleSpotlightMove, handleSpotlightLeave } from "@/lib/spotlight";
 import { personalInfo } from "@/data/portfolio";
 
 export default function Contact() {
@@ -53,18 +55,24 @@ export default function Contact() {
       {/* Gradient intro panel */}
       <motion.div
         variants={childVariants}
-        className="flex flex-col justify-center rounded-3xl bg-linear-to-br from-[#12224e] via-primary to-primary-accent p-8 text-white shadow-[0_30px_60px_-34px_rgba(23,42,99,0.6)] sm:p-9"
+        onMouseMove={handleSpotlightMove}
+        onMouseLeave={handleSpotlightLeave}
+        className="relative flex flex-col justify-center overflow-hidden rounded-3xl bg-linear-to-br from-[#12224e] via-primary to-primary-accent p-8 text-white shadow-[0_30px_60px_-34px_rgba(23,42,99,0.6)] sm:p-9"
       >
-        <div className="flex h-[52px] w-[52px] items-center justify-center rounded-2xl bg-white/15">
-          <Send className="h-5 w-5" />
+        <Spotlight size={450} />
+
+        <div className="relative">
+          <div className="flex h-[52px] w-[52px] items-center justify-center rounded-2xl bg-white/15">
+            <Send className="h-5 w-5" />
+          </div>
+          <h2 className="font-display mt-5 text-2xl leading-tight font-extrabold sm:text-[26px]">
+            Let&apos;s Connect!
+          </h2>
+          <p className="mt-3 text-sm leading-relaxed text-[#c3cdec]">
+            Open to internship opportunities, research collaborations,
+            freelance projects, and conversations about software engineering.
+          </p>
         </div>
-        <h2 className="font-display mt-5 text-2xl leading-tight font-extrabold sm:text-[26px]">
-          Let&apos;s Connect!
-        </h2>
-        <p className="mt-3 text-sm leading-relaxed text-[#c3cdec]">
-          Open to internship opportunities, research collaborations,
-          freelance projects, and conversations about software engineering.
-        </p>
       </motion.div>
 
       {/* Content panel */}

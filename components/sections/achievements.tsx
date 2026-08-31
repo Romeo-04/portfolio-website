@@ -1,101 +1,52 @@
-"use client";
-
-import { motion } from "framer-motion";
-import { Trophy, Star, Award, Sparkles } from "lucide-react";
-import SectionReveal, { childVariants } from "@/components/section-reveal";
+import SectionReveal, { SECTION_SHELL } from "@/components/section-reveal";
+import SectionHeading from "@/components/section-heading";
 import { achievementsData, type Achievement } from "@/data/portfolio";
 
-const tierConfig: Record<
-  Achievement["tier"],
-  {
-    icon: React.ComponentType<{ className?: string }>;
-    color: string;
-    bgColor: string;
-    tierClass: string;
-  }
-> = {
-  gold: {
-    icon: Trophy,
-    color: "text-yellow-700",
-    bgColor: "bg-yellow-500/10",
-    tierClass: "tier-gold",
-  },
-  silver: {
-    icon: Award,
-    color: "text-slate-600",
-    bgColor: "bg-slate-500/10",
-    tierClass: "tier-silver",
-  },
-  bronze: {
-    icon: Star,
-    color: "text-amber-700",
-    bgColor: "bg-amber-600/10",
-    tierClass: "tier-bronze",
-  },
-  special: {
-    icon: Sparkles,
-    color: "text-purple-700",
-    bgColor: "bg-purple-500/10",
-    tierClass: "tier-special",
-  },
+// Presentation only — the underlying record is `tier`. These read better as
+// a mono tag than "GOLD"/"BRONZE" would, and keep the palette to two accents.
+const TIER: Record<Achievement["tier"], { tag: string; className: string }> = {
+  gold: { tag: "HIGH HONOR", className: "text-beam" },
+  silver: { tag: "MERIT", className: "text-ink-muted" },
+  bronze: { tag: "PODIUM", className: "text-ink-muted" },
+  special: { tag: "SCHOLAR", className: "text-ember" },
 };
 
 export default function Achievements() {
   return (
-    <SectionReveal
-      id="achievements"
-      className="rounded-3xl border border-border bg-card p-6 shadow-[0_18px_40px_-32px_rgba(23,42,99,0.35)] sm:p-8 lg:p-9"
-    >
-      {/* Section header */}
-      <motion.div variants={childVariants} className="mb-10">
-        <span className="text-[11px] font-bold tracking-[2px] text-primary-accent uppercase">
-          Achievements
-        </span>
-        <h2 className="font-display mt-2 text-[28px] font-extrabold tracking-tight">
-          Achievements &amp; Milestones
-        </h2>
-        <p className="mt-3 max-w-2xl text-[15px] text-muted-foreground">
-          Academic honors, competition placements, and recognitions earned
-          along the journey.
-        </p>
-      </motion.div>
+    <SectionReveal id="achievements" className={SECTION_SHELL}>
+      <SectionHeading
+        num="05"
+        title="Honors & milestones"
+        aside={`${achievementsData.length} TOTAL`}
+      />
 
-      {/* Badges grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {achievementsData.map((achievement, i) => {
-          const tier = tierConfig[achievement.tier];
-          const Icon = tier.icon;
-
+        {achievementsData.map((item) => {
+          const tier = TIER[item.tier];
           return (
-            <motion.div
-              key={i}
-              variants={childVariants}
-              className={`badge-glow surface-card group rounded-2xl p-5 transition-all ${tier.tierClass}`}
+            <article
+              key={item.title}
+              data-reveal-child
+              className="bg-panel border-border lift-card rounded-2xl border p-5"
             >
-              <div className="flex items-start gap-4">
-                {/* Badge icon */}
-                <div
-                  className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] ${tier.bgColor}`}
+              <div className="flex items-baseline justify-between gap-3">
+                <span
+                  className={`font-mono text-[10px] tracking-[0.1em] ${tier.className}`}
                 >
-                  <Icon className={`h-5 w-5 ${tier.color}`} />
-                </div>
-
-                {/* Content */}
-                <div className="min-w-0 flex-1">
-                  <h3 className="text-sm font-bold leading-tight">
-                    {achievement.title}
-                  </h3>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {achievement.description}
-                  </p>
-                  <span
-                    className={`mt-2 inline-block rounded-full ${tier.bgColor} px-2.5 py-0.5 text-[10px] font-semibold ${tier.color} tracking-wider uppercase`}
-                  >
-                    {achievement.year}
-                  </span>
-                </div>
+                  {tier.tag}
+                </span>
+                <span className="text-ink-muted font-mono text-[10px] whitespace-nowrap">
+                  {item.year}
+                </span>
               </div>
-            </motion.div>
+
+              <h3 className="mt-2.5 text-[15px] leading-snug font-bold">
+                {item.title}
+              </h3>
+              <p className="text-ink-muted mt-2 text-[13px] leading-relaxed text-pretty">
+                {item.description}
+              </p>
+            </article>
           );
         })}
       </div>

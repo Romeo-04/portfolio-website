@@ -1,42 +1,60 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import {
+  noSections,
+  presentSections,
+  subscribeSections,
+  type SectionMeta,
+} from "@/lib/sections";
 
-const sectionIds = [
-  "home",
-  "about",
-  "skills",
-  "experience",
-  "projects",
-  "achievements",
-  "contact",
-];
+interface ActiveSection {
+  /** Anchor id of the section currently occupying the viewport band. */
+  activeId: string;
+  /** Its index within `sections` — the orb uses this to pick a rotation. */
+  activeIndex: number;
+  /** Sections that actually rendered (github/certifications can be absent). */
+  sections: SectionMeta[];
+}
 
-export function useActiveSection() {
-  const [activeSection, setActiveSection] = useState("home");
+/**
+ * Scroll-spy over whichever sections are mounted. The section list comes
+ * from the DOM rather than the static registry, so a section that rendered
+ * nothing (empty certifications, GitHub API failure) never becomes an
+ * unreachable stop in the nav or the orb's cycle.
+ */
+export function useActiveSection(): ActiveSection {
+  const sections = useSyncExternalStore(
+    subscribeSections,
+    presentSections,
+    noSections,
+  );
+  const [activeId, setActiveId] = useState("home");
 
   useEffect(() => {
-    const observers: IntersectionObserver[] = [];
+    if (sections.length === 0) return;
 
-    sectionIds.forEach((id) => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setActiveId(entry.target.id);
+        });
+      },
+      { rootMargin: "-40% 0px -55% 0px", threshold: 0 },
+    );
+
+    sections.forEach(({ id }) => {
       const el = document.getElementById(id);
-      if (!el) return;
-
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            setActiveSection(id);
-          }
-        },
-        { rootMargin: "-40% 0px -55% 0px" }
-      );
-
-      observer.observe(el);
-      observers.push(observer);
+      if (el) observer.observe(el);
     });
 
-    return () => observers.forEach((o) => o.disconnect());
-  }, []);
+    return () => observer.disconnect();
+  }, [sections]);
 
-  return activeSection;
+  const activeIndex = Math.max(
+    0,
+    sections.findIndex((s) => s.id === activeId),
+  );
+
+  return { activeId, activeIndex, sections };
 }

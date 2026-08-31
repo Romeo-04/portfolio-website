@@ -1,4 +1,8 @@
-import Sidebar from "@/components/sidebar";
+import IntroOverlay from "@/components/intro-overlay";
+import GalaxyBackground from "@/components/galaxy-background";
+import OrbNavigator from "@/components/orb-navigator";
+import TopNav from "@/components/top-nav";
+import Marquee from "@/components/marquee";
 import Hero from "@/components/sections/hero";
 import About from "@/components/sections/about";
 import Skills from "@/components/sections/skills";
@@ -12,22 +16,26 @@ import Footer from "@/components/footer";
 
 export default function Home() {
   return (
-    <div className="flex justify-center px-4 py-7 sm:px-6 lg:px-7">
-      <div className="flex w-full max-w-[1180px] flex-col gap-5 lg:flex-row">
-        <Sidebar />
-        <main className="flex min-w-0 flex-1 flex-col gap-5">
-          <Hero />
-          <About />
-          <Skills />
-          <Experience />
-          <Projects />
-          <GithubSection />
-          <Achievements />
-          <Certifications />
-          <Contact />
-          <Footer />
-        </main>
-      </div>
-    </div>
+    <>
+      <IntroOverlay />
+      <GalaxyBackground />
+      <TopNav />
+
+      <main className="relative">
+        <Hero />
+        <Marquee />
+        <About />
+        <Skills />
+        <Experience />
+        <Projects />
+        <Achievements />
+        <GithubSection />
+        <Certifications />
+        <Contact />
+        <Footer />
+      </main>
+
+      <OrbNavigator />
+    </>
   );
 }

@@ -1,84 +1,47 @@
-"use client";
-
-import { motion } from "framer-motion";
-import { Briefcase, Shield } from "lucide-react";
-import SectionReveal, { childVariants } from "@/components/section-reveal";
+import SectionReveal, { SECTION_SHELL } from "@/components/section-reveal";
+import SectionHeading from "@/components/section-heading";
 import { experienceData } from "@/data/portfolio";
 
 export default function Experience() {
   return (
-    <SectionReveal
-      id="experience"
-      className="rounded-3xl border border-border bg-card p-6 shadow-[0_18px_40px_-32px_rgba(23,42,99,0.35)] sm:p-8 lg:p-9"
-    >
-      {/* Section header */}
-      <motion.div variants={childVariants} className="mb-10">
-        <span className="text-[11px] font-bold tracking-[2px] text-primary-accent uppercase">
-          Experience
-        </span>
-        <h2 className="font-display mt-2 text-[28px] font-extrabold tracking-tight">
-          Leadership &amp; Experience
-        </h2>
-        <p className="mt-3 max-w-2xl text-[15px] text-muted-foreground">
-          Key milestones in my journey — from academic foundations to leading
-          engineering teams.
-        </p>
-      </motion.div>
+    <SectionReveal id="experience" className={SECTION_SHELL}>
+      <SectionHeading num="03" title="Experience & leadership" />
 
-      {/* Timeline */}
-      <div className="relative">
-        {/* Timeline line */}
-        <div className="absolute top-0 bottom-0 left-4 w-px bg-linear-to-b from-primary-accent/40 via-border to-transparent sm:left-8" />
-
-        <div className="flex flex-col gap-10">
-          {experienceData.map((exp, i) => (
-            <motion.div
-              key={i}
-              variants={childVariants}
-              className="relative pl-12 sm:pl-20"
-            >
-              {/* Timeline node */}
-              <div className="absolute top-0 left-0 sm:left-4">
-                <div className="relative flex h-8 w-8 items-center justify-center">
-                  <div className="animate-glow-pulse absolute inset-0 rounded-full bg-primary-accent/20" />
-                  <div className="relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-primary-accent/40 bg-card">
-                    <Shield className="h-3.5 w-3.5 text-primary-accent" />
-                  </div>
-                </div>
+      <div className="flex flex-col">
+        {experienceData.map((role) => (
+          <article
+            key={`${role.organization}-${role.title}`}
+            data-reveal-child
+            className="grid gap-4 border-b py-8 first:pt-0 sm:gap-8 md:grid-cols-[200px_1fr]"
+            style={{ borderColor: "var(--hairline)" }}
+          >
+            <div>
+              <div className="text-beam font-mono text-[11px] tracking-[0.08em] uppercase">
+                {role.period}
               </div>
-
-              {/* Card */}
-              <div className="surface-card rounded-2xl p-6">
-                {/* Header */}
-                <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                  <div>
-                    <h3 className="text-lg font-bold">{exp.title}</h3>
-                    <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Briefcase className="h-3.5 w-3.5" />
-                      {exp.organization}
-                    </p>
-                  </div>
-                  <span className="rounded-full border border-primary-accent/25 bg-primary-accent/10 px-3 py-1 text-xs font-medium whitespace-nowrap text-primary">
-                    {exp.period}
-                  </span>
-                </div>
-
-                {/* Description */}
-                <ul className="space-y-2">
-                  {exp.description.map((point, j) => (
-                    <li
-                      key={j}
-                      className="flex items-start gap-2 text-sm text-muted-foreground"
-                    >
-                      <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-primary-accent/60" />
-                      {point}
-                    </li>
-                  ))}
-                </ul>
+              <div className="text-ink-muted mt-1.5 font-mono text-[11px] uppercase">
+                {role.organization}
               </div>
-            </motion.div>
-          ))}
-        </div>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-bold sm:text-[22px]">{role.title}</h3>
+              <ul className="mt-3 max-w-[720px] space-y-2">
+                {role.description.map((line) => (
+                  <li
+                    key={line}
+                    className="text-ink-muted flex gap-3 text-[15px] leading-relaxed text-pretty"
+                  >
+                    <span aria-hidden className="text-beam mt-0.5 shrink-0">
+                      ›
+                    </span>
+                    {line}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </article>
+        ))}
       </div>
     </SectionReveal>
   );

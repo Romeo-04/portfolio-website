@@ -20,6 +20,7 @@ const EXCLUDED_REPOS = new Set<string>([
   "my-first-repo",
   "webdev_practice",
   "github-copilot-practice",
+  "star-sight", // duplicate push of the STARSight project — "datara" is the featured copy
 ]);
 
 export interface GithubRepo {

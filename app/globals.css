@@ -1,26 +1,31 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+/* The light theme is opt-in via a `.light` class on <html>; dark is the
+   default (:root). `@custom-variant light` lets components express the rare
+   light-only tweak inline, e.g. `light:bg-white`. */
+@custom-variant light (&:is(.light *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-dm-sans);
-  --font-display: var(--font-jakarta);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
+  --font-sans: var(--font-space-grotesk);
+  --font-display: var(--font-space-grotesk);
+  --font-mono: var(--font-space-mono);
+
+  /* ---- Flow State palette ----
+     Named surfaces/inks used by the redesign. Both themes define all of
+     them, so `bg-panel` / `text-beam` stay theme-correct everywhere. */
+  --color-void: var(--void);
+  --color-panel: var(--panel);
+  --color-panel-raised: var(--panel-raised);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-muted: var(--ink-muted);
+  --color-beam: var(--beam);
+  --color-beam-bright: var(--beam-bright);
+  --color-ember: var(--ember);
+
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -38,6 +43,7 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+
   --radius-sm: calc(var(--radius) - 6px);
   --radius-md: calc(var(--radius) - 3px);
   --radius-lg: var(--radius);
@@ -47,229 +53,366 @@
   --radius-4xl: calc(var(--radius) + 16px);
 }
 
-/* ========= LIGHT THEME — Dark Blue ========= */
+/* ========= DARK THEME — Flow State (default) ========= */
 :root {
-  --radius: 1.1rem;
-  --background: #eef1f8;
-  --foreground: #101a3a;
-  --card: #ffffff;
-  --card-foreground: #101a3a;
+  --radius: 1rem;
+
+  --void: #05070f;
+  --panel: #0a0f22;
+  --panel-raised: #0d1430;
+  --ink: #e8ecf7;
+  --ink-soft: #c6cde2;
+  --ink-muted: #8a93b0;
+  --beam: #5c7cff;
+  --beam-bright: #7c96ff;
+  --ember: #ff6b3d;
+
+  --background: var(--void);
+  --foreground: var(--ink);
+  --card: var(--panel);
+  --card-foreground: var(--ink);
+  --popover: var(--panel-raised);
+  --popover-foreground: var(--ink);
+  --primary: var(--beam);
+  --primary-accent: var(--beam-bright);
+  --primary-foreground: var(--void);
+  --secondary: var(--panel-raised);
+  --secondary-foreground: var(--ink);
+  --muted: var(--panel);
+  --muted-foreground: var(--ink-muted);
+  --accent: #101a3e;
+  --accent-foreground: var(--ink);
+  --destructive: #f87171;
+  --border: rgba(92, 124, 255, 0.18);
+  --input: rgba(92, 124, 255, 0.28);
+  --ring: var(--beam);
+
+  /* Effect surfaces */
+  --hairline: rgba(232, 236, 247, 0.1);
+  --glow-beam: rgba(92, 124, 255, 0.22);
+  --nav-bg: rgba(5, 7, 15, 0.8);
+  --contact-gradient: linear-gradient(135deg, #12204f, #1e3dff);
+  --contact-ink: #f7f8fb;
+  --galaxy-opacity: 1;
+}
+
+/* ========= LIGHT THEME — Dark Blue (opt-in) =========
+   Carried over from the previous design so the toggle lands somewhere
+   finished. The galaxy is suppressed here (--galaxy-opacity: 0) — the
+   particle field and its glows only read correctly against the void. */
+.light {
+  --void: #eef1f8;
+  --panel: #ffffff;
+  --panel-raised: #f6f8fd;
+  --ink: #101a3a;
+  --ink-soft: #3b456b;
+  --ink-muted: #6d7592;
+  --beam: #2563eb;
+  --beam-bright: #1e3a8a;
+  --ember: #ea580c;
+
+  --background: var(--void);
+  --foreground: var(--ink);
+  --card: var(--panel);
+  --card-foreground: var(--ink);
   --popover: #ffffff;
-  --popover-foreground: #101a3a;
+  --popover-foreground: var(--ink);
   --primary: #1e3a8a;
   --primary-accent: #2563eb;
   --primary-foreground: #ffffff;
   --secondary: #f4f6fb;
   --secondary-foreground: #1e3a8a;
   --muted: #f4f6fb;
-  --muted-foreground: #6d7592;
+  --muted-foreground: var(--ink-muted);
   --accent: #eaf0fd;
   --accent-foreground: #1e3a8a;
   --destructive: #ef4444;
   --border: #e3e8f4;
   --input: #e2e8f5;
   --ring: #2563eb;
-  --chart-1: #2563eb;
-  --chart-2: #7c3aed;
-  --chart-3: #10b981;
-  --chart-4: #f59e0b;
-  --chart-5: #ef4444;
-  --sidebar: #ffffff;
-  --sidebar-foreground: #101a3a;
-  --sidebar-primary: #1e3a8a;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f4f6fb;
-  --sidebar-accent-foreground: #1e3a8a;
-  --sidebar-border: #e3e8f4;
-  --sidebar-ring: #2563eb;
-  /* Card surface (light, opaque — replaces the old glass-on-dark treatment) */
-  --glass-bg: #ffffff;
-  --glass-border: #e3e8f4;
-  --glass-shadow: 0 18px 40px -32px rgba(23, 42, 99, 0.35);
-  --surface-bg: #f6f8fd;
-  --surface-border: #e6ebf6;
-  --grid-line: rgba(30, 58, 138, 0.04);
+
+  --hairline: rgba(16, 26, 58, 0.12);
+  --glow-beam: rgba(37, 99, 235, 0.16);
+  --nav-bg: rgba(238, 241, 248, 0.85);
+  --contact-gradient: linear-gradient(135deg, #12224e, #2563eb);
+  --contact-ink: #f7f8fb;
+  --galaxy-opacity: 0;
 }
 
-/* ========= BASE STYLES ========= */
+/* ========= BASE ========= */
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   html {
     scroll-behavior: smooth;
+    color-scheme: dark;
+  }
+  html.light {
+    color-scheme: light;
   }
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: var(--font-dm-sans), sans-serif;
+    font-family: var(--font-space-grotesk), sans-serif;
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-jakarta), sans-serif;
+    font-family: var(--font-space-grotesk), sans-serif;
+  }
+  /* Anchor jumps must clear the sticky nav, or the section heading lands
+     underneath it. Matches NAV_OFFSET in orb-navigator.tsx. */
+  section[id] {
+    scroll-margin-top: 72px;
+  }
+  /* While the intro overlay covers the page, lock the scroll position so
+     the page underneath cannot be scrolled out from under it. */
+  body[data-intro="playing"] {
+    overflow: hidden;
   }
 }
 
-/* ========= GRID BACKGROUND ========= */
-body,
-.grid-bg {
-  background-image:
-    linear-gradient(var(--grid-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-  background-size: 64px 64px;
+/* ========= SURFACES ========= */
+/* Section-level panel. In light mode this is the old opaque white card. */
+.panel-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
 }
 
-/* ========= CARD SURFACE =========
-   Opaque white section-level card (formerly a translucent glass panel on a
-   dark background — the light theme just needs a clean elevated surface). */
-.glass-card {
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
-}
-
-/* Inner tinted card used inside a .glass-card section (skill/project/repo
-   tiles, etc.) — a step down in elevation from the white section card. */
+/* Inner tile — one step down in elevation from .panel-card. */
 .surface-card {
-  background: var(--surface-bg);
-  border: 1px solid var(--surface-border);
+  background: var(--panel-raised);
+  border: 1px solid var(--border);
 }
 
-/* ========= ANIMATIONS ========= */
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+/* Hover treatment shared by every interactive tile in the redesign. */
+.lift-card {
+  transition:
+    transform 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+.lift-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--beam);
+  box-shadow: 0 16px 40px var(--glow-beam);
 }
 
-@keyframes glowPulse {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.8; }
+.hairline {
+  background: var(--hairline);
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
 
-@keyframes heroAura {
-  0%   { transform: translate(0,0) scale(1);      opacity: .85; }
-  33%  { transform: translate(-40px,30px) scale(1.15); opacity: 1; }
-  66%  { transform: translate(30px,-20px) scale(.95); opacity: .7; }
-  100% { transform: translate(0,0) scale(1);      opacity: .85; }
+/* ========= KEYFRAMES (from the Flow State canvas) ========= */
+@keyframes numPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.55) translateY(40px);
+    filter: blur(18px);
+  }
+  55% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
-
-@keyframes heroAura2 {
-  0%   { transform: translate(0,0) scale(1);      opacity: .6; }
-  50%  { transform: translate(50px,40px) scale(1.25); opacity: .9; }
-  100% { transform: translate(0,0) scale(1);      opacity: .6; }
+@keyframes slideFromRight {
+  0% {
+    opacity: 0;
+    transform: translateX(240px);
+    filter: blur(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+    filter: blur(0);
+  }
 }
-
-.animate-shimmer {
-  background-size: 200% 100%;
-  animation: shimmer 3s linear infinite;
+@keyframes arrowIn {
+  0% {
+    opacity: 0;
+    transform: scaleX(0.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
 }
-
-.animate-glow-pulse {
-  animation: glowPulse 3s ease-in-out infinite;
+@keyframes wordUp {
+  0% {
+    opacity: 0;
+    transform: translateY(110%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
+@keyframes streak {
+  0% {
+    transform: translateX(-120%) skewX(-20deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(340%) skewX(-20deg);
+    opacity: 0;
+  }
 }
-
-.animate-hero-aura {
-  animation: heroAura 14s ease-in-out infinite;
+@keyframes orbitSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
-
-.animate-hero-aura2 {
-  animation: heroAura2 18s ease-in-out infinite;
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 1;
+  }
 }
-
-/* ========= CURSOR SPOTLIGHT =========
-   Presentational overlay driven by --spot-x/--spot-y/--spot-opacity, set
-   imperatively (not via React state) by lib/spotlight.ts's mouse handlers
-   on the positioned ancestor — see components/spotlight.tsx. */
-.spotlight {
-  opacity: var(--spot-opacity, 0);
-  transition: opacity 0.3s ease;
-  background: radial-gradient(
-    var(--spot-size, 550px) circle at var(--spot-x, 50%) var(--spot-y, 50%),
-    rgba(255, 255, 255, 0.16),
-    transparent 60%
-  );
-  mix-blend-mode: soft-light;
+@keyframes marqueeX {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
-
-/* No persistent cursor on touch devices — nothing to react to. */
-@media (hover: none) {
-  .spotlight {
-    display: none;
+@keyframes floatY {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
   }
 }
 
-.animate-hero-aura-reverse {
-  animation: heroAura 20s ease-in-out infinite reverse;
+/* ========= SECTION REVEAL =========
+   `.reveal-armed` is added by SectionReveal in a layout effect — i.e. only
+   when JS runs — so the server-rendered page is never pre-hidden. Crossing
+   into view adds `.reveal-in`, which wins on source order. */
+.reveal-armed [data-reveal-child] {
+  opacity: 0;
+  transform: translateY(28px) scale(0.97);
+}
+.reveal-in [data-reveal-child] {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Hero entrance. Applied as a class only once the intro overlay lifts, so
+   the markup is fully visible on first paint and with JS disabled — the
+   animation is added to visible content, never used to reveal it. */
+@keyframes heroRise {
+  from {
+    opacity: 0;
+    transform: translateY(60px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.hero-enter > * {
+  animation: heroRise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.hero-enter > *:nth-child(2) { animation-delay: 0.09s; }
+.hero-enter > *:nth-child(3) { animation-delay: 0.18s; }
+.hero-enter > *:nth-child(4) { animation-delay: 0.27s; }
+.hero-enter > *:nth-child(5) { animation-delay: 0.36s; }
+
+.animate-num-pop {
+  animation: numPop 0.7s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+.animate-slide-right {
+  animation: slideFromRight 0.6s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+.animate-arrow-in {
+  animation: arrowIn 0.5s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+  transform-origin: left;
+}
+.animate-word-up {
+  animation: wordUp 0.6s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+.animate-streak {
+  animation: streak 1.2s ease-out both;
+}
+.animate-orbit {
+  animation: orbitSpin 44s linear infinite;
+}
+.animate-twinkle {
+  animation: twinkle 3s ease-in-out infinite;
+}
+.animate-marquee {
+  animation: marqueeX 20s linear infinite;
+}
+.animate-float-y {
+  animation: floatY 7s ease-in-out infinite;
 }
 
 /* ========= STAT BAR ========= */
 .stat-bar-track {
-  height: 6px;
+  height: 5px;
   border-radius: 3px;
   overflow: hidden;
-  background: rgba(30, 58, 138, 0.08);
+  background: var(--hairline);
 }
-
 .stat-bar-fill {
   height: 100%;
   border-radius: 3px;
   transform-origin: left;
   transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
-  background: linear-gradient(90deg, var(--primary), var(--primary-accent));
+  background: linear-gradient(90deg, var(--beam), var(--beam-bright));
 }
 
-/* ========= BADGE GLOW ========= */
-.badge-glow {
-  position: relative;
-}
-
-.badge-glow::after {
-  content: "";
-  position: absolute;
-  inset: -2px;
-  border-radius: inherit;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.badge-glow:hover::after {
-  opacity: 1;
-}
-
-/* Achievement tier glows */
-.tier-gold { --glow-color: rgba(217, 160, 15, 0.22); }
-.tier-silver { --glow-color: rgba(100, 116, 139, 0.2); }
-.tier-bronze { --glow-color: rgba(180, 83, 9, 0.22); }
-.tier-special { --glow-color: rgba(124, 58, 237, 0.22); }
-
-.badge-glow:hover {
-  box-shadow: 0 0 20px var(--glow-color, rgba(37, 99, 235, 0.15));
-}
-
-/* ========= REDUCED MOTION ========= */
+/* ========= REDUCED MOTION =========
+   Every decorative animation in the redesign stops here. The intro overlay
+   additionally short-circuits in JS so it never gates the content, and the
+   galaxy/orb renderers skip WebGL entirely. */
 @media (prefers-reduced-motion: reduce) {
-  .spotlight {
-    transition: none;
-  }
-  .animate-shimmer,
-  .animate-glow-pulse,
-  .animate-float,
-  .animate-hero-aura,
-  .animate-hero-aura2,
-  .animate-hero-aura-reverse {
-    animation: none;
-  }
   html {
     scroll-behavior: auto;
   }
   .stat-bar-fill {
+    transition: none;
+  }
+  .lift-card {
+    transition: none;
+  }
+  .lift-card:hover {
+    transform: none;
+  }
+  .animate-num-pop,
+  .animate-slide-right,
+  .animate-arrow-in,
+  .animate-word-up,
+  .animate-streak,
+  .animate-orbit,
+  .animate-twinkle,
+  .animate-marquee,
+  .animate-float-y,
+  .hero-enter > * {
+    animation: none;
+  }
+  /* SectionReveal skips arming entirely under reduced motion; this is the
+     belt-and-braces guarantee that nothing is left hidden. */
+  .reveal-armed [data-reveal-child] {
+    opacity: 1;
+    transform: none;
     transition: none;
   }
 }

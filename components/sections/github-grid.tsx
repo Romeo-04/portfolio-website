@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Github, Star, GitFork, ExternalLink, ArrowUpRight } from "lucide-react";
-import { childVariants } from "@/components/section-reveal";
+import { Star, GitFork, ExternalLink, ArrowUpRight } from "lucide-react";
 import { languageColors, type GithubRepo } from "@/lib/github";
 
 const INITIAL_COUNT = 6;
@@ -23,28 +21,21 @@ function RepoCard({ repo }: { repo: GithubRepo }) {
   const accent = repo.language ? languageColors[repo.language] : undefined;
 
   return (
-    <motion.a
-      variants={childVariants}
-      initial="hidden"
-      animate="visible"
-      exit="hidden"
-      layout
+    <a
+      data-reveal-child
       href={repo.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="surface-card group relative flex flex-col rounded-2xl p-5 transition-shadow hover:shadow-lg hover:shadow-primary-accent/10"
+      className="bg-panel border-border lift-card group relative flex flex-col rounded-2xl border p-5"
     >
       <div className="mb-2 flex items-start justify-between gap-2">
-        <div className="flex min-w-0 items-center gap-2">
-          <Github className="h-4 w-4 shrink-0 text-muted-foreground" />
-          <h3 className="truncate text-base font-bold leading-tight">
-            {repo.displayName}
-          </h3>
-        </div>
-        <ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+        <h3 className="truncate text-[15px] leading-tight font-bold">
+          {repo.displayName}
+        </h3>
+        <ArrowUpRight className="text-beam h-4 w-4 shrink-0 opacity-0 transition-opacity group-hover:opacity-100" />
       </div>
 
-      <p className="mb-4 line-clamp-2 min-h-[2.5rem] text-sm leading-relaxed text-muted-foreground">
+      <p className="text-ink-muted mb-4 line-clamp-2 min-h-[2.5rem] text-[13px] leading-relaxed">
         {repo.description ?? "No description provided."}
       </p>
 
@@ -53,7 +44,7 @@ function RepoCard({ repo }: { repo: GithubRepo }) {
           {repo.topics.slice(0, 4).map((topic) => (
             <span
               key={topic}
-              className="rounded-md border border-border bg-card px-2 py-0.5 text-[11px] font-medium text-muted-foreground"
+              className="border-border text-ink-muted rounded-full border px-2 py-0.5 font-mono text-[10px]"
             >
               {topic}
             </span>
@@ -61,33 +52,37 @@ function RepoCard({ repo }: { repo: GithubRepo }) {
         </div>
       )}
 
-      {/* Meta footer */}
-      <div className="mt-auto flex items-center gap-4 border-t border-border pt-3 text-xs text-muted-foreground">
+      <div
+        className="text-ink-muted mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 border-t pt-3 font-mono text-[10px]"
+        style={{ borderColor: "var(--hairline)" }}
+      >
         {repo.language && (
           <span className="flex items-center gap-1.5">
             <span
-              className="h-2.5 w-2.5 rounded-full"
-              style={{ backgroundColor: accent ?? "#8b949e" }}
+              className="h-2 w-2 rounded-full"
+              style={{ backgroundColor: accent ?? "var(--ink-muted)" }}
             />
-            {repo.language}
+            {repo.language.toUpperCase()}
           </span>
         )}
         {repo.stars > 0 && (
           <span className="flex items-center gap-1">
-            <Star className="h-3.5 w-3.5" />
+            <Star className="h-3 w-3" />
             {repo.stars}
           </span>
         )}
         {repo.forks > 0 && (
           <span className="flex items-center gap-1">
-            <GitFork className="h-3.5 w-3.5" />
+            <GitFork className="h-3 w-3" />
             {repo.forks}
           </span>
         )}
-        <span className="ml-auto">Updated {formatUpdated(repo.pushedAt)}</span>
+        <span className="ml-auto">{formatUpdated(repo.pushedAt)}</span>
       </div>
 
       {repo.homepage && (
+        // Nested inside the card link, so this can't be an <a> — it opens the
+        // demo itself and stops the outer navigation.
         <span
           role="link"
           tabIndex={0}
@@ -101,13 +96,13 @@ function RepoCard({ repo }: { repo: GithubRepo }) {
               window.open(repo.homepage!, "_blank", "noopener,noreferrer");
             }
           }}
-          className="mt-3 inline-flex w-fit items-center gap-1 rounded-lg border border-primary-accent/20 bg-primary-accent/10 px-2.5 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary-accent/20"
+          className="border-beam/25 bg-beam/10 text-beam hover:bg-beam/20 mt-3 inline-flex w-fit cursor-pointer items-center gap-1 rounded-full border px-2.5 py-1 font-mono text-[10px] transition-colors"
         >
           <ExternalLink className="h-3 w-3" />
-          Live demo
+          LIVE DEMO
         </span>
       )}
-    </motion.a>
+    </a>
   );
 }
 
@@ -117,23 +112,22 @@ export default function GithubGrid({ repos }: { repos: GithubRepo[] }) {
 
   return (
     <>
-      <motion.div layout className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        <AnimatePresence mode="popLayout">
-          {visible.map((repo) => (
-            <RepoCard key={repo.id} repo={repo} />
-          ))}
-        </AnimatePresence>
-      </motion.div>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {visible.map((repo) => (
+          <RepoCard key={repo.id} repo={repo} />
+        ))}
+      </div>
 
       {repos.length > INITIAL_COUNT && (
-        <motion.div variants={childVariants} className="mt-8 flex justify-center">
+        <div data-reveal-child className="mt-8 flex justify-center">
           <button
+            type="button"
             onClick={() => setShowAll((v) => !v)}
-            className="rounded-lg border border-border bg-secondary px-5 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            className="border-border text-ink-muted hover:border-beam hover:text-beam cursor-pointer rounded-full border px-6 py-3 font-mono text-[11px] tracking-[0.08em] transition-colors"
           >
-            {showAll ? "Show less" : `Show all ${repos.length} repositories`}
+            {showAll ? "SHOW LESS" : `SHOW ALL ${repos.length} REPOSITORIES`}
           </button>
-        </motion.div>
+        </div>
       )}
     </>
   );

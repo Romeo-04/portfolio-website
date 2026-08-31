@@ -2,220 +2,120 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  ExternalLink,
-  Github,
-  ChevronDown,
-  Image as ImageIcon,
-  Star,
-} from "lucide-react";
-import SectionReveal, { childVariants } from "@/components/section-reveal";
+import SectionReveal, { SECTION_SHELL } from "@/components/section-reveal";
+import SectionHeading from "@/components/section-heading";
 import { projectsData, type Project } from "@/data/portfolio";
 
-const categories = [
-  "All",
-  ...Array.from(new Set(projectsData.map((p) => p.category))),
-];
+const INITIAL_COUNT = 6;
 
-function ProjectCard({ project }: { project: Project }) {
-  const [expanded, setExpanded] = useState(false);
-  const entryNum = String(project.id).padStart(3, "0");
+// Featured builds lead; everything else follows in data order.
+const ORDERED = [...projectsData].sort(
+  (a, b) => Number(b.featured) - Number(a.featured),
+);
 
-  return (
-    <motion.div
-      variants={childVariants}
-      initial="hidden"
-      animate="visible"
-      exit="hidden"
-      layout
-      onMouseMove={(e) => {
-        const el = e.currentTarget;
-        const r = el.getBoundingClientRect();
-        const px = (e.clientX - r.left) / r.width - 0.5;
-        const py = (e.clientY - r.top) / r.height - 0.5;
-        el.style.transform = `perspective(900px) rotateY(${px * 6}deg) rotateX(${-py * 6}deg)`;
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform =
-          "perspective(900px) rotateY(0deg) rotateX(0deg)";
-      }}
-      style={{ transition: "transform .15s ease", willChange: "transform" }}
-      className="surface-card group relative overflow-hidden rounded-2xl transition-shadow hover:shadow-lg hover:shadow-primary-accent/10"
-    >
-      {/* Project image (falls back to an icon when no screenshot exists) */}
-      <div className="relative aspect-video overflow-hidden bg-accent/40">
+function ProjectCard({ project, rank }: { project: Project; rank: number }) {
+  const href = project.demoUrl || project.repoUrl;
+  const num = String(rank).padStart(3, "0");
+
+  const body = (
+    <>
+      <div
+        className="relative h-[200px] overflow-hidden sm:h-[230px]"
+        style={{
+          background:
+            "linear-gradient(135deg, var(--panel-raised), var(--accent))",
+        }}
+      >
         {project.image ? (
           <Image
             src={project.image}
             alt={`${project.title} screenshot`}
             fill
-            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            sizes="(max-width: 768px) 100vw, 560px"
+            className="object-cover object-top"
           />
         ) : (
-          <div className="flex h-full items-center justify-center">
-            <ImageIcon className="h-10 w-10 text-muted-foreground/25" />
+          <div className="text-beam/18 absolute inset-0 flex items-center justify-center text-[110px] leading-none font-bold">
+            {num}
           </div>
         )}
-        {/* Dex entry number */}
-        <div className="absolute top-3 left-3 rounded-lg border border-border bg-card/90 px-2.5 py-1 font-mono text-xs font-bold backdrop-blur-sm">
-          #{entryNum}
-        </div>
-        {/* Category tag */}
-        <div className="absolute top-3 right-3 rounded-lg border border-primary-accent/20 bg-primary-accent/10 px-2.5 py-1 text-xs font-semibold text-primary backdrop-blur-sm">
+
+        <span className="bg-beam text-primary-foreground absolute top-3.5 left-3.5 rounded-full px-3 py-1 font-mono text-[11px] font-bold">
+          #{num}
+        </span>
+        <span className="bg-void/85 text-beam absolute top-3.5 right-3.5 rounded-full px-3 py-1 font-mono text-[10px] tracking-wide uppercase">
           {project.category}
-        </div>
+        </span>
       </div>
 
-      {/* Content */}
-      <div className="p-5 sm:p-6">
-        <div className="mb-2 flex items-start justify-between gap-2">
-          <h3 className="text-lg font-bold leading-tight">{project.title}</h3>
-          {project.featured && (
-            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold tracking-wider text-amber-700 uppercase">
-              <Star className="h-2.5 w-2.5 fill-current" />
-              Featured
-            </span>
-          )}
+      <div className="p-6">
+        <div className="flex items-baseline justify-between gap-3">
+          <h3 className="text-[19px] leading-tight font-bold sm:text-[21px]">
+            {project.title}
+          </h3>
+          <span className="text-ink-muted shrink-0 font-mono text-[10px] whitespace-nowrap uppercase">
+            {project.role}
+          </span>
         </div>
 
-        <p className="mb-3 text-xs font-medium text-primary">
-          {project.role}
-        </p>
-
-        <p className="mb-4 text-sm leading-relaxed text-muted-foreground">
+        <p className="text-ink-muted mt-2.5 text-sm leading-relaxed text-pretty">
           {project.pitch}
         </p>
 
-        {/* Tech stack */}
-        <div className="mb-4 flex flex-wrap gap-1.5">
-          {project.techStack.map((tech) => (
-            <span
-              key={tech}
-              className="rounded-md border border-border bg-card px-2 py-0.5 text-[11px] font-medium text-muted-foreground"
-            >
-              {tech}
-            </span>
-          ))}
-        </div>
-
-        {/* Expandable details */}
-        <AnimatePresence>
-          {expanded && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="overflow-hidden"
-            >
-              <ul className="mb-4 space-y-1.5 border-t border-border pt-4">
-                {project.description.map((point, j) => (
-                  <li
-                    key={j}
-                    className="flex items-start gap-2 text-sm text-muted-foreground"
-                  >
-                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-primary-accent/60" />
-                    {point}
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Actions */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="flex items-center gap-1 rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-medium transition-colors hover:bg-accent"
-          >
-            {expanded ? "Less" : "Details"}
-            <ChevronDown
-              className={`h-3 w-3 transition-transform ${expanded ? "rotate-180" : ""}`}
-            />
-          </button>
-          {project.repoUrl && (
-            <a
-              href={project.repoUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card transition-colors hover:bg-accent"
-              aria-label="GitHub Repository"
-            >
-              <Github className="h-3.5 w-3.5" />
-            </a>
-          )}
-          {project.demoUrl && (
-            <a
-              href={project.demoUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-card transition-colors hover:bg-accent"
-              aria-label="Live Demo"
-            >
-              <ExternalLink className="h-3.5 w-3.5" />
-            </a>
-          )}
-        </div>
+        <p className="text-beam mt-4 font-mono text-[10px] tracking-[0.08em] uppercase">
+          {project.techStack.join(" · ")}
+        </p>
       </div>
-    </motion.div>
+    </>
+  );
+
+  const shell =
+    "bg-panel border-border lift-card block overflow-hidden rounded-[18px] border";
+
+  // Two projects have neither a demo nor a public repo — those render as
+  // plain cards rather than links that go nowhere.
+  return href ? (
+    <a
+      data-reveal-child
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={shell}
+    >
+      {body}
+    </a>
+  ) : (
+    <div data-reveal-child className={shell}>
+      {body}
+    </div>
   );
 }
 
 export default function Projects() {
-  const [filter, setFilter] = useState("All");
-
-  const filtered =
-    filter === "All"
-      ? projectsData
-      : projectsData.filter((p) => p.category === filter);
+  const [showAll, setShowAll] = useState(false);
+  const visible = showAll ? ORDERED : ORDERED.slice(0, INITIAL_COUNT);
 
   return (
-    <SectionReveal
-      id="projects"
-      className="rounded-3xl border border-border bg-card p-6 shadow-[0_18px_40px_-32px_rgba(23,42,99,0.35)] sm:p-8 lg:p-9"
-    >
-      {/* Section header */}
-      <motion.div variants={childVariants} className="mb-8">
-        <span className="text-[11px] font-bold tracking-[2px] text-primary-accent uppercase">
-          Projects
-        </span>
-        <h2 className="font-display mt-2 text-[28px] font-extrabold tracking-tight">
-          Featured Builds
-        </h2>
-        <p className="mt-3 max-w-2xl text-[15px] text-muted-foreground">
-          A curated collection of projects — full-stack applications,
-          intelligence systems, and creative engineering.
-        </p>
-      </motion.div>
+    <SectionReveal id="projects" className={SECTION_SHELL}>
+      <SectionHeading num="04" title="Featured builds" aside="SORTED BY RANK" />
 
-      {/* Filter tabs */}
-      <motion.div variants={childVariants} className="mb-8 flex flex-wrap gap-2">
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setFilter(cat)}
-            className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-              filter === cat
-                ? "bg-linear-to-br from-primary to-primary-accent text-white"
-                : "border border-border bg-secondary text-muted-foreground hover:bg-accent hover:text-foreground"
-            }`}
-          >
-            {cat}
-          </button>
+      <div className="grid gap-5 md:grid-cols-2">
+        {visible.map((project, i) => (
+          <ProjectCard key={project.id} project={project} rank={i + 1} />
         ))}
-      </motion.div>
+      </div>
 
-      {/* Project grid */}
-      <motion.div layout className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        <AnimatePresence mode="popLayout">
-          {filtered.map((project) => (
-            <ProjectCard key={project.id} project={project} />
-          ))}
-        </AnimatePresence>
-      </motion.div>
+      {ORDERED.length > INITIAL_COUNT && (
+        <div data-reveal-child className="mt-8 flex justify-center">
+          <button
+            type="button"
+            onClick={() => setShowAll((v) => !v)}
+            className="border-border text-ink-muted hover:border-beam hover:text-beam cursor-pointer rounded-full border px-6 py-3 font-mono text-[11px] tracking-[0.08em] transition-colors"
+          >
+            {showAll ? "SHOW LESS" : `SHOW ALL ${ORDERED.length} BUILDS`}
+          </button>
+        </div>
+      )}
     </SectionReveal>
   );
 }

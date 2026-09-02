@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { markIntroDone } from "@/lib/intro";
 
 // Phase durations in ms, in order: 0 → 1, 1 → ∞, tagline.
@@ -17,12 +16,17 @@ const PHASE_LABELS = [
 /**
  * The `0 → 1 → ∞` boot sequence that precedes the site on every visit.
  *
- * Deliberately fail-visible: the page itself is server-rendered underneath,
- * and this overlay only mounts after hydration. If JS never runs — or the
- * visitor prefers reduced motion — the portfolio is simply there, unblocked.
+ * Plays for everyone, including visitors with `prefers-reduced-motion: reduce`
+ * — a deliberate product decision, not an oversight. The rest of the page
+ * still honours the preference (galaxy, orb, marquee, scroll reveals all
+ * stand down); the intro is the one exception. SKIP and Escape dismiss it at
+ * any point, and the failsafe below guarantees it can never trap anyone.
+ *
+ * Still fail-visible: the page is server-rendered underneath and this overlay
+ * only mounts after hydration, so if JS never runs the portfolio is simply
+ * there, unblocked.
  */
 export default function IntroOverlay() {
-  const reduced = useReducedMotion();
   const [phase, setPhase] = useState(0);
   const [leaving, setLeaving] = useState(false);
   const [gone, setGone] = useState(false);
@@ -44,13 +48,6 @@ export default function IntroOverlay() {
   }, []);
 
   useEffect(() => {
-    if (reduced) {
-      // Nothing to play — hand straight off to the hero. `gone` is derived
-      // from `reduced` below rather than set here.
-      markIntroDone();
-      return;
-    }
-
     // The overlay is the first thing a visitor sees, so start from the top
     // even if the browser restored a scroll position — but never clobber a
     // deep link: someone following #projects should land on #projects.
@@ -88,9 +85,9 @@ export default function IntroOverlay() {
       delete document.body.dataset.intro;
       window.removeEventListener("keydown", onKey);
     };
-  }, [reduced, dismiss]);
+  }, [dismiss]);
 
-  if (gone || reduced) return null;
+  if (gone) return null;
 
   return (
     <div

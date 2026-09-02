@@ -396,11 +396,10 @@
   .lift-card:hover {
     transform: none;
   }
-  .animate-num-pop,
-  .animate-slide-right,
-  .animate-arrow-in,
-  .animate-word-up,
-  .animate-streak,
+  /* The intro's own animations (num-pop, slide-right, arrow-in, word-up,
+     streak) are deliberately absent from this list: the boot sequence plays
+     for everyone by product decision. Everything else on the page still
+     stands down. */
   .animate-orbit,
   .animate-twinkle,
   .animate-marquee,

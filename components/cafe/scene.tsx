@@ -18,6 +18,9 @@ import type { Mesh, MeshBasicMaterial, ShaderMaterial } from "three";
 import { INK, OUTLINE_THICKNESS } from "@/components/cafe/materials/toon";
 import Effects from "@/components/cafe/effects";
 import { Ink, Toon } from "@/components/cafe/kit";
+import Model from "@/components/cafe/model";
+import Room from "@/components/cafe/room";
+import BrewBar from "@/components/cafe/stations/brew-bar";
 import Checkout from "@/components/cafe/stations/checkout";
 import MenuBoard from "@/components/cafe/stations/menu-board";
 import Roastery from "@/components/cafe/stations/roastery";
@@ -131,7 +134,7 @@ function SignatureCups() {
   );
 }
 
-const BUILT = new Set<string>(["storefront", "menu-board", "wall", "roastery", "checkout", "specials"]);
+const BUILT = new Set<string>(["storefront", "menu-board", "wall", "roastery", "checkout", "specials", "brew-bar"]);
 
 function PlaceholderShop({ reduced, specials }: { reduced: boolean; specials: SpecialItem[] }) {
   return (
@@ -155,6 +158,8 @@ function PlaceholderShop({ reduced, specials }: { reduced: boolean; specials: Sp
           </group>
         );
       })}
+      <Model name="room" fallback={<Room />} />
+      <Model name="brew-bar" fallback={<BrewBar />} />
       <Storefront reduced={reduced} />
       <MenuBoard />
       <Wall />

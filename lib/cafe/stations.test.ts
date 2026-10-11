@@ -142,3 +142,29 @@ describe("stationYaw", () => {
     expect(stationYaw("storefront")).toBeCloseTo(0);
   });
 });
+
+describe("camera inside the shop", () => {
+  it("never leaves the room except through a doorway", () => {
+    for (let i = 0; i <= 400; i++) {
+      const p = i / 400;
+      const [x, y, z] = cameraPose(p).position;
+      if (z > 0) {
+        // Street side: only the approach to the front door.
+        expect(Math.abs(x)).toBeLessThan(0.6);
+        continue;
+      }
+      if (Math.abs(z + 9.5) < 0.15) {
+        // Crossing the back wall: only through the 1.4-wide doorway.
+        expect(Math.abs(x)).toBeLessThan(0.7);
+      }
+      if (z < -9.5) {
+        // Roastery: through the back doorway, inside the back room.
+        expect(Math.abs(x)).toBeLessThan(4);
+        continue;
+      }
+      expect(Math.abs(x)).toBeLessThan(7);
+      expect(y).toBeGreaterThan(0);
+      expect(y).toBeLessThan(4);
+    }
+  });
+});

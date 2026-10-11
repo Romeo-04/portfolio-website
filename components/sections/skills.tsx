@@ -31,7 +31,7 @@ export default function Skills() {
                   key={skill.name}
                   className="border-border text-ink-soft rounded-full border px-3 py-1.5 font-mono text-[11px]"
                 >
-                  {skill.name} <span className="text-beam">{skill.level}</span>
+                  {skill.name}
                 </li>
               ))}
             </ul>

@@ -10,18 +10,9 @@
 // works without it — it just falls back to the lower anon limit.
 // ============================================================
 
-export const GITHUB_USERNAME = "Romeo-04";
+import { githubExclude } from "@/data/portfolio";
 
-// Repos to hide from the auto-generated grid (config repo, throwaway
-// practice/learning repos, coursework). Add slugs here to exclude them.
-const EXCLUDED_REPOS = new Set<string>([
-  GITHUB_USERNAME.toLowerCase(), // profile README config repo
-  "learn-git",
-  "my-first-repo",
-  "webdev_practice",
-  "github-copilot-practice",
-  "star-sight", // duplicate push of the STARSight project — "datara" is the featured copy
-]);
+export const GITHUB_USERNAME = "Romeo-04";
 
 export interface GithubRepo {
   id: number;
@@ -88,7 +79,7 @@ export async function getGithubRepos(): Promise<GithubRepo[]> {
         (r) =>
           !r.fork &&
           !r.archived &&
-          !EXCLUDED_REPOS.has(r.name.toLowerCase()),
+          !githubExclude.includes(r.name.toLowerCase()),
       )
       .map<GithubRepo>((r) => ({
         id: r.id,

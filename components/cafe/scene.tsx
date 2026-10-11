@@ -14,7 +14,7 @@ import { Html, Outlines } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import { Color } from "three";
-import type { Mesh, MeshToonMaterial, ShaderMaterial } from "three";
+import type { Mesh, MeshBasicMaterial, ShaderMaterial } from "three";
 import { INK, OUTLINE_THICKNESS, toonGradient } from "@/components/cafe/materials/toon";
 import { createPourMaterial, setFill } from "@/components/cafe/shaders/pour";
 import { projectsData } from "@/data/portfolio";
@@ -26,6 +26,9 @@ import { STATIONS, cameraPose } from "@/lib/cafe/stations";
 const STATION_COLORS = ["#c0632f", "#3d5a40", "#8a5a3b", "#a8873c", "#5a3620", "#c8873a", "#7a4a2a"];
 
 const CUP_HEIGHT = 0.4;
+const LIQUID_HEIGHT = CUP_HEIGHT * 0.9;
+const LIQUID_RADIUS_TOP = 0.165;
+const LIQUID_RADIUS_BOTTOM = 0.13;
 
 function Ink() {
   return <Outlines thickness={OUTLINE_THICKNESS} color={INK} />;
@@ -52,13 +55,13 @@ function PouringCup({
   const drink = useMemo(() => drinkFor(project), [project]);
   const colors = useMemo(() => drink.layers.map((l) => new Color(l.color)), [drink]);
   const liquid = useMemo<ShaderMaterial>(
-    () => createPourMaterial(drink, CUP_HEIGHT * 0.9),
+    () => createPourMaterial(drink, LIQUID_HEIGHT),
     [drink],
   );
   useEffect(() => () => liquid.dispose(), [liquid]);
   const lastIdx = useRef(-1);
   const surfaceRef = useRef<Mesh>(null);
-  const surfaceMat = useRef<MeshToonMaterial>(null);
+  const surfaceMat = useRef<MeshBasicMaterial>(null);
   useFrame(() => {
     const fill = cupFill(getProgress(), index, count);
     setFill(liquid, fill);
@@ -66,8 +69,8 @@ function PouringCup({
     const mat = surfaceMat.current;
     if (!surface || !mat) return;
     surface.visible = fill > 0;
-    surface.position.y = (fill - 0.5) * CUP_HEIGHT * 0.9;
-    const r = 0.13 + (0.165 - 0.13) * fill;
+    surface.position.y = (fill - 0.5) * LIQUID_HEIGHT;
+    const r = LIQUID_RADIUS_BOTTOM + (LIQUID_RADIUS_TOP - LIQUID_RADIUS_BOTTOM) * fill;
     surface.scale.set(r, r, 1);
     const idx = layerIndexAt(Math.min(fill, 0.999), colors.length);
     if (idx !== lastIdx.current) {
@@ -84,17 +87,17 @@ function PouringCup({
         <meshToonMaterial color="#f6ead8" gradientMap={toonGradient()} transparent opacity={0.25} />
       </mesh>
       <mesh position={[0, CUP_HEIGHT / 2, 0]} rotation-x={-Math.PI / 2}>
-        <torusGeometry args={[0.18, 0.008, 6, 32]} />
+        <torusGeometry args={[0.18, OUTLINE_THICKNESS / 2, 6, 32]} />
         <meshBasicMaterial color={INK} />
       </mesh>
       {/* Liquid: slightly smaller so it sits inside the glass. */}
       <mesh material={liquid}>
-        <cylinderGeometry args={[0.165, 0.13, CUP_HEIGHT * 0.9, 24]} />
+        <cylinderGeometry args={[LIQUID_RADIUS_TOP, LIQUID_RADIUS_BOTTOM, LIQUID_HEIGHT, 24]} />
       </mesh>
       {/* Liquid surface: caps the stack at the fill line. */}
       <mesh ref={surfaceRef} rotation-x={-Math.PI / 2} visible={false}>
         <circleGeometry args={[1, 24]} />
-        <meshToonMaterial ref={surfaceMat} gradientMap={toonGradient()} />
+        <meshBasicMaterial ref={surfaceMat} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
       </mesh>
     </group>
   );

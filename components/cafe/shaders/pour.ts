@@ -40,6 +40,7 @@ const fragmentShader = /* glsl */ `
     float light = dot(n, normalize(vec3(0.4, 0.8, 0.6)));
     float band = light > 0.5 ? 1.0 : (light > 0.0 ? 0.8 : 0.6);
     gl_FragColor = vec4(color * band, 1.0);
+    #include <tonemapping_fragment>
     #include <colorspace_fragment>
   }
 `;

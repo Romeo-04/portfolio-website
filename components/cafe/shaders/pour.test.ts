@@ -53,6 +53,21 @@ describe("createPourMaterial", () => {
     const m = createPourMaterial(drink, 0.4);
     expect(m.fragmentShader).toContain("#include <colorspace_fragment>");
   });
+
+  it("tone maps before the colour space conversion like the scene's other materials", () => {
+    const m = createPourMaterial(drink, 0.4);
+    const src = m.fragmentShader;
+    expect(src).toContain("#include <tonemapping_fragment>");
+    expect(src.indexOf("#include <tonemapping_fragment>")).toBeLessThan(
+      src.indexOf("#include <colorspace_fragment>"),
+    );
+  });
+
+  it("pins the fill comparisons", () => {
+    const m = createPourMaterial(drink, 0.4);
+    expect(m.fragmentShader).toContain("vH >= uFill");
+    expect(m.fragmentShader).toContain("uFill <= 0.0");
+  });
 });
 
 describe("setFill", () => {

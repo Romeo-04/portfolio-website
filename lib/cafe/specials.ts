@@ -12,8 +12,15 @@ export function drinkRepoNames(projects: Pick<Project, "repoUrl">[]): string[] {
   return projects
     .map((p) => p.repoUrl.toLowerCase())
     .filter((url) => url.startsWith(prefix))
-    .map((url) => url.slice(prefix.length).replace(/\/+$/, ""));
+    .map((url) => url.slice(prefix.length).split(/[/?#]/)[0].replace(/\.git$/, ""))
+    .filter((name) => name.length > 0);
 }
+
+// Unparsable dates count as 0 so they sort last instead of yielding NaN.
+const timeOf = (iso: string): number => {
+  const t = Date.parse(iso);
+  return Number.isNaN(t) ? 0 : t;
+};
 
 export function selectSpecials(
   repos: GithubRepo[],
@@ -23,6 +30,6 @@ export function selectSpecials(
   const hidden = new Set(exclude.map((n) => n.toLowerCase()));
   return repos
     .filter((r) => !hidden.has(r.name.toLowerCase()))
-    .sort((a, b) => Date.parse(b.pushedAt) - Date.parse(a.pushedAt))
+    .sort((a, b) => timeOf(b.pushedAt) - timeOf(a.pushedAt))
     .slice(0, limit);
 }

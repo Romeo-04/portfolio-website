@@ -26,6 +26,16 @@ describe("drinkRepoNames", () => {
       ]),
     ).toEqual(["kislap"]);
   });
+
+  it("keeps only the repo segment when the link has extra path or query", () => {
+    expect(
+      drinkRepoNames([
+        { repoUrl: "https://github.com/Romeo-04/Kislap/tree/main" },
+        { repoUrl: "https://github.com/Romeo-04/kislap.git" },
+        { repoUrl: "https://github.com/Romeo-04/kislap?tab=readme" },
+      ]),
+    ).toEqual(["kislap", "kislap", "kislap"]);
+  });
 });
 
 describe("selectSpecials", () => {
@@ -46,6 +56,17 @@ describe("selectSpecials", () => {
 
   it("respects the limit", () => {
     expect(selectSpecials(repos, [], 2)).toHaveLength(2);
+  });
+
+  it("sorts a repo with an unparsable pushedAt after dated repos", () => {
+    const withBadDate = [
+      repo("broken", "not-a-date"),
+      repo("dated", "2026-01-01T00:00:00Z"),
+    ];
+    expect(selectSpecials(withBadDate, []).map((r) => r.name)).toEqual([
+      "dated",
+      "broken",
+    ]);
   });
 
   it("returns an empty list when GitHub returned nothing", () => {

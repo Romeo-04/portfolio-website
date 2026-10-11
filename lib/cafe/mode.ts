@@ -16,7 +16,11 @@ export function resolveMode(env: {
 export function detectWebGL(): boolean {
   try {
     const canvas = document.createElement("canvas");
-    return Boolean(canvas.getContext("webgl2") ?? canvas.getContext("webgl"));
+    const ctx = canvas.getContext("webgl2") ?? canvas.getContext("webgl");
+    if (!ctx) return false;
+    // Release the probe's GL context so browsers do not count it toward their limit.
+    ctx.getExtension("WEBGL_lose_context")?.loseContext();
+    return true;
   } catch {
     return false;
   }

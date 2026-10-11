@@ -2,10 +2,11 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import SceneBoundary from "@/components/cafe/scene-boundary";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { detectWebGL, isPhoneViewport, resolveMode } from "@/lib/cafe/mode";
 import { goTo, startScroll } from "@/lib/cafe/scroll";
-import { STATIONS, resolveHash } from "@/lib/cafe/stations";
+import { STATIONS, menuTargetForHash, resolveHash } from "@/lib/cafe/stations";
 
 const CafeScene = dynamic(() => import("@/components/cafe/scene"), { ssr: false });
 
@@ -22,6 +23,7 @@ export default function CafeShell({ children }: { children: ReactNode }) {
   const reduced = useReducedMotion();
   const [entered, setEntered] = useState(false);
   const [open, setOpen] = useState(false);
+  const [failed, setFailed] = useState(false);
   const asideRef = useRef<HTMLElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const wasOpen = useRef(false);
@@ -41,7 +43,7 @@ export default function CafeShell({ children }: { children: ReactNode }) {
     wasOpen.current = open;
   }, [open]);
 
-  const mode = caps ? resolveMode({ ...caps, entered }) : "menu";
+  const mode = !caps ? "menu" : failed ? "closed" : resolveMode({ ...caps, entered });
   const inCafe = mode === "cafe";
 
   useEffect(() => {
@@ -57,6 +59,14 @@ export default function CafeShell({ children }: { children: ReactNode }) {
       stop();
     };
   }, [inCafe, reduced]);
+
+  // Menu is the page (phones, no WebGL): honour a deep link by scrolling to
+  // the matching menu section.
+  useEffect(() => {
+    if (inCafe) return;
+    const id = menuTargetForHash(window.location.hash);
+    if (id) document.getElementById(id)?.scrollIntoView();
+  }, [inCafe]);
 
   useEffect(() => {
     if (!inCafe) return;
@@ -78,6 +88,7 @@ export default function CafeShell({ children }: { children: ReactNode }) {
   // One handler for every "#station" link in the menu: glide the camera in
   // the café, or jump to the matching menu section when the menu is the page.
   function onLinkClick(e: React.MouseEvent) {
+    if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
     const link = (e.target as HTMLElement).closest("a");
     const href = link?.getAttribute("href");
     if (!href?.startsWith("#")) return;
@@ -89,14 +100,14 @@ export default function CafeShell({ children }: { children: ReactNode }) {
       setOpen(false);
       goTo(station, { immediate: reduced });
     } else {
-      const section = STATIONS.find((s) => s.id === station)?.menuSection;
-      if (section) document.getElementById(section)?.scrollIntoView();
+      const id = menuTargetForHash(href);
+      if (id) document.getElementById(id)?.scrollIntoView();
     }
   }
 
   if (!inCafe) {
     return (
-      <main onClick={onLinkClick} className="mx-auto max-w-2xl px-5 py-10">
+      <main onClick={onLinkClick} aria-label="Quick Order menu" className="mx-auto max-w-2xl px-5 py-10">
         {mode === "closed" && (
           <p role="status" className="font-chalk mb-6 text-center text-2xl">
             The café is closed today ☕
@@ -118,7 +129,9 @@ export default function CafeShell({ children }: { children: ReactNode }) {
 
   return (
     <div onClick={onLinkClick}>
-      <CafeScene cut={reduced} />
+      <SceneBoundary onError={() => setFailed(true)}>
+        <CafeScene cut={reduced} />
+      </SceneBoundary>
       {/* Scroll track: one viewport of scroll per station. */}
       <div aria-hidden style={{ height: `${STATIONS.length * 100}vh` }} />
       <button
@@ -136,6 +149,7 @@ export default function CafeShell({ children }: { children: ReactNode }) {
         tabIndex={-1}
         aria-label="Quick Order menu"
         id="quick-order"
+        data-lenis-prevent
         inert={!open}
         className={`fixed top-0 right-0 z-10 h-full w-full max-w-md overflow-y-auto bg-[#f6ead8] p-6 pt-16 shadow-2xl transition-transform duration-300 ${open ? "translate-x-0" : "translate-x-full"}`}
       >

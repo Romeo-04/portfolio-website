@@ -27,7 +27,9 @@ function CameraRig({ cut }: { cut: boolean }) {
 }
 
 function SignatureCups() {
-  const [x, y, z] = STATIONS[2].camera.target;
+  const brewBar = STATIONS.find((s) => s.id === "brew-bar");
+  if (!brewBar) throw new Error("brew-bar station missing");
+  const [x, y, z] = brewBar.camera.target;
   const signature = projectsData.filter((p) => p.featured);
   return (
     <group position={[x, y, z]}>

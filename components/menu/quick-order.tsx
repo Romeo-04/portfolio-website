@@ -101,7 +101,7 @@ export default function QuickOrderMenu({ specials }: { specials: GithubRepo[] })
   const shelf = projectsData.filter((p) => !p.featured);
 
   return (
-    <div aria-label="Quick Order menu" className="font-cafe text-[#2b1a10]">
+    <div className="font-cafe text-[#2b1a10]">
       <header id="menu-top" className="pb-4 text-center">
         <p className="font-receipt text-xs tracking-[0.3em]">QUICK ORDER</p>
         <h1 className="font-chalk text-4xl">{personalInfo.name}</h1>

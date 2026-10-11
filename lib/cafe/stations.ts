@@ -161,3 +161,11 @@ export function resolveHash(hash: string): StationId | null {
   if (projectSlugs.has(key)) return "brew-bar";
   return null;
 }
+
+/** Menu-mode counterpart of resolveHash: the id of the element to scroll to. */
+export function menuTargetForHash(hash: string): string | null {
+  const key = hash.replace(/^#/, "");
+  if (projectSlugs.has(key)) return `menu-${key}`;
+  const station = resolveHash(key);
+  return station ? (STATIONS.find((s) => s.id === station)?.menuSection ?? null) : null;
+}

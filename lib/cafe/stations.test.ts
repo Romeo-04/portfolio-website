@@ -4,6 +4,7 @@ import {
   STATIONS,
   cameraPose,
   progressFromScroll,
+  menuTargetForHash,
   resolveHash,
   stationAnchor,
   stationIndexAt,
@@ -106,5 +107,19 @@ describe("resolveHash", () => {
     expect(resolveHash("#foo")).toBeNull();
     expect(resolveHash("")).toBeNull();
     expect(resolveHash("#")).toBeNull();
+  });
+});
+
+describe("menuTargetForHash", () => {
+  it("targets a project ticket for a project slug", () => {
+    expect(menuTargetForHash("#kislap")).toBe("menu-kislap");
+  });
+  it("targets the station's menu section", () => {
+    expect(menuTargetForHash("#checkout")).toBe("menu-find-us");
+    expect(menuTargetForHash("#brew-bar")).toBe("menu-drinks");
+  });
+  it("returns null for unknown or empty hashes", () => {
+    expect(menuTargetForHash("#foo")).toBeNull();
+    expect(menuTargetForHash("")).toBeNull();
   });
 });

@@ -22,9 +22,13 @@ describe("cupFill", () => {
   });
 
   it("un-pours when scrolling back (depends only on progress)", () => {
-    const p = atDwell(0.6);
-    expect(cupFill(p, 2, 4)).toBe(cupFill(p, 2, 4));
-    expect(cupFill(atDwell(0.4), 2, 4)).toBeLessThan(cupFill(p, 2, 4));
+    const later = atDwell(0.6);
+    const earlier = atDwell(0.4);
+    const first = cupFill(later, 2, 4);
+    const back = cupFill(earlier, 2, 4);
+    const again = cupFill(later, 2, 4);
+    expect(first).toBe(again);
+    expect(back).toBeLessThan(first);
   });
 
   it("handles a single cup and no cups", () => {

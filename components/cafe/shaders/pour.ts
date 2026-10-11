@@ -36,7 +36,8 @@ const fragmentShader = /* glsl */ `
     for (int i = 1; i < ${MAX_LAYERS}; i++) {
       if (i == pick) color = uColors[i];
     }
-    float light = dot(normalize(vNormal), normalize(vec3(0.4, 0.8, 0.6)));
+    vec3 n = normalize(vNormal) * (gl_FrontFacing ? 1.0 : -1.0);
+    float light = dot(n, normalize(vec3(0.4, 0.8, 0.6)));
     float band = light > 0.5 ? 1.0 : (light > 0.0 ? 0.8 : 0.6);
     gl_FragColor = vec4(color * band, 1.0);
     #include <colorspace_fragment>
@@ -56,7 +57,7 @@ export function createPourMaterial(drink: Drink, height: number): ShaderMaterial
       uFill: { value: 0 },
       uHeight: { value: height },
       uColors: { value: colors },
-      uCount: { value: drink.layers.length },
+      uCount: { value: Math.min(drink.layers.length, MAX_LAYERS) },
     },
   });
 }

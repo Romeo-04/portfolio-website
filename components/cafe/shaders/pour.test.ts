@@ -32,7 +32,21 @@ describe("createPourMaterial", () => {
 
   it("avoids dynamic array indexing so WebGL1 compiles it", () => {
     const m = createPourMaterial(drink, 0.4);
-    expect(m.fragmentShader).not.toMatch(/uColors\[\s*pick\s*\]/);
+    expect(m.fragmentShader).toContain("for (int i = 1; i <");
+    const indexes = m.fragmentShader.match(/uColors\[([^\]]+)\]/g) ?? [];
+    expect(indexes.length).toBeGreaterThan(0);
+    expect(
+      indexes.every((s) => /uColors\[(0|i|\d+)\]/.test(s)),
+    ).toBe(true);
+  });
+
+  it("caps uCount at MAX_LAYERS for drinks with too many layers", () => {
+    const tall: Drink = {
+      ...drink,
+      layers: Array.from({ length: 6 }, (_, i) => ({ name: `L${i}`, color: "#101010" })),
+    };
+    const m = createPourMaterial(tall, 0.4);
+    expect(m.uniforms.uCount.value).toBe(MAX_LAYERS);
   });
 
   it("converts to the output colour space like the other materials", () => {

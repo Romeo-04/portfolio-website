@@ -52,6 +52,7 @@ export function startScroll(opts: { smooth: boolean }): () => void {
 export function goTo(id: StationId, opts: { immediate?: boolean } = {}): void {
   const max = document.documentElement.scrollHeight - window.innerHeight;
   const y = Math.max(0, max) * stationAnchor(id);
+  if (lenis) lenis.resize();
   if (lenis) lenis.scrollTo(y, { immediate: opts.immediate ?? false });
   else window.scrollTo({ top: y, behavior: "instant" });
 }

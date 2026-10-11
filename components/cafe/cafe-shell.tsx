@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { detectWebGL, isPhoneViewport, resolveMode } from "@/lib/cafe/mode";
 import { goTo, startScroll } from "@/lib/cafe/scroll";
@@ -22,6 +22,24 @@ export default function CafeShell({ children }: { children: ReactNode }) {
   const reduced = useReducedMotion();
   const [entered, setEntered] = useState(false);
   const [open, setOpen] = useState(false);
+  const asideRef = useRef<HTMLElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const wasOpen = useRef(false);
+
+  // Move focus into the drawer when it opens; hand it back to the toggle on
+  // close if it was inside. Not a modal, so no trap. Skips initial mount.
+  useEffect(() => {
+    if (open) {
+      asideRef.current?.focus();
+    } else if (
+      wasOpen.current &&
+      // inert drops focus to <body> in the same commit, so count that too.
+      (document.activeElement === document.body || asideRef.current?.contains(document.activeElement))
+    ) {
+      toggleRef.current?.focus();
+    }
+    wasOpen.current = open;
+  }, [open]);
 
   const mode = caps ? resolveMode({ ...caps, entered }) : "menu";
   const inCafe = mode === "cafe";
@@ -30,15 +48,28 @@ export default function CafeShell({ children }: { children: ReactNode }) {
     if (!inCafe) return;
     const stop = startScroll({ smooth: !reduced });
     const target = resolveHash(window.location.hash);
-    if (target) goTo(target, { immediate: true });
-    return stop;
+    // Wait a frame so Lenis and the layout have measured before jumping.
+    const frame = requestAnimationFrame(() => {
+      if (target) goTo(target, { immediate: true });
+    });
+    return () => {
+      cancelAnimationFrame(frame);
+      stop();
+    };
   }, [inCafe, reduced]);
 
   useEffect(() => {
     if (!inCafe) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "m" || e.key === "M") setOpen((o) => !o);
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") {
+        setOpen(false);
+        return;
+      }
+      if (e.key !== "m" && e.key !== "M") return;
+      if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
+      const t = e.target as HTMLElement | null;
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      setOpen((o) => !o);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -91,6 +122,7 @@ export default function CafeShell({ children }: { children: ReactNode }) {
       {/* Scroll track: one viewport of scroll per station. */}
       <div aria-hidden style={{ height: `${STATIONS.length * 100}vh` }} />
       <button
+        ref={toggleRef}
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
@@ -100,6 +132,9 @@ export default function CafeShell({ children }: { children: ReactNode }) {
         {open ? "Close menu" : "Quick Order (M)"}
       </button>
       <aside
+        ref={asideRef}
+        tabIndex={-1}
+        aria-label="Quick Order menu"
         id="quick-order"
         inert={!open}
         className={`fixed top-0 right-0 z-10 h-full w-full max-w-md overflow-y-auto bg-[#f6ead8] p-6 pt-16 shadow-2xl transition-transform duration-300 ${open ? "translate-x-0" : "translate-x-full"}`}

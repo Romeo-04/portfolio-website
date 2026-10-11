@@ -66,6 +66,8 @@ from it.
 
 | File | Responsibility |
 |---|---|
+| `lib/cafe/stations.ts` (modify) | Indoor camera layout, `stationYaw` |
+| `components/cafe/stations/wall.tsx` (modify) | Follow the wall station's target |
 | `lib/cafe/choreo.ts` (modify) | `roastColor`, `beanX`, `trayOffset`, `receiptLength` |
 | `lib/cafe/choreo.test.ts` (modify) | Tests |
 | `lib/cafe/quality.ts` | `qualityFor` |
@@ -77,6 +79,114 @@ from it.
 | `components/cafe/scene.tsx` (modify) | Render stations, quality, effects |
 | `components/cafe/cafe-shell.tsx` (modify) | Pass `specials` and `light` to the scene |
 | `app/cafe/page.tsx` (modify) | Pass specials to the shell |
+
+---
+
+### Task 0: Move every station inside the shop
+
+Step 1 placed the specials case (z = 4), the checkout (z = 6) and half of
+the wall of fame (z from -2 to 2) on the street side of the storefront door
+(z = 0), and the menu-board and brew-bar cameras stood outside too. This
+task moves them indoors. The room is x from -7 to 7, z from 0 to -9.5, with
+the roastery behind it (z from -9.5 to -14). Station components now face
+their camera through one tested helper instead of hard-coded angles.
+
+**Files:**
+- Modify: `lib/cafe/stations.ts`, `lib/cafe/stations.test.ts`,
+  `components/cafe/stations/wall.tsx`, `components/cafe/scene.tsx`
+
+**Interfaces:**
+- Produces: `stationYaw(id: StationId): number`, the y-rotation that turns a
+  model's +z face toward the station's camera.
+
+- [ ] **Step 1: Write the failing test**
+
+Append to `lib/cafe/stations.test.ts` (add `stationYaw` to the import):
+
+```ts
+describe("indoor layout", () => {
+  it("keeps every station after the storefront inside the shop", () => {
+    for (const s of STATIONS.slice(1)) {
+      expect(s.camera.position[2]).toBeLessThan(0);
+      expect(s.camera.target[2]).toBeLessThan(0);
+      expect(Math.abs(s.camera.target[0])).toBeLessThan(7);
+    }
+  });
+});
+
+describe("stationYaw", () => {
+  it("turns a +z face toward the camera", () => {
+    expect(stationYaw("wall")).toBeCloseTo(Math.PI / 2);
+    expect(stationYaw("specials")).toBeCloseTo(-Math.PI / 2);
+    expect(stationYaw("storefront")).toBeCloseTo(0);
+  });
+});
+```
+
+- [ ] **Step 2: Run to see it fail**
+
+Run: `npx vitest run lib/cafe/stations.test.ts`. Expected: FAIL (layout and missing export).
+
+- [ ] **Step 3: Update the cameras in `lib/cafe/stations.ts`**
+
+Change only these `camera` values; leave ids, labels and `menuSection`
+alone:
+
+| id | position | target |
+|---|---|---|
+| storefront | `[0, 1.6, 12]` (unchanged) | `[0, 1.5, 0]` (unchanged) |
+| menu-board | `[0, 2, -0.5]` | `[0, 2.6, -4]` (unchanged) |
+| brew-bar | `[3.5, 1.5, -2.5]` | `[6, 1, -3]` |
+| wall | `[-3, 1.8, -3]` | `[-6, 1.8, -3]` |
+| roastery | `[0, 1.8, -9.9]` | `[0, 1, -13.2]` |
+| specials | `[3, 1.2, -6]` | `[5.5, 0.8, -6]` |
+| checkout | `[-2, 1.5, -5.5]` | `[-4.5, 1.1, -7]` |
+
+Add below `stationAnchor`:
+
+```ts
+/** y-rotation that turns a model's +z face toward the station's camera. */
+export function stationYaw(id: StationId): number {
+  const { position, target } = STATIONS[indexOf(id)].camera;
+  return Math.atan2(position[0] - target[0], position[2] - target[2]);
+}
+```
+
+- [ ] **Step 4: Make the wall follow its station**
+
+In `components/cafe/stations/wall.tsx`, import `STATIONS` and `stationYaw`
+from `@/lib/cafe/stations`. Replace the outer group's hard-coded
+`position={[-6.4, 1.8, 0]} rotation={[0, Math.PI / 2, 0]}` with:
+
+```tsx
+const [tx, ty, tz] = STATIONS.find((s) => s.id === "wall")!.camera.target;
+// ...
+<group position={[tx - 0.4, ty, tz]} rotation={[0, stationYaw("wall"), 0]}>
+```
+
+Declare the target constant at module level, and update the comment above
+the return to "The wall stands just behind the wall station's target,
+facing its camera."
+
+Also in `components/cafe/scene.tsx`, turn the brew-bar cups toward their
+camera, so they spread across the view instead of lining up in depth.
+Import `stationYaw`, and give `SignatureCups`' outer group
+`rotation={[0, stationYaw("brew-bar"), 0]}`. In `PlaceholderShop`, give
+each placeholder `<group>` `rotation={[0, stationYaw(s.id), 0]}` as well.
+Add `components/cafe/scene.tsx` to this task's `git add`.
+
+- [ ] **Step 5: Verify**
+
+Run: `npm test && npx tsc --noEmit && npm run lint && npm run build`. The
+existing camera-pose tests read positions from `STATIONS`, so they still
+pass.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add lib/cafe/stations.ts lib/cafe/stations.test.ts components/cafe/stations/wall.tsx components/cafe/scene.tsx
+git commit -m "fix: move every station inside the shop" -m "The specials case, checkout, half of the wall and two cameras sat on the street side of the storefront door, so the camera left the shop after entering it. Stations now sit inside one room with the roastery behind it, and components face their camera through stationYaw." -m "Verification: tests (new layout and yaw tests), tsc, lint and build green."
+```
 
 ---
 
@@ -206,8 +316,8 @@ export function roastColor(t: number): string {
   return `#${mix.map((v) => v.toString(16).padStart(2, "0")).join("")}`;
 }
 
-export const CONVEYOR_START = -3;
-export const CONVEYOR_END = 3;
+export const CONVEYOR_START = -2.2;
+export const CONVEYOR_END = 2.2;
 
 /** A bean's x on the belt: starts at `offset` and travels one belt length. */
 export function beanX(t: number, offset: number): number {
@@ -293,7 +403,9 @@ import { Ink, Toon } from "@/components/cafe/kit";
 import { experienceData } from "@/data/portfolio";
 import { CONVEYOR_END, CONVEYOR_START, beanX, dwellT, roastColor, stagger } from "@/lib/cafe/choreo";
 import { getProgress } from "@/lib/cafe/scroll";
+import { STATIONS } from "@/lib/cafe/stations";
 
+const RZ = STATIONS.find((s) => s.id === "roastery")!.camera.target[2];
 const BEANS = 48;
 const BELT_Y = 0.55;
 
@@ -330,9 +442,9 @@ export default function Roastery() {
     });
   });
 
-  // The camera looks along -z at [0, 1.2, -12].
+  // The conveyor runs across the roastery target, facing its camera.
   return (
-    <group position={[0, 0, -12]}>
+    <group position={[0, 0, RZ]}>
       <mesh position={[0, BELT_Y / 2, 0]}>
         <boxGeometry args={[CONVEYOR_END - CONVEYOR_START + 0.4, BELT_Y, 0.5]} />
         <Toon color="#2b1a10" />
@@ -390,7 +502,9 @@ import { Ink, Toon } from "@/components/cafe/kit";
 import { personalInfo } from "@/data/portfolio";
 import { dwellT, receiptLength } from "@/lib/cafe/choreo";
 import { getProgress } from "@/lib/cafe/scroll";
+import { STATIONS, stationYaw } from "@/lib/cafe/stations";
 
+const [CX, , CZ] = STATIONS.find((s) => s.id === "checkout")!.camera.target;
 const RECEIPT_HEIGHT = 0.9;
 
 export default function Checkout() {
@@ -406,9 +520,9 @@ export default function Checkout() {
     if (text.current) text.current.style.clipPath = `inset(0 0 ${(1 - len) * 100}% 0)`;
   });
 
-  // The camera looks from [-2, 1.5, 4] at [-4, 1.1, 6].
+  // The register stands at the checkout target, facing its camera.
   return (
-    <group position={[-4, 0, 6]} rotation={[0, Math.PI * 0.75, 0]}>
+    <group position={[CX, 0, CZ]} rotation={[0, stationYaw("checkout"), 0]}>
       <mesh position={[0, 0.5, 0]}>
         <boxGeometry args={[1.4, 1, 0.8]} />
         <Toon color="#7a4a2a" />
@@ -481,7 +595,8 @@ git commit -m "feat: build the roastery and checkout stations" -m "Beans roast f
     exported from `components/cafe/stations/specials.tsx`
   - `Specials({ items }: { items: SpecialItem[] })`
   - `CafeShell({ children, specials }: { children: ReactNode; specials: SpecialItem[] })`
-  - `CafeScene({ cut, specials, light }: { cut: boolean; specials: SpecialItem[]; light: boolean })`
+  - `CafeScene({ cut, specials, light, onReady }: { cut: boolean; specials: SpecialItem[]; light: boolean; onReady?: () => void })`
+    (`onReady` already exists from step 3a; keep passing it to `<Canvas onCreated>`)
     (`light` is used in Task 4; add it now and pass it through)
 
 - [ ] **Step 1: Create `components/cafe/stations/specials.tsx`**
@@ -503,6 +618,11 @@ import type { Group, PointLight } from "three";
 import { Ink, Toon } from "@/components/cafe/kit";
 import { dwellT, trayOffset } from "@/lib/cafe/choreo";
 import { getProgress } from "@/lib/cafe/scroll";
+import { STATIONS, stationYaw } from "@/lib/cafe/stations";
+
+const [SX, , SZ] = STATIONS.find((s) => s.id === "specials")!.camera.target;
+const CASE_X = SX + 0.4;
+const CASE_Z = SZ;
 
 export type SpecialItem = { id: number; name: string; language: string | null };
 
@@ -513,6 +633,7 @@ function slot(i: number): [number, number, number] {
 
 export default function Specials({ items }: { items: SpecialItem[] }) {
   const trays = useRef<(Group | null)[]>([]);
+  const labels = useRef<(HTMLDivElement | null)[]>([]);
   const light = useRef<PointLight>(null);
 
   useFrame(() => {
@@ -524,12 +645,15 @@ export default function Specials({ items }: { items: SpecialItem[] }) {
       const [x, y, z] = slot(i);
       g.position.set(x + out * 2.5, y, z);
       g.visible = out < 1;
+      // drei Html ignores the parent's visible flag, so hide the label too.
+      const label = labels.current[i];
+      if (label) label.style.visibility = out < 1 ? "visible" : "hidden";
     });
   });
 
-  // The camera looks along +x at [5, 0.8, 4], so the case faces -x.
+  // The case stands just behind the specials target, facing its camera.
   return (
-    <group position={[5.4, 0, 4]} rotation={[0, -Math.PI / 2, 0]}>
+    <group position={[CASE_X, 0, CASE_Z]} rotation={[0, stationYaw("specials"), 0]}>
       <mesh position={[0, 0.7, -0.3]}>
         <boxGeometry args={[2.3, 1.4, 0.1]} />
         <Toon color="#5a3620" />
@@ -561,7 +685,13 @@ export default function Specials({ items }: { items: SpecialItem[] }) {
               <Ink />
             </mesh>
             <Html transform position={[0, 0.16, 0.1]} distanceFactor={1.4} className="pointer-events-none">
-              <div className="font-receipt w-[120px] text-center text-[10px] leading-tight text-[#f5e9da]">
+              <div
+                ref={(el) => {
+                  labels.current[i] = el;
+                }}
+                style={{ visibility: "hidden" }}
+                className="font-receipt w-[120px] text-center text-[10px] leading-tight text-[#f5e9da]"
+              >
                 <strong className="block">{item.name}</strong>
                 {item.language ?? ""}
               </div>
@@ -591,11 +721,11 @@ In `app/cafe/page.tsx`, pass the list to the shell:
 In `components/cafe/cafe-shell.tsx`:
 - Import `type SpecialItem` from `@/components/cafe/stations/specials`.
 - Change the props to `{ children, specials }: { children: ReactNode; specials: SpecialItem[] }`.
-- Render `<CafeScene cut={reduced} specials={specials} light={Boolean(caps?.phone)} />`.
+- Add `specials={specials}` and `light={Boolean(caps?.phone)}` to the existing `<CafeScene … />` element, keeping its current props (`cut`, `onReady`).
 
 In `components/cafe/scene.tsx`:
 - Import `Specials` and `type SpecialItem`.
-- Change `CafeScene` to `({ cut, specials, light }: { cut: boolean; specials: SpecialItem[]; light: boolean })`.
+- Add `specials: SpecialItem[]` and `light: boolean` to `CafeScene`'s props, keeping `cut` and `onReady`.
 - Pass `specials` down to `PlaceholderShop`, render `<Specials items={specials} />`, and add `"specials"` to `BUILT`.
 - Accept `light` but leave it unused until Task 4. Prefix it as `_light` if lint complains about an unused variable.
 

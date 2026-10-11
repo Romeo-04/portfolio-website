@@ -38,14 +38,18 @@ function Section({
 }) {
   return (
     <section id={id} className="border-t border-dashed border-[#2b1a10]/30 py-6">
-      <h2 className="font-chalk flex items-baseline justify-between text-2xl">
-        {title}
+      <div className="flex items-baseline justify-between">
+        <h2 className="font-chalk text-2xl">{title}</h2>
         {station && (
-          <a href={`#${station}`} className="font-receipt text-xs underline">
+          <a
+            href={`#${station}`}
+            aria-label={`See ${title} in the café`}
+            className="font-receipt text-xs underline"
+          >
             see it in the café →
           </a>
         )}
-      </h2>
+      </div>
       <div className="mt-3">{children}</div>
     </section>
   );
@@ -67,10 +71,24 @@ function Ticket({ project }: { project: Project }) {
         <p className="font-receipt mt-1 text-xs">{project.techStack.join(" · ")}</p>
         <p className="mt-2 flex gap-3 text-sm underline">
           {project.demoUrl && (
-            <a href={project.demoUrl} target="_blank" rel="noopener noreferrer">Live demo ↗</a>
+            <a
+              href={project.demoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Live demo of ${project.title}`}
+            >
+              Live demo ↗
+            </a>
           )}
           {project.repoUrl && (
-            <a href={project.repoUrl} target="_blank" rel="noopener noreferrer">Code ↗</a>
+            <a
+              href={project.repoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Code for ${project.title}`}
+            >
+              Code ↗
+            </a>
           )}
         </p>
       </div>
@@ -83,7 +101,7 @@ export default function QuickOrderMenu({ specials }: { specials: GithubRepo[] })
   const shelf = projectsData.filter((p) => !p.featured);
 
   return (
-    <nav aria-label="Quick Order menu" className="font-cafe text-[#2b1a10]">
+    <div aria-label="Quick Order menu" className="font-cafe text-[#2b1a10]">
       <header id="menu-top" className="pb-4 text-center">
         <p className="font-receipt text-xs tracking-[0.3em]">QUICK ORDER</p>
         <h1 className="font-chalk text-4xl">{personalInfo.name}</h1>
@@ -179,6 +197,6 @@ export default function QuickOrderMenu({ specials }: { specials: GithubRepo[] })
           <li><a href={personalInfo.resumeUrl} target="_blank" rel="noopener noreferrer">Résumé (PDF)</a></li>
         </ul>
       </Section>
-    </nav>
+    </div>
   );
 }

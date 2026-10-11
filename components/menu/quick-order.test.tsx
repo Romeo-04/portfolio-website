@@ -17,10 +17,22 @@ describe("QuickOrderMenu", () => {
   const html = decode(renderToStaticMarkup(<QuickOrderMenu specials={[]} />));
 
   it("contains every project, role, skill and achievement as text", () => {
-    for (const p of projectsData) expect(html).toContain(p.title);
-    for (const e of experienceData) expect(html).toContain(e.title);
+    for (const p of projectsData) {
+      expect(html).toContain(p.title);
+      expect(html).toContain(p.role);
+    }
+    for (const e of experienceData) {
+      expect(html).toContain(e.title);
+      expect(html).toContain(e.organization);
+    }
     for (const a of achievementsData) expect(html).toContain(a.title);
     for (const c of skillsData) for (const s of c.skills) expect(html).toContain(s.name);
+  });
+
+  it("keeps section headings free of links", () => {
+    const headings = html.match(/<h2[\s\S]*?<\/h2>/g) ?? [];
+    expect(headings.length).toBeGreaterThan(0);
+    for (const h of headings) expect(h).not.toContain("<a ");
   });
 
   it("contains the contact details", () => {
@@ -30,9 +42,14 @@ describe("QuickOrderMenu", () => {
   });
 
   it("lists signature drinks before the shelf", () => {
-    expect(html.indexOf('id="menu-drinks"')).toBeLessThan(html.indexOf('id="menu-shelf"'));
-    const kislapAt = html.indexOf("Kislap");
-    expect(kislapAt).toBeLessThan(html.indexOf('id="menu-shelf"'));
+    const shelfAt = html.indexOf('id="menu-shelf"');
+    expect(html.indexOf('id="menu-drinks"')).toBeLessThan(shelfAt);
+    for (const p of projectsData) {
+      const at = html.indexOf(p.title);
+      expect(at).toBeGreaterThanOrEqual(0);
+      if (p.featured) expect(at).toBeLessThan(shelfAt);
+      else expect(at).toBeGreaterThan(shelfAt);
+    }
   });
 
   it("never renders an empty link", () => {

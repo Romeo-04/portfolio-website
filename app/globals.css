@@ -12,6 +12,9 @@
   --font-sans: var(--font-space-grotesk);
   --font-display: var(--font-space-grotesk);
   --font-mono: var(--font-space-mono);
+  --font-chalk: var(--font-caveat-brush);
+  --font-receipt: var(--font-courier-prime);
+  --font-cafe: var(--font-nunito);
 
   /* ---- Flow State palette ----
      Named surfaces/inks used by the redesign. Both themes define all of

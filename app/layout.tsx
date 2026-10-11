@@ -36,6 +36,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: siteConfig.name, url: siteConfig.url }],
   alternates: { canonical: "/" },
+  verification: { google: "1HU0cnVBurlUNvIgIKWOAndNQBByDmemEXvj1nJxYxU" },
   // og:image / twitter:image come from app/opengraph-image.tsx.
   openGraph: {
     title: `${siteConfig.name} — ${siteConfig.title}`,

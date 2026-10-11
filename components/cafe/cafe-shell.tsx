@@ -6,7 +6,7 @@ import SceneBoundary from "@/components/cafe/scene-boundary";
 import Intro from "@/components/cafe/intro";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { detectWebGL, isPhoneViewport, resolveMode } from "@/lib/cafe/mode";
-import { goTo, startScroll } from "@/lib/cafe/scroll";
+import { goTo, pauseScroll, startScroll } from "@/lib/cafe/scroll";
 import { STATIONS, menuTargetForHash, resolveHash } from "@/lib/cafe/stations";
 
 const CafeScene = dynamic(() => import("@/components/cafe/scene"), { ssr: false });
@@ -25,6 +25,8 @@ export default function CafeShell({ children }: { children: ReactNode }) {
   const [entered, setEntered] = useState(false);
   const [open, setOpen] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [introActive, setIntroActive] = useState(true);
+  const [sceneReady, setSceneReady] = useState(false);
   const asideRef = useRef<HTMLElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const wasOpen = useRef(false);
@@ -50,6 +52,7 @@ export default function CafeShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!inCafe) return;
     const stop = startScroll({ smooth: !reduced });
+    pauseScroll(introActive);
     const target = resolveHash(window.location.hash);
     // Wait a frame so Lenis and the layout have measured before jumping.
     const frame = requestAnimationFrame(() => {
@@ -59,7 +62,16 @@ export default function CafeShell({ children }: { children: ReactNode }) {
       cancelAnimationFrame(frame);
       stop();
     };
+    // introActive is read only at start; the effect below tracks later changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inCafe, reduced]);
+
+  // Freeze scrolling while the intro covers the café.
+  useEffect(() => {
+    if (!inCafe || !introActive) return;
+    pauseScroll(true);
+    return () => pauseScroll(false);
+  }, [inCafe, introActive]);
 
   // Menu is the page (phones, no WebGL): honour a deep link by scrolling to
   // the matching menu section.
@@ -70,7 +82,7 @@ export default function CafeShell({ children }: { children: ReactNode }) {
   }, [inCafe]);
 
   useEffect(() => {
-    if (!inCafe) return;
+    if (!inCafe || introActive) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setOpen(false);
@@ -84,7 +96,7 @@ export default function CafeShell({ children }: { children: ReactNode }) {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [inCafe]);
+  }, [inCafe, introActive]);
 
   // One handler for every "#station" link in the menu: glide the camera in
   // the café, or jump to the matching menu section when the menu is the page.
@@ -130,8 +142,9 @@ export default function CafeShell({ children }: { children: ReactNode }) {
 
   return (
     <div onClick={onLinkClick}>
+      <div inert={introActive}>
       <SceneBoundary onError={() => setFailed(true)}>
-        <CafeScene cut={reduced} />
+        <CafeScene cut={reduced} onReady={() => setSceneReady(true)} />
       </SceneBoundary>
       {/* Scroll track: one viewport of scroll per station. */}
       <div aria-hidden style={{ height: `${STATIONS.length * 100}vh` }} />
@@ -156,7 +169,8 @@ export default function CafeShell({ children }: { children: ReactNode }) {
       >
         {children}
       </aside>
-      <Intro reduced={reduced} />
+      </div>
+      <Intro reduced={reduced} ready={sceneReady} onActiveChange={setIntroActive} />
     </div>
   );
 }

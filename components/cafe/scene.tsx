@@ -149,10 +149,10 @@ function PlaceholderShop({ reduced }: { reduced: boolean }) {
   );
 }
 
-export default function CafeScene({ cut }: { cut: boolean }) {
+export default function CafeScene({ cut, onReady }: { cut: boolean; onReady?: () => void }) {
   return (
     <div aria-hidden className="fixed inset-0">
-      <Canvas camera={{ fov: 50, position: [...STATIONS[0].camera.position] }} dpr={[1, 2]}>
+      <Canvas camera={{ fov: 50, position: [...STATIONS[0].camera.position] }} dpr={[1, 2]} onCreated={() => onReady?.()}>
         <color attach="background" args={["#1b120c"]} />
         <ambientLight intensity={0.5} />
         <directionalLight position={[5, 8, 5]} intensity={1.6} />

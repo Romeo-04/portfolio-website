@@ -49,6 +49,13 @@ export function startScroll(opts: { smooth: boolean }): () => void {
   };
 }
 
+/** Freeze scrolling (intro overlay). Safe to call before/after Lenis exists. */
+export function pauseScroll(paused: boolean): void {
+  if (paused) lenis?.stop();
+  else lenis?.start();
+  document.documentElement.style.overflow = paused ? "hidden" : "";
+}
+
 export function goTo(id: StationId, opts: { immediate?: boolean } = {}): void {
   const max = document.documentElement.scrollHeight - window.innerHeight;
   const y = Math.max(0, max) * stationAnchor(id);

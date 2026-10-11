@@ -16,6 +16,7 @@ import { Ink, Toon } from "@/components/cafe/kit";
 import { personalInfo, skillsData, tierLabels, type SkillTier } from "@/data/portfolio";
 import { dwellT, stagger } from "@/lib/cafe/choreo";
 import { getProgress } from "@/lib/cafe/scroll";
+import { DWELL, stationRange } from "@/lib/cafe/stations";
 
 const TIERS: SkillTier[] = ["house", "seasonal", "experimental"];
 
@@ -58,7 +59,14 @@ class PortraitBoundary extends Component<{ children: ReactNode }, { failed: bool
 export default function MenuBoard() {
   const lines = useRef<(HTMLSpanElement | null)[]>([]);
 
+  const chalk = useRef<HTMLDivElement>(null);
+  const label = useRef<HTMLDivElement>(null);
+
   useFrame(() => {
+    const [a, b] = stationRange(0);
+    const v = getProgress() >= a + DWELL * (b - a) ? "visible" : "hidden";
+    if (chalk.current) chalk.current.style.visibility = v;
+    if (label.current) label.current.style.visibility = v;
     const t = dwellT(getProgress(), "menu-board");
     lines.current.forEach((el, i) => {
       if (!el) return;
@@ -79,7 +87,7 @@ export default function MenuBoard() {
         <Toon color="#23352a" />
       </mesh>
       <Html transform position={[0, 0, 0.06]} distanceFactor={2.2} className="pointer-events-none">
-        <div className="font-chalk w-[560px] text-[#f5e9da]">
+        <div ref={chalk} style={{ visibility: "hidden" }} className="font-chalk w-[560px] text-[#f5e9da]">
           <p className="mb-3 text-center text-4xl">Menu</p>
           {LINES.map((line, i) => (
             <span
@@ -106,8 +114,10 @@ export default function MenuBoard() {
             <Portrait />
           </Suspense>
         </PortraitBoundary>
-        <Html transform position={[0, -0.62, 0.05]} distanceFactor={2.2} className="font-receipt pointer-events-none text-xs whitespace-nowrap text-[#f5e9da]">
-          Barista of the Month
+        <Html transform position={[0, -0.62, 0.05]} distanceFactor={2.2} className="pointer-events-none">
+          <div ref={label} style={{ visibility: "hidden" }} className="font-receipt text-xs whitespace-nowrap text-[#f5e9da]">
+            Barista of the Month
+          </div>
         </Html>
       </group>
     </group>

@@ -15,6 +15,7 @@ import { progressFromScroll, stationAnchor, type StationId } from "@/lib/cafe/st
 
 let progress = 0;
 let lenis: Lenis | null = null;
+let paused = false;
 const listeners = new Set<() => void>();
 
 function measure(): void {
@@ -37,7 +38,10 @@ export function subscribeProgress(fn: () => void): () => void {
 
 /** Start tracking scroll. smooth=false (reduced motion) uses native scroll. */
 export function startScroll(opts: { smooth: boolean }): () => void {
-  if (opts.smooth) lenis = new Lenis({ autoRaf: true });
+  if (opts.smooth) {
+    lenis = new Lenis({ autoRaf: true });
+    if (paused) lenis.stop();
+  }
   window.addEventListener("scroll", measure, { passive: true });
   window.addEventListener("resize", measure);
   measure();
@@ -49,10 +53,18 @@ export function startScroll(opts: { smooth: boolean }): () => void {
   };
 }
 
+/** Freeze scrolling (intro overlay). Safe to call before/after Lenis exists. */
+export function pauseScroll(value: boolean): void {
+  paused = value;
+  if (paused) lenis?.stop();
+  else lenis?.start();
+  document.documentElement.style.overflow = paused ? "hidden" : "";
+}
+
 export function goTo(id: StationId, opts: { immediate?: boolean } = {}): void {
   const max = document.documentElement.scrollHeight - window.innerHeight;
   const y = Math.max(0, max) * stationAnchor(id);
   if (lenis) lenis.resize();
-  if (lenis) lenis.scrollTo(y, { immediate: opts.immediate ?? false });
+  if (lenis) lenis.scrollTo(y, { immediate: opts.immediate ?? false, force: true });
   else window.scrollTo({ top: y, behavior: "instant" });
 }

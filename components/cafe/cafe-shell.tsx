@@ -1,11 +1,12 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import SceneBoundary from "@/components/cafe/scene-boundary";
+import Intro from "@/components/cafe/intro";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { detectWebGL, isPhoneViewport, resolveMode } from "@/lib/cafe/mode";
-import { goTo, startScroll } from "@/lib/cafe/scroll";
+import { goTo, pauseScroll, startScroll } from "@/lib/cafe/scroll";
 import { STATIONS, menuTargetForHash, resolveHash } from "@/lib/cafe/stations";
 
 const CafeScene = dynamic(() => import("@/components/cafe/scene"), { ssr: false });
@@ -24,9 +25,24 @@ export default function CafeShell({ children }: { children: ReactNode }) {
   const [entered, setEntered] = useState(false);
   const [open, setOpen] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [introActive, setIntroActive] = useState(true);
+  const [sceneReady, setSceneReady] = useState(false);
   const asideRef = useRef<HTMLElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const wasOpen = useRef(false);
+  const wasIntroActive = useRef(true);
+  const introShown = useRef(false);
+  // Stable: Intro re-runs its report effect when this changes.
+  const onIntroActive = useCallback((active: boolean) => {
+    if (active) introShown.current = true;
+    setIntroActive(active);
+  }, []);
+
+  // Hand focus to the Quick Order toggle when the intro closes.
+  useEffect(() => {
+    if (wasIntroActive.current && !introActive && introShown.current) toggleRef.current?.focus({ preventScroll: true });
+    wasIntroActive.current = introActive;
+  }, [introActive]);
 
   // Move focus into the drawer when it opens; hand it back to the toggle on
   // close if it was inside. Not a modal, so no trap. Skips initial mount.
@@ -60,6 +76,13 @@ export default function CafeShell({ children }: { children: ReactNode }) {
     };
   }, [inCafe, reduced]);
 
+  // Freeze scrolling while the intro covers the café.
+  useEffect(() => {
+    if (!inCafe || !introActive) return;
+    pauseScroll(true);
+    return () => pauseScroll(false);
+  }, [inCafe, introActive]);
+
   // Menu is the page (phones, no WebGL): honour a deep link by scrolling to
   // the matching menu section.
   useEffect(() => {
@@ -69,7 +92,7 @@ export default function CafeShell({ children }: { children: ReactNode }) {
   }, [inCafe]);
 
   useEffect(() => {
-    if (!inCafe) return;
+    if (!inCafe || introActive) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setOpen(false);
@@ -83,7 +106,7 @@ export default function CafeShell({ children }: { children: ReactNode }) {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [inCafe]);
+  }, [inCafe, introActive]);
 
   // One handler for every "#station" link in the menu: glide the camera in
   // the café, or jump to the matching menu section when the menu is the page.
@@ -129,8 +152,9 @@ export default function CafeShell({ children }: { children: ReactNode }) {
 
   return (
     <div onClick={onLinkClick}>
+      <div inert={introActive}>
       <SceneBoundary onError={() => setFailed(true)}>
-        <CafeScene cut={reduced} />
+        <CafeScene cut={reduced} onReady={() => setSceneReady(true)} />
       </SceneBoundary>
       {/* Scroll track: one viewport of scroll per station. */}
       <div aria-hidden style={{ height: `${STATIONS.length * 100}vh` }} />
@@ -155,6 +179,8 @@ export default function CafeShell({ children }: { children: ReactNode }) {
       >
         {children}
       </aside>
+      </div>
+      <Intro reduced={reduced} ready={sceneReady} onActiveChange={onIntroActive} />
     </div>
   );
 }

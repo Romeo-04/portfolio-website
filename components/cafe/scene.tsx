@@ -20,6 +20,7 @@ import { Ink, Toon } from "@/components/cafe/kit";
 import Checkout from "@/components/cafe/stations/checkout";
 import MenuBoard from "@/components/cafe/stations/menu-board";
 import Roastery from "@/components/cafe/stations/roastery";
+import Specials, { type SpecialItem } from "@/components/cafe/stations/specials";
 import Storefront from "@/components/cafe/stations/storefront";
 import Wall from "@/components/cafe/stations/wall";
 import { createPourMaterial, setFill } from "@/components/cafe/shaders/pour";
@@ -128,9 +129,9 @@ function SignatureCups() {
   );
 }
 
-const BUILT = new Set<string>(["storefront", "menu-board", "wall", "roastery", "checkout"]);
+const BUILT = new Set<string>(["storefront", "menu-board", "wall", "roastery", "checkout", "specials"]);
 
-function PlaceholderShop({ reduced }: { reduced: boolean }) {
+function PlaceholderShop({ reduced, specials }: { reduced: boolean; specials: SpecialItem[] }) {
   return (
     <>
       <mesh rotation-x={-Math.PI / 2} position={[0, 0, 0]}>
@@ -157,12 +158,23 @@ function PlaceholderShop({ reduced }: { reduced: boolean }) {
       <Wall />
       <Roastery />
       <Checkout />
+      <Specials items={specials} />
       <SignatureCups />
     </>
   );
 }
 
-export default function CafeScene({ cut, onReady }: { cut: boolean; onReady?: () => void }) {
+export default function CafeScene({
+  cut,
+  specials,
+  light: _light,
+  onReady,
+}: {
+  cut: boolean;
+  specials: SpecialItem[];
+  light: boolean;
+  onReady?: () => void;
+}) {
   return (
     <div aria-hidden className="fixed inset-0">
       <Canvas camera={{ fov: 50, position: [...STATIONS[0].camera.position] }} dpr={[1, 2]} onCreated={() => onReady?.()}>
@@ -172,7 +184,7 @@ export default function CafeScene({ cut, onReady }: { cut: boolean; onReady?: ()
         <pointLight position={[0, 3, 0]} intensity={8} color="#ffb36b" />
         <LoadingReporter />
         <CameraRig cut={cut} />
-        <PlaceholderShop reduced={cut} />
+        <PlaceholderShop reduced={cut} specials={specials} />
       </Canvas>
     </div>
   );

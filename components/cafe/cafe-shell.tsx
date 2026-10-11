@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import SceneBoundary from "@/components/cafe/scene-boundary";
 import Intro from "@/components/cafe/intro";
+import type { SpecialItem } from "@/components/cafe/stations/specials";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { detectWebGL, isPhoneViewport, resolveMode } from "@/lib/cafe/mode";
 import { goTo, pauseScroll, startScroll } from "@/lib/cafe/scroll";
@@ -19,7 +20,7 @@ let env: Env | null = null;
 const readEnv = () => (env ??= { webgl: detectWebGL(), phone: isPhoneViewport() });
 const noSubscribe = () => () => {};
 
-export default function CafeShell({ children }: { children: ReactNode }) {
+export default function CafeShell({ children, specials }: { children: ReactNode; specials: SpecialItem[] }) {
   const caps = useSyncExternalStore(noSubscribe, readEnv, () => null);
   const reduced = useReducedMotion();
   const [entered, setEntered] = useState(false);
@@ -154,7 +155,7 @@ export default function CafeShell({ children }: { children: ReactNode }) {
     <div onClick={onLinkClick}>
       <div inert={introActive}>
       <SceneBoundary onError={() => setFailed(true)}>
-        <CafeScene cut={reduced} onReady={() => setSceneReady(true)} />
+        <CafeScene cut={reduced} specials={specials} light={Boolean(caps?.phone)} onReady={() => setSceneReady(true)} />
       </SceneBoundary>
       {/* Scroll track: one viewport of scroll per station. */}
       <div aria-hidden style={{ height: `${STATIONS.length * 100}vh` }} />

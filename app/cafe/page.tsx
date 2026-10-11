@@ -16,7 +16,7 @@ export default async function CafePage() {
   // getGithubRepos already drops githubExclude; here we only hide drinks.
   const specials = selectSpecials(repos, drinkRepoNames(projectsData));
   return (
-    <CafeShell>
+    <CafeShell specials={specials.map((r) => ({ id: r.id, name: r.displayName, language: r.language }))}>
       <QuickOrderMenu specials={specials} />
     </CafeShell>
   );

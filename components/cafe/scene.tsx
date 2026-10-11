@@ -10,12 +10,14 @@
 // <Outlines>.
 // ============================================================
 
-import { Html, Outlines } from "@react-three/drei";
+import { Html } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import { Color } from "three";
 import type { Mesh, MeshBasicMaterial, ShaderMaterial } from "three";
-import { INK, OUTLINE_THICKNESS, toonGradient } from "@/components/cafe/materials/toon";
+import { INK, OUTLINE_THICKNESS } from "@/components/cafe/materials/toon";
+import { Ink, Toon } from "@/components/cafe/kit";
+import Storefront from "@/components/cafe/stations/storefront";
 import { createPourMaterial, setFill } from "@/components/cafe/shaders/pour";
 import { projectsData } from "@/data/portfolio";
 import { drinkFor } from "@/lib/cafe/drinks";
@@ -30,9 +32,6 @@ const LIQUID_HEIGHT = CUP_HEIGHT * 0.9;
 const LIQUID_RADIUS_TOP = 0.165;
 const LIQUID_RADIUS_BOTTOM = 0.13;
 
-function Ink() {
-  return <Outlines thickness={OUTLINE_THICKNESS} color={INK} />;
-}
 
 function CameraRig({ cut }: { cut: boolean }) {
   useFrame(({ camera }) => {
@@ -84,7 +83,7 @@ function PouringCup({
       {/* Glass: a see-through toon shell with an ink rim. */}
       <mesh>
         <cylinderGeometry args={[0.18, 0.14, CUP_HEIGHT, 24, 1, true]} />
-        <meshToonMaterial color="#f6ead8" gradientMap={toonGradient()} transparent opacity={0.25} />
+        <Toon color="#f6ead8" transparent opacity={0.25} />
       </mesh>
       <mesh position={[0, CUP_HEIGHT / 2, 0]} rotation-x={-Math.PI / 2}>
         <torusGeometry args={[0.18, OUTLINE_THICKNESS / 2, 6, 32]} />
@@ -117,25 +116,31 @@ function SignatureCups() {
   );
 }
 
-function PlaceholderShop() {
+const BUILT = new Set<string>(["storefront"]);
+
+function PlaceholderShop({ reduced }: { reduced: boolean }) {
   return (
     <>
       <mesh rotation-x={-Math.PI / 2} position={[0, 0, 0]}>
         <planeGeometry args={[40, 40]} />
-        <meshToonMaterial color="#3a2618" gradientMap={toonGradient()} />
+        <Toon color="#3a2618" />
       </mesh>
-      {STATIONS.map((s, i) => (
-        <group key={s.id} position={[...s.camera.target]}>
-          <mesh>
-            <boxGeometry args={[1.6, 1, 0.6]} />
-            <meshToonMaterial color={STATION_COLORS[i]} gradientMap={toonGradient()} />
-            <Ink />
-          </mesh>
-          <Html center position={[0, 0.9, 0]} className="font-chalk pointer-events-none text-2xl whitespace-nowrap text-[#f5e9da]">
-            {s.label}
-          </Html>
-        </group>
-      ))}
+      {STATIONS.filter((s) => !BUILT.has(s.id)).map((s) => {
+        const i = STATIONS.indexOf(s);
+        return (
+          <group key={s.id} position={[...s.camera.target]}>
+            <mesh>
+              <boxGeometry args={[1.6, 1, 0.6]} />
+              <Toon color={STATION_COLORS[i]} />
+              <Ink />
+            </mesh>
+            <Html center position={[0, 0.9, 0]} className="font-chalk pointer-events-none text-2xl whitespace-nowrap text-[#f5e9da]">
+              {s.label}
+            </Html>
+          </group>
+        );
+      })}
+      <Storefront reduced={reduced} />
       <SignatureCups />
     </>
   );
@@ -150,7 +155,7 @@ export default function CafeScene({ cut }: { cut: boolean }) {
         <directionalLight position={[5, 8, 5]} intensity={1.6} />
         <pointLight position={[0, 3, 0]} intensity={8} color="#ffb36b" />
         <CameraRig cut={cut} />
-        <PlaceholderShop />
+        <PlaceholderShop reduced={cut} />
       </Canvas>
     </div>
   );

@@ -56,12 +56,12 @@ export default function Checkout() {
       {/* Receipt hangs from the printer slot; scale.y grows it downward. */}
       <group ref={paper} position={[0, 1.3, 0.42]}>
         <mesh position={[0, -RECEIPT_HEIGHT / 2, 0]}>
-          <planeGeometry args={[0.4, RECEIPT_HEIGHT]} />
+          <planeGeometry args={[0.56, RECEIPT_HEIGHT]} />
           <Toon color="#fbf6ee" />
         </mesh>
       </group>
       <Html transform position={[0, 1.3 - RECEIPT_HEIGHT / 2, 0.44]} distanceFactor={1.4} className="pointer-events-none">
-        <div ref={text} style={{ clipPath: "inset(0 0 100% 0)" }} className="font-receipt w-[150px] text-[9px] leading-snug text-[#1b120c]">
+        <div ref={text} style={{ clipPath: "inset(0 0 100% 0)" }} className="font-receipt w-[130px] text-[9px] leading-snug text-[#1b120c]">
           <p className="text-center font-bold">THANK YOU</p>
           <p>{personalInfo.email}</p>
           <p>{personalInfo.github.replace("https://", "")}</p>

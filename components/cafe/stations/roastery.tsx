@@ -76,7 +76,7 @@ export default function Roastery() {
         <Html
           key={`${e.title}-${e.organization}`}
           transform
-          distanceFactor={3}
+          distanceFactor={2}
           position={[CONVEYOR_START + ((i + 0.5) / experienceData.length) * (CONVEYOR_END - CONVEYOR_START), 1.4, 0]}
           className="pointer-events-none"
         >

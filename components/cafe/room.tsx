@@ -85,7 +85,6 @@ export default function Room({ lampLights }: { lampLights: boolean }) {
       <Wall size={[8, H, 0.2]} position={[0, H / 2, -14]} />
       {[
         [-3, 3.2, -2.5],
-        [0, 3.2, -2.5],
         [3, 3.2, -2.5],
         [-3, 3.2, -6.5],
         [0, 3.2, -6.5],

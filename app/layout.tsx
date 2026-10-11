@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Space_Mono } from "next/font/google";
 import "./globals.css";
+import { personalInfo, siteConfig } from "@/data/portfolio";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-space-grotesk",
@@ -21,9 +22,9 @@ const spaceMono = Space_Mono({
 const themeScript = `(function(){try{var t=localStorage.getItem("theme");if(t==="light"){document.documentElement.classList.add("light")}}catch(e){}})();`;
 
 export const metadata: Metadata = {
-  title: "Jhezra A. Tolentino — Software Engineer",
-  description:
-    "Software Engineer specializing in Web Development, Machine Learning, and Full-Stack Projects. FEU Tech Computer Science student with strong academic and leadership credentials.",
+  metadataBase: new URL(siteConfig.url),
+  title: `${siteConfig.name} — ${siteConfig.title}`,
+  description: siteConfig.description,
   keywords: [
     "Jhezra Tolentino",
     "Software Engineer",
@@ -33,22 +34,35 @@ export const metadata: Metadata = {
     "FEU Tech",
     "Portfolio",
   ],
-  authors: [{ name: "Jhezra A. Tolentino" }],
+  authors: [{ name: siteConfig.name, url: siteConfig.url }],
+  alternates: { canonical: "/" },
+  // og:image / twitter:image come from app/opengraph-image.tsx.
   openGraph: {
-    title: "Jhezra A. Tolentino — Software Engineer",
-    description:
-      "Software Engineer building thoughtful systems across web development, machine learning, and interactive experiences.",
+    title: `${siteConfig.name} — ${siteConfig.title}`,
+    description: personalInfo.tagline,
+    url: "/",
+    siteName: siteConfig.name,
     type: "website",
     locale: "en_US",
-    images: [{ url: "/images/og-image.png", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Jhezra A. Tolentino — Software Engineer",
-    description:
-      "Software Engineer building thoughtful systems across web development, machine learning, and interactive experiences.",
-    images: ["/images/og-image.png"],
+    title: `${siteConfig.name} — ${siteConfig.title}`,
+    description: personalInfo.tagline,
   },
+};
+
+// Person schema so search can tie the name, role, and profiles together.
+const personJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: personalInfo.name,
+  jobTitle: personalInfo.role,
+  url: siteConfig.url,
+  image: new URL(personalInfo.heroImage, siteConfig.url).href,
+  email: `mailto:${personalInfo.email}`,
+  alumniOf: { "@type": "CollegeOrUniversity", name: personalInfo.school },
+  sameAs: [personalInfo.github, personalInfo.linkedin],
 };
 
 export default function RootLayout({
@@ -60,6 +74,10 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+        />
       </head>
       <body
         className={`${spaceGrotesk.variable} ${spaceMono.variable} font-sans`}

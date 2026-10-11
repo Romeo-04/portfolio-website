@@ -12,7 +12,8 @@
 
 import { Html, Outlines } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
+import { Color } from "three";
 import type { Mesh, MeshToonMaterial, ShaderMaterial } from "three";
 import { INK, OUTLINE_THICKNESS, toonGradient } from "@/components/cafe/materials/toon";
 import { createPourMaterial, setFill } from "@/components/cafe/shaders/pour";
@@ -49,11 +50,13 @@ function PouringCup({
   count: number;
 }) {
   const drink = useMemo(() => drinkFor(project), [project]);
-  const layers = drink.layers;
+  const colors = useMemo(() => drink.layers.map((l) => new Color(l.color)), [drink]);
   const liquid = useMemo<ShaderMaterial>(
     () => createPourMaterial(drink, CUP_HEIGHT * 0.9),
     [drink],
   );
+  useEffect(() => () => liquid.dispose(), [liquid]);
+  const lastIdx = useRef(-1);
   const surfaceRef = useRef<Mesh>(null);
   const surfaceMat = useRef<MeshToonMaterial>(null);
   useFrame(() => {
@@ -66,7 +69,11 @@ function PouringCup({
     surface.position.y = (fill - 0.5) * CUP_HEIGHT * 0.9;
     const r = 0.13 + (0.165 - 0.13) * fill;
     surface.scale.set(r, r, 1);
-    mat.color.set(layers[layerIndexAt(Math.min(fill, 0.999), layers.length)].color);
+    const idx = layerIndexAt(Math.min(fill, 0.999), colors.length);
+    if (idx !== lastIdx.current) {
+      lastIdx.current = idx;
+      mat.color.copy(colors[idx]);
+    }
   });
 
   return (
@@ -75,7 +82,10 @@ function PouringCup({
       <mesh>
         <cylinderGeometry args={[0.18, 0.14, CUP_HEIGHT, 24, 1, true]} />
         <meshToonMaterial color="#f6ead8" gradientMap={toonGradient()} transparent opacity={0.25} />
-        <Ink />
+      </mesh>
+      <mesh position={[0, CUP_HEIGHT / 2, 0]} rotation-x={-Math.PI / 2}>
+        <torusGeometry args={[0.18, 0.008, 6, 32]} />
+        <meshBasicMaterial color={INK} />
       </mesh>
       {/* Liquid: slightly smaller so it sits inside the glass. */}
       <mesh material={liquid}>

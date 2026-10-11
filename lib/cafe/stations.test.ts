@@ -167,4 +167,22 @@ describe("camera inside the shop", () => {
       expect(y).toBeLessThan(4);
     }
   });
+
+  it("crosses the front wall and back wall only through the doors (analytic)", () => {
+    const pts = STATIONS.map((st) => st.camera.position);
+    for (let i = 0; i < pts.length - 1; i++) {
+      const [a, b] = [pts[i], pts[i + 1]];
+      for (const [wallZ, maxX, maxY] of [
+        [0, 0.5, 2.2],
+        [-9.5, 0.7, 2.4],
+      ] as const) {
+        if ((a[2] - wallZ) * (b[2] - wallZ) >= 0) continue; // does not cross
+        const t = (wallZ - a[2]) / (b[2] - a[2]);
+        const x = a[0] + (b[0] - a[0]) * t;
+        const y = a[1] + (b[1] - a[1]) * t;
+        expect(Math.abs(x), `x at z=${wallZ} on glide ${i}`).toBeLessThan(maxX);
+        expect(y, `y at z=${wallZ} on glide ${i}`).toBeLessThan(maxY);
+      }
+    }
+  });
 });

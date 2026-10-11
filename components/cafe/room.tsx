@@ -25,7 +25,7 @@ function Wall({ size, position }: { size: [number, number, number]; position: [n
   );
 }
 
-function Lamp({ position }: { position: [number, number, number] }) {
+function Lamp({ position, light }: { position: [number, number, number]; light: boolean }) {
   return (
     <group position={position}>
       <mesh position={[0, 0.4, 0]}>
@@ -41,12 +41,12 @@ function Lamp({ position }: { position: [number, number, number] }) {
         <sphereGeometry args={[0.08, 12, 8]} />
         <meshBasicMaterial color="#ffd9a0" />
       </mesh>
-      <pointLight position={[0, -0.2, 0]} intensity={2} distance={6} decay={2} color="#ffb36b" />
+      {light && <pointLight position={[0, -0.2, 0]} intensity={2} distance={6} decay={2} color="#ffb36b" />}
     </group>
   );
 }
 
-export default function Room() {
+export default function Room({ lampLights }: { lampLights: boolean }) {
   return (
     <group>
       {/* Main room: x -7..7, z 0..-9.5 */}
@@ -66,7 +66,7 @@ export default function Room() {
       <Wall size={[5.4, H - 2.8, 0.2]} position={[0, 2.8 + (H - 2.8) / 2, 0]} />
       {/* Night windows on the front wall. */}
       {[-4.85, 4.85].map((x) => (
-        <mesh key={x} position={[x, 2, -0.11]}>
+        <mesh key={x} position={[x, 2, -0.11]} rotation-y={Math.PI}>
           <planeGeometry args={[2.4, 1.4]} />
           <meshBasicMaterial color="#1d2a3a" />
         </mesh>
@@ -91,7 +91,7 @@ export default function Room() {
         [0, 3.2, -6.5],
         [3, 3.2, -6.5],
       ].map((p) => (
-        <Lamp key={p.join()} position={p as [number, number, number]} />
+        <Lamp key={p.join()} position={p as [number, number, number]} light={lampLights} />
       ))}
     </group>
   );

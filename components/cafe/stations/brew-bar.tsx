@@ -14,30 +14,30 @@ import { Ink, Toon } from "@/components/cafe/kit";
 export default function BrewBar() {
   return (
     <group>
-      <mesh position={[5.6, 0.55, -3]}>
-        <boxGeometry args={[0.8, 1.1, 4.2]} />
+      <mesh position={[5.6, 0.55, -2.8]}>
+        <boxGeometry args={[0.8, 1.1, 3.8]} />
         <Toon color="#5a3620" />
         <Ink />
       </mesh>
-      <mesh position={[5.6, 1.12, -3]}>
-        <boxGeometry args={[0.9, 0.04, 4.3]} />
+      <mesh position={[5.6, 1.12, -2.8]}>
+        <boxGeometry args={[0.9, 0.04, 3.8]} />
         <Toon color="#2b1a10" />
         <Ink />
       </mesh>
-      {/* Espresso machine */}
-      <group position={[5.8, 1.14, -4.6]}>
+      {/* Espresso machine: x 5.595..6.045, z -4.65..-3.95, clear of the cups (z -3 +- 0.9 + 0.18) */}
+      <group position={[5.82, 1.14, -4.3]}>
         <mesh position={[0, 0.3, 0]}>
-          <boxGeometry args={[0.5, 0.6, 0.7]} />
+          <boxGeometry args={[0.45, 0.6, 0.7]} />
           <Toon color="#b8b8b8" />
           <Ink />
         </mesh>
-        <mesh position={[-0.28, 0.32, 0]} rotation-z={Math.PI / 2}>
+        <mesh position={[-0.26, 0.32, 0]} rotation-z={Math.PI / 2}>
           <cylinderGeometry args={[0.07, 0.07, 0.12, 16]} />
           <Toon color="#2b1a10" />
           <Ink />
         </mesh>
         <mesh position={[0, 0.66, 0]}>
-          <boxGeometry args={[0.4, 0.12, 0.5]} />
+          <boxGeometry args={[0.36, 0.12, 0.5]} />
           <Toon color="#c0632f" />
           <Ink />
         </mesh>

@@ -9,7 +9,7 @@
 // ============================================================
 
 import { useGLTF } from "@react-three/drei";
-import { Component, Suspense, useMemo, type ReactNode } from "react";
+import { Component, Suspense, useEffect, useMemo, type ReactNode } from "react";
 import { Ink } from "@/components/cafe/kit";
 import { collectMeshes } from "@/components/cafe/materials/toonify";
 import { modelSrc, type ModelName } from "@/lib/cafe/models";
@@ -30,6 +30,8 @@ class ModelBoundary extends Component<{ fallback: ReactNode; children: ReactNode
 function Loaded({ src }: { src: string }) {
   const { scene } = useGLTF(src, false, true);
   const meshes = useMemo(() => collectMeshes(scene), [scene]);
+  // Dispose the toon materials we created; their textures belong to the glTF cache.
+  useEffect(() => () => meshes.forEach((m) => m.material.dispose()), [meshes]);
   return (
     <group>
       {meshes.map((m, i) => (

@@ -10,6 +10,8 @@
 
 import {
   Color,
+  FrontSide,
+  InstancedMesh,
   Matrix4,
   Mesh,
   MeshToonMaterial,
@@ -30,6 +32,9 @@ export function toonify(source: Material | Material[]): MeshToonMaterial {
     gradientMap: toonGradient(),
     transparent: src?.transparent ?? false,
     opacity: src?.opacity ?? 1,
+    side: src?.side ?? FrontSide,
+    alphaTest: src?.alphaTest ?? 0,
+    vertexColors: src?.vertexColors ?? false,
   });
   toon.name = src?.name ?? "";
   return toon;
@@ -41,7 +46,15 @@ export function collectMeshes(root: Object3D): BakedMesh[] {
   root.updateMatrixWorld(true);
   const out: BakedMesh[] = [];
   root.traverse((obj) => {
-    if (obj instanceof Mesh) {
+    if (obj instanceof InstancedMesh) {
+      // One baked copy per instance: world matrix x instance matrix.
+      const material = toonify(obj.material);
+      const inst = new Matrix4();
+      for (let i = 0; i < obj.count; i++) {
+        obj.getMatrixAt(i, inst);
+        out.push({ geometry: obj.geometry, material, matrix: new Matrix4().multiplyMatrices(obj.matrixWorld, inst) });
+      }
+    } else if (obj instanceof Mesh) {
       out.push({
         geometry: obj.geometry,
         material: toonify(obj.material),

@@ -1,7 +1,10 @@
 import {
   BoxGeometry,
   Color,
+  DoubleSide,
   Group,
+  InstancedMesh,
+  Matrix4,
   Mesh,
   MeshBasicMaterial,
   MeshStandardMaterial,
@@ -37,7 +40,30 @@ describe("toonify", () => {
   });
 });
 
+describe("toonify render state", () => {
+  it("keeps side, alphaTest and vertexColors", () => {
+    expect(toonify(new MeshStandardMaterial({ side: DoubleSide })).side).toBe(DoubleSide);
+    expect(toonify(new MeshStandardMaterial({ alphaTest: 0.5 })).alphaTest).toBe(0.5);
+    expect(toonify(new MeshStandardMaterial({ vertexColors: true })).vertexColors).toBe(true);
+  });
+});
+
 describe("collectMeshes", () => {
+  it("expands an InstancedMesh into one baked mesh per instance", () => {
+    const root = new Group();
+    root.position.set(10, 0, 0);
+    const inst = new InstancedMesh(new BoxGeometry(), new MeshStandardMaterial(), 3);
+    for (let i = 0; i < 3; i++) inst.setMatrixAt(i, new Matrix4().makeTranslation(i, i * 2, 0));
+    root.add(inst);
+
+    const baked = collectMeshes(root);
+    expect(baked).toHaveLength(3);
+    baked.forEach((b, i) => {
+      expect(new Vector3().setFromMatrixPosition(b.matrix).toArray()).toEqual([10 + i, i * 2, 0]);
+      expect(b.geometry).toBe(inst.geometry);
+    });
+  });
+
   it("bakes parent transforms into each mesh's matrix", () => {
     const root = new Group();
     const parent = new Group();

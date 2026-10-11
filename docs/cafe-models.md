@@ -15,16 +15,17 @@ replace a piece with your own model:
    cameras or lights.
 4. **Compress** (keeps the whole café under about 5 MB):
 
-       npm run models:optimize -- room.glb public/models/room.glb --compress meshopt --texture-compress webp
+       npm run models:optimize -- room.glb public/models/room.glb --compress meshopt --texture-compress webp --texture-size 1024
 
    A file over about 2 MB after this usually has textures that are too
    large; resize them to 1024 px or less.
 5. **Register** it in `lib/cafe/models.ts`:
 
-       export const MODELS = { room: "/models/room.glb" };
+       export const MODELS: Partial<Record<ModelName, string>> = { room: "/models/room.glb" };
 
    Names available: `room` (walls, floor, ceiling, lamps) and `brew-bar`
-   (counter and espresso machine).
+   (counter and espresso machine). Animated or skinned meshes are shown in
+   their rest pose.
 6. **Check** `npm run dev` → `/cafe`. If the file is missing or broken, the
    built-in piece shows and the console logs a `[cafe]` warning.
 

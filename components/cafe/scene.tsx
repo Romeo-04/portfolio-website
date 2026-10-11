@@ -10,12 +10,13 @@
 // toon material and <Outlines>.
 // ============================================================
 
-import { Html, useProgress } from "@react-three/drei";
+import { Html, PerformanceMonitor, useProgress } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Color } from "three";
 import type { Mesh, MeshBasicMaterial, ShaderMaterial } from "three";
 import { INK, OUTLINE_THICKNESS } from "@/components/cafe/materials/toon";
+import Effects from "@/components/cafe/effects";
 import { Ink, Toon } from "@/components/cafe/kit";
 import Checkout from "@/components/cafe/stations/checkout";
 import MenuBoard from "@/components/cafe/stations/menu-board";
@@ -27,6 +28,7 @@ import { createPourMaterial, setFill } from "@/components/cafe/shaders/pour";
 import { projectsData } from "@/data/portfolio";
 import { drinkFor } from "@/lib/cafe/drinks";
 import { cupFill, layerIndexAt } from "@/lib/cafe/pour";
+import { qualityFor } from "@/lib/cafe/quality";
 import { setLoading } from "@/lib/cafe/loading";
 import { getProgress } from "@/lib/cafe/scroll";
 import { STATIONS, cameraPose, stationYaw } from "@/lib/cafe/stations";
@@ -167,7 +169,7 @@ function PlaceholderShop({ reduced, specials }: { reduced: boolean; specials: Sp
 export default function CafeScene({
   cut,
   specials,
-  light: _light,
+  light,
   onReady,
 }: {
   cut: boolean;
@@ -175,9 +177,12 @@ export default function CafeScene({
   light: boolean;
   onReady?: () => void;
 }) {
+  const [declined, setDeclined] = useState(false);
+  const quality = qualityFor({ light, declined, reduced: cut });
   return (
     <div aria-hidden className="fixed inset-0">
-      <Canvas camera={{ fov: 50, position: [...STATIONS[0].camera.position] }} dpr={[1, 2]} onCreated={() => onReady?.()}>
+      <Canvas camera={{ fov: 50, position: [...STATIONS[0].camera.position] }} dpr={quality.dpr} onCreated={() => onReady?.()}>
+        <PerformanceMonitor onDecline={() => setDeclined(true)} />
         <color attach="background" args={["#1b120c"]} />
         <ambientLight intensity={0.5} />
         <directionalLight position={[5, 8, 5]} intensity={1.6} />
@@ -185,6 +190,7 @@ export default function CafeScene({
         <LoadingReporter />
         <CameraRig cut={cut} />
         <PlaceholderShop reduced={cut} specials={specials} />
+        {quality.effects && <Effects grain={quality.grain} />}
       </Canvas>
     </div>
   );

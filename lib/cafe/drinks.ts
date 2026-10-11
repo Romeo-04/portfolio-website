@@ -51,18 +51,28 @@ function fallbackLayer(tech: string): DrinkLayer {
   return { name: tech, color: FALLBACK_COLORS[hash % FALLBACK_COLORS.length] };
 }
 
-export function drinkFor(
-  project: Pick<Project, "title" | "techStack" | "drink">,
-): Drink {
+// One place that enforces the layer rules: unique names, at most MAX_LAYERS.
+function capLayers(candidates: Iterable<DrinkLayer>): DrinkLayer[] {
   const layers: DrinkLayer[] = [];
-  for (const tech of project.techStack) {
-    const layer = TECH_LAYERS[tech.toLowerCase()] ?? fallbackLayer(tech);
+  for (const layer of candidates) {
     if (!layers.some((l) => l.name === layer.name)) layers.push(layer);
     if (layers.length === MAX_LAYERS) break;
   }
-  if (layers.length === 0) layers.push(HOUSE_BLEND);
+  return layers;
+}
 
-  const finalLayers = project.drink?.layers ?? layers;
+export function drinkFor(
+  project: Pick<Project, "title" | "techStack" | "drink">,
+): Drink {
+  const derived = capLayers(
+    project.techStack.map((tech) => TECH_LAYERS[tech.toLowerCase()] ?? fallbackLayer(tech)),
+  );
+  if (derived.length === 0) derived.push(HOUSE_BLEND);
+
+  // An empty override would leave the cup with no layers, so it falls back.
+  const override = project.drink?.layers;
+  const finalLayers =
+    override && override.length > 0 ? capLayers(override) : derived;
   return {
     cup: project.drink?.cup ?? (finalLayers.length >= 3 ? "glass" : "mug"),
     layers: finalLayers,

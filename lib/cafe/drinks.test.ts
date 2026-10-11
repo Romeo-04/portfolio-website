@@ -47,3 +47,43 @@ describe("drinkFor", () => {
     expect(drinkFor({ title: "archeon", techStack: [] }).mark).toBe("A");
   });
 });
+
+describe("drinkFor overrides", () => {
+  it("falls back to derived layers when the override layers are empty", () => {
+    const drink = drinkFor({
+      title: "Empty override",
+      techStack: ["Python", "React"],
+      drink: { layers: [] },
+    });
+    expect(drink.layers.map((l) => l.name)).toEqual(["Espresso", "Steamed milk"]);
+  });
+
+  it("caps and dedupes override layers like derived ones", () => {
+    const drink = drinkFor({
+      title: "Override big",
+      techStack: ["Python"],
+      drink: {
+        layers: [
+          { name: "Ube", color: "#7b4fa0" },
+          { name: "Ube", color: "#7b4fa0" },
+          { name: "Pandan", color: "#3f7d4e" },
+          { name: "Mango", color: "#f4a300" },
+          { name: "Coconut", color: "#f5f0e1" },
+          { name: "Calamansi", color: "#c9d94a" },
+        ],
+      },
+    });
+    expect(drink.layers).toHaveLength(MAX_LAYERS);
+    expect(new Set(drink.layers.map((l) => l.name)).size).toBe(MAX_LAYERS);
+  });
+
+  it("keeps derived layers when only the cup is overridden", () => {
+    const drink = drinkFor({
+      title: "Cup only",
+      techStack: ["Python", "React"],
+      drink: { cup: "cup" },
+    });
+    expect(drink.cup).toBe("cup");
+    expect(drink.layers.map((l) => l.name)).toEqual(["Espresso", "Steamed milk"]);
+  });
+});

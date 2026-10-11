@@ -1,3 +1,4 @@
+import { useId } from "react";
 import type { Project } from "@/data/portfolio";
 import { drinkFor } from "@/lib/cafe/drinks";
 
@@ -14,8 +15,9 @@ export default function DrinkIllustration({
   const top = 22;
   const bottom = 74;
   const band = (bottom - top) / drink.layers.length;
-  // SVG ids can't contain spaces; titles can ("CitySense Live Geo").
-  const clipId = `cup-${project.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+  // useId is unique per render, so the same project drawn twice stays valid.
+  // React ids can contain characters that break url(#...), so strip them.
+  const clipId = `cup-${useId().replace(/[^A-Za-z0-9_-]/g, "")}`;
 
   return (
     <svg

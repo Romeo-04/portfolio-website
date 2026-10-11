@@ -16,6 +16,7 @@ import { progressFromScroll, stationAnchor, type StationId } from "@/lib/cafe/st
 let progress = 0;
 let lenis: Lenis | null = null;
 let paused = false;
+let gliding = false;
 const listeners = new Set<() => void>();
 
 function measure(): void {
@@ -25,6 +26,11 @@ function measure(): void {
     window.innerHeight,
   );
   listeners.forEach((fn) => fn());
+}
+
+/** True while a smooth goTo is still travelling. */
+export function isGliding(): boolean {
+  return gliding;
 }
 
 export function getProgress(): number {
@@ -37,6 +43,13 @@ export function subscribeProgress(fn: () => void): () => void {
 }
 
 /** Start tracking scroll. smooth=false (reduced motion) uses native scroll. */
+// Lenis drops our onComplete when the user wheels, touches or presses a key
+// mid-glide (the animation is replaced or stopped), so any such input ends
+// the glide as far as stamping is concerned.
+const endGlide = () => {
+  gliding = false;
+};
+
 export function startScroll(opts: { smooth: boolean }): () => void {
   if (opts.smooth) {
     lenis = new Lenis({ autoRaf: true });
@@ -44,12 +57,19 @@ export function startScroll(opts: { smooth: boolean }): () => void {
   }
   window.addEventListener("scroll", measure, { passive: true });
   window.addEventListener("resize", measure);
+  window.addEventListener("wheel", endGlide, { passive: true });
+  window.addEventListener("touchstart", endGlide, { passive: true });
+  window.addEventListener("keydown", endGlide);
   measure();
   return () => {
     window.removeEventListener("scroll", measure);
     window.removeEventListener("resize", measure);
+    window.removeEventListener("wheel", endGlide);
+    window.removeEventListener("touchstart", endGlide);
+    window.removeEventListener("keydown", endGlide);
     lenis?.destroy();
     lenis = null;
+    gliding = false;
   };
 }
 
@@ -65,6 +85,16 @@ export function goTo(id: StationId, opts: { immediate?: boolean } = {}): void {
   const max = document.documentElement.scrollHeight - window.innerHeight;
   const y = Math.max(0, max) * stationAnchor(id);
   if (lenis) lenis.resize();
-  if (lenis) lenis.scrollTo(y, { immediate: opts.immediate ?? false, force: true });
-  else window.scrollTo({ top: y, behavior: "instant" });
+  if (lenis) {
+    const immediate = opts.immediate ?? false;
+    if (!immediate) gliding = true;
+    lenis.scrollTo(y, {
+      immediate,
+      force: true,
+      onComplete: () => {
+        gliding = false;
+        measure();
+      },
+    });
+  } else window.scrollTo({ top: y, behavior: "instant" });
 }

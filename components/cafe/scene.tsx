@@ -182,7 +182,7 @@ export default function CafeScene({
   return (
     <div aria-hidden className="fixed inset-0">
       <Canvas camera={{ fov: 50, position: [...STATIONS[0].camera.position] }} dpr={quality.dpr} onCreated={() => onReady?.()}>
-        <PerformanceMonitor onDecline={() => setDeclined(true)} />
+        {!declined && <PerformanceMonitor onDecline={() => setDeclined(true)} />}
         <color attach="background" args={["#1b120c"]} />
         <ambientLight intensity={0.5} />
         <directionalLight position={[5, 8, 5]} intensity={1.6} />

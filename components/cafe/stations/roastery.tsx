@@ -74,7 +74,7 @@ export default function Roastery() {
       </instancedMesh>
       {experienceData.map((e, i) => (
         <Html
-          key={e.title}
+          key={`${e.title}-${e.organization}`}
           transform
           distanceFactor={3}
           position={[CONVEYOR_START + ((i + 0.5) / experienceData.length) * (CONVEYOR_END - CONVEYOR_START), 1.4, 0]}

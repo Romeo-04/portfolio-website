@@ -97,6 +97,7 @@ export default function CafeShell({ children, specials }: { children: ReactNode;
     if (!inCafe || introActive) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
+        if (document.querySelector("dialog[open]")) return;
         setOpen(false);
         return;
       }

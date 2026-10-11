@@ -16,6 +16,7 @@ import { progressFromScroll, stationAnchor, type StationId } from "@/lib/cafe/st
 let progress = 0;
 let lenis: Lenis | null = null;
 let paused = false;
+let gliding = false;
 const listeners = new Set<() => void>();
 
 function measure(): void {
@@ -25,6 +26,11 @@ function measure(): void {
     window.innerHeight,
   );
   listeners.forEach((fn) => fn());
+}
+
+/** True while a smooth goTo is still travelling. */
+export function isGliding(): boolean {
+  return gliding;
 }
 
 export function getProgress(): number {
@@ -50,6 +56,7 @@ export function startScroll(opts: { smooth: boolean }): () => void {
     window.removeEventListener("resize", measure);
     lenis?.destroy();
     lenis = null;
+    gliding = false;
   };
 }
 
@@ -65,6 +72,16 @@ export function goTo(id: StationId, opts: { immediate?: boolean } = {}): void {
   const max = document.documentElement.scrollHeight - window.innerHeight;
   const y = Math.max(0, max) * stationAnchor(id);
   if (lenis) lenis.resize();
-  if (lenis) lenis.scrollTo(y, { immediate: opts.immediate ?? false, force: true });
-  else window.scrollTo({ top: y, behavior: "instant" });
+  if (lenis) {
+    const immediate = opts.immediate ?? false;
+    if (!immediate) gliding = true;
+    lenis.scrollTo(y, {
+      immediate,
+      force: true,
+      onComplete: () => {
+        gliding = false;
+        measure();
+      },
+    });
+  } else window.scrollTo({ top: y, behavior: "instant" });
 }

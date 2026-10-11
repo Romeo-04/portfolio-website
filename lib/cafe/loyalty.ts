@@ -7,7 +7,7 @@
 // ============================================================
 
 import type { StorageLike } from "@/lib/cafe/intro";
-import { STATIONS, type StationId } from "@/lib/cafe/stations";
+import { DWELL, STATIONS, stationIndexAt, stationProgress, type StationId } from "@/lib/cafe/stations";
 
 export const STAMPS_KEY = "cafe-stamps";
 
@@ -52,4 +52,12 @@ export function saveStamps(storage: StorageLike | null, stamps: StationId[]): vo
   } catch {
     // Blocked storage: the card resets next visit, nothing else breaks.
   }
+}
+
+/** The station to stamp for a scroll position: only when the visitor has
+ *  arrived (not mid-glide, in the station's dwell zone). */
+export function stampFor(progress: number, gliding: boolean): StationId | null {
+  if (gliding) return null;
+  const id = STATIONS[stationIndexAt(progress)].id;
+  return stationProgress(progress, id) <= DWELL ? id : null;
 }

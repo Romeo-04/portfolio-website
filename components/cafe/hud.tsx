@@ -11,9 +11,9 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { offTheClock } from "@/data/portfolio";
-import { addStamp, isComplete, loadStamps, saveStamps } from "@/lib/cafe/loyalty";
-import { getProgress, goTo, subscribeProgress } from "@/lib/cafe/scroll";
-import { STATIONS, stationIndexAt, type StationId } from "@/lib/cafe/stations";
+import { addStamp, isComplete, loadStamps, saveStamps, stampFor } from "@/lib/cafe/loyalty";
+import { getProgress, goTo, isGliding, subscribeProgress } from "@/lib/cafe/scroll";
+import { STATIONS, type StationId } from "@/lib/cafe/stations";
 
 function storage(): Storage | null {
   try {
@@ -28,40 +28,25 @@ export default function Hud({ reduced }: { reduced: boolean }) {
   const [secretOpen, setSecretOpen] = useState(false);
   const last = useRef<StationId | null>(null);
   const cardRef = useRef<HTMLButtonElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
   const titleId = useId();
 
   useEffect(() => {
     const onScroll = () => {
-      const id = STATIONS[stationIndexAt(getProgress())].id;
-      if (id === last.current) return;
+      const id = stampFor(getProgress(), isGliding());
+      if (!id || id === last.current) return;
       last.current = id;
-      setStamps((prev) => {
-        const next = addStamp(prev, id);
-        if (next !== prev) saveStamps(storage(), next);
-        return next;
-      });
+      setStamps((prev) => addStamp(prev, id));
     };
-    onScroll();
     return subscribeProgress(onScroll);
   }, []);
 
   useEffect(() => {
-    if (!secretOpen) return;
-    const card = cardRef.current;
-    panelRef.current?.focus();
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return;
-      // Capture phase + stopPropagation: the shell's Escape handler (which
-      // closes the Quick Order drawer) never sees this keypress.
-      e.stopPropagation();
-      setSecretOpen(false);
-    };
-    window.addEventListener("keydown", onKey, true);
-    return () => {
-      window.removeEventListener("keydown", onKey, true);
-      card?.focus();
-    };
+    saveStamps(storage(), stamps);
+  }, [stamps]);
+
+  useEffect(() => {
+    if (secretOpen) dialogRef.current?.showModal();
   }, [secretOpen]);
 
   const complete = isComplete(stamps);
@@ -93,7 +78,7 @@ export default function Hud({ reduced }: { reduced: boolean }) {
         </span>
       </button>
 
-      <nav aria-label="Visited stations" className="fixed top-4 left-1/2 z-20 hidden -translate-x-1/2 gap-2 sm:flex">
+      <nav aria-label="Visited stations" className="fixed top-4 left-1/2 z-20 hidden -translate-x-1/2 gap-2 lg:flex">
         {stamps.map((id) => {
           const station = STATIONS.find((s) => s.id === id);
           return (
@@ -110,42 +95,44 @@ export default function Hud({ reduced }: { reduced: boolean }) {
       </nav>
 
       {secretOpen && (
-        <div className="fixed inset-0 z-40 grid place-items-center bg-[#1b120c]/70 p-4">
-          <div
-            ref={panelRef}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby={titleId}
-            tabIndex={-1}
-            className="w-full max-w-sm rounded-md bg-[#f6ead8] p-6 text-[#2b1a10] shadow-2xl"
+        <dialog
+          ref={dialogRef}
+          aria-labelledby={titleId}
+          onClose={() => {
+            setSecretOpen(false);
+            cardRef.current?.focus();
+          }}
+          onClick={(e) => {
+            if (e.target === dialogRef.current) dialogRef.current?.close();
+          }}
+          className="m-auto max-h-[80vh] w-full max-w-sm overflow-y-auto rounded-md bg-[#f6ead8] p-6 text-[#2b1a10] shadow-2xl backdrop:bg-[#1b120c]/70"
+        >
+          <h2 id={titleId} className="font-chalk text-3xl">
+            Off the Clock
+          </h2>
+          {offTheClock ? (
+            <div className="mt-3 space-y-2 text-sm">
+              <p>
+                <strong>My order:</strong> {offTheClock.coffeeOrder}
+              </p>
+              <p>
+                <strong>Off the clock:</strong> {offTheClock.hobbies.join(" · ")}
+              </p>
+              <p>
+                <strong>Fun fact:</strong> {offTheClock.funFact}
+              </p>
+            </div>
+          ) : (
+            <p className="mt-3 text-sm">The barista is still writing this one — check back soon.</p>
+          )}
+          <button
+            type="button"
+            onClick={() => dialogRef.current?.close()}
+            className="font-receipt mt-5 rounded-sm border border-[#2b1a10]/40 px-4 py-2 text-sm"
           >
-            <h2 id={titleId} className="font-chalk text-3xl">
-              Off the Clock
-            </h2>
-            {offTheClock ? (
-              <div className="mt-3 space-y-2 text-sm">
-                <p>
-                  <strong>My order:</strong> {offTheClock.coffeeOrder}
-                </p>
-                <p>
-                  <strong>Off the clock:</strong> {offTheClock.hobbies.join(" · ")}
-                </p>
-                <p>
-                  <strong>Fun fact:</strong> {offTheClock.funFact}
-                </p>
-              </div>
-            ) : (
-              <p className="mt-3 text-sm">The barista is still writing this one — check back soon.</p>
-            )}
-            <button
-              type="button"
-              onClick={() => setSecretOpen(false)}
-              className="font-receipt mt-5 rounded-sm border border-[#2b1a10]/40 px-4 py-2 text-sm"
-            >
-              Close
-            </button>
-          </div>
-        </div>
+            Close
+          </button>
+        </dialog>
       )}
     </>
   );

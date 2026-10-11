@@ -7,8 +7,9 @@ import {
   loadStamps,
   parseStamps,
   saveStamps,
+  stampFor,
 } from "@/lib/cafe/loyalty";
-import { STATIONS } from "@/lib/cafe/stations";
+import { STATIONS, stationAnchor } from "@/lib/cafe/stations";
 
 describe("parseStamps", () => {
   it("keeps valid ids in journey order without duplicates", () => {
@@ -63,5 +64,20 @@ describe("load and save", () => {
     expect(loadStamps(broken)).toEqual([]);
     expect(loadStamps(null)).toEqual([]);
     expect(() => saveStamps(broken, ["wall"])).not.toThrow();
+  });
+});
+
+describe("stampFor", () => {
+  it("gives nothing while gliding", () => {
+    expect(stampFor(stationAnchor("wall"), true)).toBeNull();
+  });
+  it("stamps the station the visitor rests on", () => {
+    expect(stampFor(stationAnchor("wall"), false)).toBe("wall");
+    expect(stampFor(0, false)).toBe("storefront");
+  });
+  it("gives nothing mid-glide-zone", () => {
+    const [i] = [STATIONS.findIndex((s) => s.id === "wall")];
+    const span = 1 / STATIONS.length;
+    expect(stampFor((i + 0.8) * span, false)).toBeNull();
   });
 });

@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import SceneBoundary from "@/components/cafe/scene-boundary";
+import Hud from "@/components/cafe/hud";
 import Intro from "@/components/cafe/intro";
 import type { SpecialItem } from "@/components/cafe/stations/specials";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
@@ -169,6 +170,7 @@ export default function CafeShell({ children, specials }: { children: ReactNode;
       >
         {open ? "Close menu" : "Quick Order (M)"}
       </button>
+      <Hud reduced={reduced} />
       <aside
         ref={asideRef}
         tabIndex={-1}

@@ -639,3 +639,15 @@ export const skillStats = [
   { label: "Leadership", value: 90 },
   { label: "Problem Solving", value: 95 },
 ];
+
+// --- Off the Clock (the café's secret drink) ---
+// Unlocked when a visitor fills the loyalty card. Fill this in with your
+// real coffee order, a few hobbies and a fun fact; while it is null the
+// card says the barista is still writing it.
+export interface OffTheClock {
+  coffeeOrder: string;
+  hobbies: string[];
+  funFact: string;
+}
+
+export const offTheClock: OffTheClock | null = null;

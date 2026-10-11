@@ -9,9 +9,6 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-space-grotesk);
-  --font-display: var(--font-space-grotesk);
-  --font-mono: var(--font-space-mono);
   --font-chalk: var(--font-caveat-brush);
   --font-receipt: var(--font-courier-prime);
   --font-cafe: var(--font-nunito);
@@ -156,10 +153,6 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: var(--font-space-grotesk), sans-serif;
-  }
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-space-grotesk), sans-serif;
   }
   /* Anchor jumps must clear the sticky nav, or the section heading lands
      underneath it. Matches NAV_OFFSET in orb-navigator.tsx. */

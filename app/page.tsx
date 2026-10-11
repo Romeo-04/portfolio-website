@@ -1,41 +1,16 @@
-import IntroOverlay from "@/components/intro-overlay";
-import GalaxyBackground from "@/components/galaxy-background";
-import OrbNavigator from "@/components/orb-navigator";
-import TopNav from "@/components/top-nav";
-import Marquee from "@/components/marquee";
-import Hero from "@/components/sections/hero";
-import About from "@/components/sections/about";
-import Skills from "@/components/sections/skills";
-import Experience from "@/components/sections/experience";
-import Projects from "@/components/sections/projects";
-import GithubSection from "@/components/sections/github";
-import Achievements from "@/components/sections/achievements";
-import Certifications from "@/components/sections/certifications";
-import Contact from "@/components/sections/contact";
-import Footer from "@/components/footer";
+import CafeShell from "@/components/cafe/cafe-shell";
+import QuickOrderMenu from "@/components/menu/quick-order";
+import { projectsData } from "@/data/portfolio";
+import { drinkRepoNames, selectSpecials } from "@/lib/cafe/specials";
+import { getGithubRepos } from "@/lib/github";
 
-export default function Home() {
+export default async function Home() {
+  const repos = await getGithubRepos();
+  // getGithubRepos already drops githubExclude; here we only hide drinks.
+  const specials = selectSpecials(repos, drinkRepoNames(projectsData));
   return (
-    <>
-      <IntroOverlay />
-      <GalaxyBackground />
-      <TopNav />
-
-      <main className="relative">
-        <Hero />
-        <Marquee />
-        <About />
-        <Skills />
-        <Experience />
-        <Projects />
-        <Achievements />
-        <GithubSection />
-        <Certifications />
-        <Contact />
-        <Footer />
-      </main>
-
-      <OrbNavigator />
-    </>
+    <CafeShell specials={specials.map((r) => ({ id: r.id, name: r.displayName, language: r.language }))}>
+      <QuickOrderMenu specials={specials} />
+    </CafeShell>
   );
 }

@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import SceneBoundary from "@/components/cafe/scene-boundary";
+import Intro from "@/components/cafe/intro";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { detectWebGL, isPhoneViewport, resolveMode } from "@/lib/cafe/mode";
 import { goTo, startScroll } from "@/lib/cafe/scroll";
@@ -155,6 +156,7 @@ export default function CafeShell({ children }: { children: ReactNode }) {
       >
         {children}
       </aside>
+      <Intro reduced={reduced} />
     </div>
   );
 }

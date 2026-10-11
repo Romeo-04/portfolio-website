@@ -46,7 +46,7 @@ export default function Hud({ reduced }: { reduced: boolean }) {
   }, [stamps]);
 
   useEffect(() => {
-    if (secretOpen) dialogRef.current?.showModal();
+    if (secretOpen && dialogRef.current && !dialogRef.current.open) dialogRef.current.showModal();
   }, [secretOpen]);
 
   const complete = isComplete(stamps);

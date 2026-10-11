@@ -43,6 +43,13 @@ export function subscribeProgress(fn: () => void): () => void {
 }
 
 /** Start tracking scroll. smooth=false (reduced motion) uses native scroll. */
+// Lenis drops our onComplete when the user wheels, touches or presses a key
+// mid-glide (the animation is replaced or stopped), so any such input ends
+// the glide as far as stamping is concerned.
+const endGlide = () => {
+  gliding = false;
+};
+
 export function startScroll(opts: { smooth: boolean }): () => void {
   if (opts.smooth) {
     lenis = new Lenis({ autoRaf: true });
@@ -50,10 +57,16 @@ export function startScroll(opts: { smooth: boolean }): () => void {
   }
   window.addEventListener("scroll", measure, { passive: true });
   window.addEventListener("resize", measure);
+  window.addEventListener("wheel", endGlide, { passive: true });
+  window.addEventListener("touchstart", endGlide, { passive: true });
+  window.addEventListener("keydown", endGlide);
   measure();
   return () => {
     window.removeEventListener("scroll", measure);
     window.removeEventListener("resize", measure);
+    window.removeEventListener("wheel", endGlide);
+    window.removeEventListener("touchstart", endGlide);
+    window.removeEventListener("keydown", endGlide);
     lenis?.destroy();
     lenis = null;
     gliding = false;

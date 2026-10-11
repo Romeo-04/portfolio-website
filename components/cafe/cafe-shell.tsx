@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import SceneBoundary from "@/components/cafe/scene-boundary";
 import Intro from "@/components/cafe/intro";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
@@ -31,10 +31,16 @@ export default function CafeShell({ children }: { children: ReactNode }) {
   const toggleRef = useRef<HTMLButtonElement>(null);
   const wasOpen = useRef(false);
   const wasIntroActive = useRef(true);
+  const introShown = useRef(false);
+  // Stable: Intro re-runs its report effect when this changes.
+  const onIntroActive = useCallback((active: boolean) => {
+    if (active) introShown.current = true;
+    setIntroActive(active);
+  }, []);
 
   // Hand focus to the Quick Order toggle when the intro closes.
   useEffect(() => {
-    if (wasIntroActive.current && !introActive) toggleRef.current?.focus({ preventScroll: true });
+    if (wasIntroActive.current && !introActive && introShown.current) toggleRef.current?.focus({ preventScroll: true });
     wasIntroActive.current = introActive;
   }, [introActive]);
 
@@ -174,7 +180,7 @@ export default function CafeShell({ children }: { children: ReactNode }) {
         {children}
       </aside>
       </div>
-      <Intro reduced={reduced} ready={sceneReady} onActiveChange={setIntroActive} />
+      <Intro reduced={reduced} ready={sceneReady} onActiveChange={onIntroActive} />
     </div>
   );
 }

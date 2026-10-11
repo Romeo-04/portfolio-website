@@ -17,7 +17,9 @@ import { Color } from "three";
 import type { Mesh, MeshBasicMaterial, ShaderMaterial } from "three";
 import { INK, OUTLINE_THICKNESS } from "@/components/cafe/materials/toon";
 import { Ink, Toon } from "@/components/cafe/kit";
+import MenuBoard from "@/components/cafe/stations/menu-board";
 import Storefront from "@/components/cafe/stations/storefront";
+import Wall from "@/components/cafe/stations/wall";
 import { createPourMaterial, setFill } from "@/components/cafe/shaders/pour";
 import { projectsData } from "@/data/portfolio";
 import { drinkFor } from "@/lib/cafe/drinks";
@@ -116,7 +118,7 @@ function SignatureCups() {
   );
 }
 
-const BUILT = new Set<string>(["storefront"]);
+const BUILT = new Set<string>(["storefront", "menu-board", "wall"]);
 
 function PlaceholderShop({ reduced }: { reduced: boolean }) {
   return (
@@ -141,6 +143,8 @@ function PlaceholderShop({ reduced }: { reduced: boolean }) {
         );
       })}
       <Storefront reduced={reduced} />
+      <MenuBoard />
+      <Wall />
       <SignatureCups />
     </>
   );

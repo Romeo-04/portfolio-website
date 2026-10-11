@@ -71,8 +71,7 @@ export type CategoryColor =
   | "violet"
   | "slate";
 
-// One of the semantic icon keys mapped to a lucide-react component in
-// components/sections/skills.tsx.
+// Semantic icon label kept in the data; no component maps it to an icon now.
 export type CategoryIcon =
   | "code"
   | "layout"

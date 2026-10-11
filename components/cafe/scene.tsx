@@ -26,7 +26,7 @@ import { drinkFor } from "@/lib/cafe/drinks";
 import { cupFill, layerIndexAt } from "@/lib/cafe/pour";
 import { setLoading } from "@/lib/cafe/loading";
 import { getProgress } from "@/lib/cafe/scroll";
-import { STATIONS, cameraPose } from "@/lib/cafe/stations";
+import { STATIONS, cameraPose, stationYaw } from "@/lib/cafe/stations";
 
 const STATION_COLORS = ["#c0632f", "#3d5a40", "#8a5a3b", "#a8873c", "#5a3620", "#c8873a", "#7a4a2a"];
 
@@ -118,7 +118,7 @@ function SignatureCups() {
   const [x, y, z] = brewBar.camera.target;
   const signature = projectsData.filter((p) => p.featured);
   return (
-    <group position={[x, y, z]}>
+    <group position={[x, y, z]} rotation={[0, stationYaw("brew-bar"), 0]}>
       {signature.map((p, i) => (
         <PouringCup key={p.slug} project={p} index={i} count={signature.length} />
       ))}
@@ -138,7 +138,7 @@ function PlaceholderShop({ reduced }: { reduced: boolean }) {
       {STATIONS.filter((s) => !BUILT.has(s.id)).map((s) => {
         const i = STATIONS.indexOf(s);
         return (
-          <group key={s.id} position={[...s.camera.target]}>
+          <group key={s.id} position={[...s.camera.target]} rotation={[0, stationYaw(s.id), 0]}>
             <mesh>
               <boxGeometry args={[1.6, 1, 0.6]} />
               <Toon color={STATION_COLORS[i]} />

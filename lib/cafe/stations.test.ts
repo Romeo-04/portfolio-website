@@ -10,6 +10,7 @@ import {
   stationIndexAt,
   stationProgress,
   stationRange,
+  stationYaw,
 } from "@/lib/cafe/stations";
 
 const n = STATIONS.length;
@@ -121,5 +122,23 @@ describe("menuTargetForHash", () => {
   it("returns null for unknown or empty hashes", () => {
     expect(menuTargetForHash("#foo")).toBeNull();
     expect(menuTargetForHash("")).toBeNull();
+  });
+});
+
+describe("indoor layout", () => {
+  it("keeps every station after the storefront inside the shop", () => {
+    for (const s of STATIONS.slice(1)) {
+      expect(s.camera.position[2]).toBeLessThan(0);
+      expect(s.camera.target[2]).toBeLessThan(0);
+      expect(Math.abs(s.camera.target[0])).toBeLessThan(7);
+    }
+  });
+});
+
+describe("stationYaw", () => {
+  it("turns a +z face toward the camera", () => {
+    expect(stationYaw("wall")).toBeCloseTo(Math.PI / 2);
+    expect(stationYaw("specials")).toBeCloseTo(-Math.PI / 2);
+    expect(stationYaw("storefront")).toBeCloseTo(0);
   });
 });

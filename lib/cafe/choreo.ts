@@ -42,7 +42,8 @@ export function doorAngle(t: number): number {
 export const FRAME_SWING = 1.2;
 
 export function frameAngle(t: number, index: number, count: number): number {
-  return (1 - easeOutBack(stagger(t, index, count))) * FRAME_SWING;
+  // easeOutBack overshoots 1; clamp so frames never swing into the wall.
+  return Math.max(0, (1 - easeOutBack(stagger(t, index, count))) * FRAME_SWING);
 }
 
 /** Intro gauge: done only when the minimum time passed AND loading finished. */

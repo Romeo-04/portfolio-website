@@ -30,6 +30,13 @@ export default function CafeShell({ children }: { children: ReactNode }) {
   const asideRef = useRef<HTMLElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const wasOpen = useRef(false);
+  const wasIntroActive = useRef(true);
+
+  // Hand focus to the Quick Order toggle when the intro closes.
+  useEffect(() => {
+    if (wasIntroActive.current && !introActive) toggleRef.current?.focus({ preventScroll: true });
+    wasIntroActive.current = introActive;
+  }, [introActive]);
 
   // Move focus into the drawer when it opens; hand it back to the toggle on
   // close if it was inside. Not a modal, so no trap. Skips initial mount.
@@ -52,7 +59,6 @@ export default function CafeShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!inCafe) return;
     const stop = startScroll({ smooth: !reduced });
-    pauseScroll(introActive);
     const target = resolveHash(window.location.hash);
     // Wait a frame so Lenis and the layout have measured before jumping.
     const frame = requestAnimationFrame(() => {
@@ -62,8 +68,6 @@ export default function CafeShell({ children }: { children: ReactNode }) {
       cancelAnimationFrame(frame);
       stop();
     };
-    // introActive is read only at start; the effect below tracks later changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inCafe, reduced]);
 
   // Freeze scrolling while the intro covers the café.

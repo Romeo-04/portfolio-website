@@ -4,15 +4,15 @@
 // INTRO (station 0)
 // ============================================================
 // The espresso machine warms up: its pressure gauge follows real asset
-// loading (drei useProgress), never finishing before a minimum time so the
+// loading (reported by the scene via lib/cafe/loading), never finishing before a minimum time so the
 // moment registers. Plays once per session, never on deep links, and can
 // be skipped. Mounted only in café mode, so it never renders on the server.
 // ============================================================
 
-import { useProgress } from "@react-three/drei";
 import { useEffect, useRef, useState } from "react";
 import { personalInfo } from "@/data/portfolio";
 import { gaugeValue } from "@/lib/cafe/choreo";
+import { getLoading } from "@/lib/cafe/loading";
 import { markIntroSeen, shouldPlayIntro } from "@/lib/cafe/intro";
 
 function storage(): Storage | null {
@@ -51,13 +51,25 @@ export default function Intro({
 
   useEffect(() => {
     if (!show) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        markIntroSeen(storage());
+        setShow(false);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [show]);
+
+  useEffect(() => {
+    if (!show) return;
     const minMs = reduced ? 1200 : 2400;
     const start = performance.now();
     let frame = 0;
     // Latched so the needle never moves backwards when more assets start loading.
     let latched = 0;
     const tick = () => {
-      const { active, total, progress } = useProgress.getState();
+      const { active, total, progress } = getLoading();
       const loaded = !readyRef.current ? 0 : total === 0 && !active ? null : progress;
       const v = gaugeValue(performance.now() - start, minMs, loaded);
       latched = Math.max(latched, v);

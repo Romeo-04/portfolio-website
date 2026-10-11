@@ -11,11 +11,12 @@
 import { Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
-import type { BufferAttribute, Group } from "three";
+import type { BufferAttribute, Group, Mesh } from "three";
 import { Ink, Toon } from "@/components/cafe/kit";
 import { personalInfo } from "@/data/portfolio";
 import { doorAngle, dwellT } from "@/lib/cafe/choreo";
 import { getProgress } from "@/lib/cafe/scroll";
+import { stationProgress } from "@/lib/cafe/stations";
 
 const RAIN_COUNT = 400;
 const RAIN_TOP = 8;
@@ -61,9 +62,13 @@ function Rain({ reduced }: { reduced: boolean }) {
 
 export default function Storefront({ reduced }: { reduced: boolean }) {
   const door = useRef<Group>(null);
+  const warm = useRef<Mesh>(null);
 
   useFrame(() => {
-    if (door.current) door.current.rotation.y = doorAngle(dwellT(getProgress(), "storefront"));
+    const p = getProgress();
+    if (door.current) door.current.rotation.y = doorAngle(dwellT(p, "storefront"));
+    // Hide the glow plane once the camera is indoors so it can't block the view.
+    if (warm.current) warm.current.visible = stationProgress(p, "storefront") < 1;
   });
 
   return (
@@ -85,7 +90,7 @@ export default function Storefront({ reduced }: { reduced: boolean }) {
         <Ink />
       </mesh>
       {/* Warm light behind the door. */}
-      <mesh position={[0, 1.1, -1.2]}>
+      <mesh ref={warm} position={[0, 1.1, -1.2]}>
         <planeGeometry args={[1, 2.2]} />
         <meshBasicMaterial color="#ffb36b" />
       </mesh>

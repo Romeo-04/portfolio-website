@@ -79,3 +79,13 @@ describe("gaugeValue", () => {
     expect(gaugeValue(600, 2400, null)).toBeCloseTo(0.25);
   });
 });
+
+describe("frameAngle never sinks into the wall", () => {
+  it("is never negative", () => {
+    for (let i = 0; i <= 50; i++) {
+      for (let idx = 0; idx < 3; idx++) {
+        expect(frameAngle(i / 50, idx, 3)).toBeGreaterThanOrEqual(0);
+      }
+    }
+  });
+});

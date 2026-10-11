@@ -10,7 +10,7 @@
 // toon material and <Outlines>.
 // ============================================================
 
-import { Html } from "@react-three/drei";
+import { Html, useProgress } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import { Color } from "three";
@@ -24,6 +24,7 @@ import { createPourMaterial, setFill } from "@/components/cafe/shaders/pour";
 import { projectsData } from "@/data/portfolio";
 import { drinkFor } from "@/lib/cafe/drinks";
 import { cupFill, layerIndexAt } from "@/lib/cafe/pour";
+import { setLoading } from "@/lib/cafe/loading";
 import { getProgress } from "@/lib/cafe/scroll";
 import { STATIONS, cameraPose } from "@/lib/cafe/stations";
 
@@ -33,6 +34,14 @@ const CUP_HEIGHT = 0.4;
 const LIQUID_HEIGHT = CUP_HEIGHT * 0.9;
 const LIQUID_RADIUS_TOP = 0.165;
 const LIQUID_RADIUS_BOTTOM = 0.13;
+
+function LoadingReporter() {
+  const { active, total, progress } = useProgress();
+  useEffect(() => {
+    setLoading({ active, total, progress });
+  }, [active, total, progress]);
+  return null;
+}
 
 function CameraRig({ cut }: { cut: boolean }) {
   useFrame(({ camera }) => {
@@ -157,6 +166,7 @@ export default function CafeScene({ cut, onReady }: { cut: boolean; onReady?: ()
         <ambientLight intensity={0.5} />
         <directionalLight position={[5, 8, 5]} intensity={1.6} />
         <pointLight position={[0, 3, 0]} intensity={8} color="#ffb36b" />
+        <LoadingReporter />
         <CameraRig cut={cut} />
         <PlaceholderShop reduced={cut} />
       </Canvas>

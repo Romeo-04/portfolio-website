@@ -3,21 +3,24 @@
 // ============================================================
 // CAFÉ SCENE (toon blockout)
 // ============================================================
-// Toon blockout: the storefront, menu board and wall of fame are built;
-// the other stations are still placeholder boxes, and the four signature
-// cups pour their stack as the visitor scrolls through the brew bar. Later
-// steps swap the boxes for Blender models; every model mesh gets the same
-// toon material and <Outlines>.
+// The whole shop in toon style: room shell, storefront, menu board, wall
+// of fame, roastery, specials case, checkout and the brew bar, plus four
+// signature cups that pour their stack as the visitor scrolls. The room and
+// brew bar swap for Blender models when registered; every model mesh gets
+// the same toon material and ink outline.
 // ============================================================
 
-import { Html, PerformanceMonitor, useProgress } from "@react-three/drei";
+import { PerformanceMonitor, useProgress } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Color } from "three";
 import type { Mesh, MeshBasicMaterial, ShaderMaterial } from "three";
 import { INK, OUTLINE_THICKNESS } from "@/components/cafe/materials/toon";
 import Effects from "@/components/cafe/effects";
-import { Ink, Toon } from "@/components/cafe/kit";
+import { Toon } from "@/components/cafe/kit";
+import Model from "@/components/cafe/model";
+import Room from "@/components/cafe/room";
+import BrewBar from "@/components/cafe/stations/brew-bar";
 import Checkout from "@/components/cafe/stations/checkout";
 import MenuBoard from "@/components/cafe/stations/menu-board";
 import Roastery from "@/components/cafe/stations/roastery";
@@ -32,8 +35,6 @@ import { qualityFor } from "@/lib/cafe/quality";
 import { setLoading } from "@/lib/cafe/loading";
 import { getProgress } from "@/lib/cafe/scroll";
 import { STATIONS, cameraPose, stationYaw } from "@/lib/cafe/stations";
-
-const STATION_COLORS = ["#c0632f", "#3d5a40", "#8a5a3b", "#a8873c", "#5a3620", "#c8873a", "#7a4a2a"];
 
 const CUP_HEIGHT = 0.4;
 const LIQUID_HEIGHT = CUP_HEIGHT * 0.9;
@@ -131,30 +132,15 @@ function SignatureCups() {
   );
 }
 
-const BUILT = new Set<string>(["storefront", "menu-board", "wall", "roastery", "checkout", "specials"]);
-
-function PlaceholderShop({ reduced, specials }: { reduced: boolean; specials: SpecialItem[] }) {
+function Shop({ reduced, specials, lampLights }: { reduced: boolean; specials: SpecialItem[]; lampLights: boolean }) {
   return (
     <>
       <mesh rotation-x={-Math.PI / 2} position={[0, 0, 0]}>
         <planeGeometry args={[40, 40]} />
         <Toon color="#3a2618" />
       </mesh>
-      {STATIONS.filter((s) => !BUILT.has(s.id)).map((s) => {
-        const i = STATIONS.indexOf(s);
-        return (
-          <group key={s.id} position={[...s.camera.target]} rotation={[0, stationYaw(s.id), 0]}>
-            <mesh>
-              <boxGeometry args={[1.6, 1, 0.6]} />
-              <Toon color={STATION_COLORS[i]} />
-              <Ink />
-            </mesh>
-            <Html center position={[0, 0.9, 0]} className="font-chalk pointer-events-none text-2xl whitespace-nowrap text-[#f5e9da]">
-              {s.label}
-            </Html>
-          </group>
-        );
-      })}
+      <Model name="room" fallback={<Room lampLights={lampLights} />} />
+      <Model name="brew-bar" fallback={<BrewBar />} />
       <Storefront reduced={reduced} />
       <MenuBoard />
       <Wall />
@@ -189,7 +175,7 @@ export default function CafeScene({
         <pointLight position={[0, 3, 0]} intensity={8} color="#ffb36b" />
         <LoadingReporter />
         <CameraRig cut={cut} />
-        <PlaceholderShop reduced={cut} specials={specials} />
+        <Shop reduced={cut} specials={specials} lampLights={quality.effects} />
         {quality.effects && <Effects grain={quality.grain} />}
       </Canvas>
     </div>

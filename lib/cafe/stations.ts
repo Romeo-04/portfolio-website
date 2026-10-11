@@ -49,13 +49,13 @@ export const STATIONS: readonly Station[] = [
     id: "brew-bar",
     label: "Brew Bar",
     menuSection: "menu-drinks",
-    camera: { position: [3.5, 1.5, -2.5], target: [6, 1, -3] },
+    camera: { position: [2.4, 1.9, -2.9], target: [6, 1, -3] },
   },
   {
     id: "wall",
     label: "Wall of Fame",
     menuSection: "menu-wall",
-    camera: { position: [-3, 1.8, -3], target: [-6, 1.8, -3] },
+    camera: { position: [-1.4, 1.8, -3], target: [-6, 1.8, -3] },
   },
   {
     id: "roastery",

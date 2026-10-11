@@ -142,3 +142,47 @@ describe("stationYaw", () => {
     expect(stationYaw("storefront")).toBeCloseTo(0);
   });
 });
+
+describe("camera inside the shop", () => {
+  it("never leaves the room except through a doorway", () => {
+    for (let i = 0; i <= 400; i++) {
+      const p = i / 400;
+      const [x, y, z] = cameraPose(p).position;
+      if (z > 0) {
+        // Street side: only the approach to the front door.
+        expect(Math.abs(x)).toBeLessThan(0.6);
+        continue;
+      }
+      if (Math.abs(z + 9.5) < 0.15) {
+        // Crossing the back wall: only through the 1.4-wide doorway.
+        expect(Math.abs(x)).toBeLessThan(0.7);
+      }
+      if (z < -9.5) {
+        // Roastery: through the back doorway, inside the back room.
+        expect(Math.abs(x)).toBeLessThan(4);
+        continue;
+      }
+      expect(Math.abs(x)).toBeLessThan(7);
+      expect(y).toBeGreaterThan(0);
+      expect(y).toBeLessThan(4);
+    }
+  });
+
+  it("crosses the front wall and back wall only through the doors (analytic)", () => {
+    const pts = STATIONS.map((st) => st.camera.position);
+    for (let i = 0; i < pts.length - 1; i++) {
+      const [a, b] = [pts[i], pts[i + 1]];
+      for (const [wallZ, maxX, maxY] of [
+        [0, 0.5, 2.2],
+        [-9.5, 0.7, 2.4],
+      ] as const) {
+        if ((a[2] - wallZ) * (b[2] - wallZ) >= 0) continue; // does not cross
+        const t = (wallZ - a[2]) / (b[2] - a[2]);
+        const x = a[0] + (b[0] - a[0]) * t;
+        const y = a[1] + (b[1] - a[1]) * t;
+        expect(Math.abs(x), `x at z=${wallZ} on glide ${i}`).toBeLessThan(maxX);
+        expect(y, `y at z=${wallZ} on glide ${i}`).toBeLessThan(maxY);
+      }
+    }
+  });
+});

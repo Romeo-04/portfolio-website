@@ -33,6 +33,21 @@ export const personalInfo = {
   linkedin: "https://www.linkedin.com/in/jhezra-tolentino-513780287/", // e.g., "https://linkedin.com/in/jhezra"
 };
 
+// --- GitHub exclusions ---
+// Repos hidden from the GitHub grid and the café's specials case: the
+// profile config repo, this site, practice and coursework repos. Lower-case.
+export const githubExclude: string[] = [
+  "romeo-04",
+  "portfolio-website",
+  "learn-git",
+  "my-first-repo",
+  "webdev_practice",
+  "github-copilot-practice",
+  "neetcode-submissions",
+  "leetcodesolutions",
+  "star-sight", // duplicate push of STARSight; "datara" is the featured copy
+];
+
 // --- About Section ---
 export const aboutData = {
   bio: [
@@ -67,10 +82,18 @@ export type CategoryIcon =
   | "brain"
   | "wrench";
 
+export type SkillTier = "house" | "seasonal" | "experimental";
+
 export interface Skill {
   name: string;
-  level: number; // 0–100
+  tier: SkillTier;
 }
+
+export const tierLabels: Record<SkillTier, string> = {
+  house: "House Blend",
+  seasonal: "Seasonal",
+  experimental: "Experimental",
+};
 
 export interface SkillCategory {
   title: string;
@@ -85,12 +108,12 @@ export const skillsData: SkillCategory[] = [
     color: "amber",
     icon: "code",
     skills: [
-      { name: "Python", level: 90 },
-      { name: "TypeScript", level: 85 },
-      { name: "JavaScript", level: 85 },
-      { name: "C++", level: 75 },
-      { name: "Java", level: 70 },
-      { name: "SQL", level: 80 },
+      { name: "Python", tier: "house" },
+      { name: "TypeScript", tier: "house" },
+      { name: "JavaScript", tier: "house" },
+      { name: "C++", tier: "seasonal" },
+      { name: "Java", tier: "seasonal" },
+      { name: "SQL", tier: "house" },
     ],
   },
   {
@@ -98,10 +121,10 @@ export const skillsData: SkillCategory[] = [
     color: "blue",
     icon: "layout",
     skills: [
-      { name: "React.js", level: 90 },
-      { name: "Next.js", level: 88 },
-      { name: "Tailwind CSS", level: 92 },
-      { name: "HTML / CSS", level: 95 },
+      { name: "React.js", tier: "house" },
+      { name: "Next.js", tier: "house" },
+      { name: "Tailwind CSS", tier: "house" },
+      { name: "HTML / CSS", tier: "house" },
     ],
   },
   {
@@ -109,8 +132,8 @@ export const skillsData: SkillCategory[] = [
     color: "rose",
     icon: "server",
     skills: [
-      { name: "Node.js", level: 82 },
-      { name: "Prisma ORM", level: 80 },
+      { name: "Node.js", tier: "seasonal" },
+      { name: "Prisma ORM", tier: "seasonal" },
     ],
   },
   {
@@ -118,10 +141,10 @@ export const skillsData: SkillCategory[] = [
     color: "orange",
     icon: "database",
     skills: [
-      { name: "PostgreSQL", level: 82 },
-      { name: "MySQL", level: 78 },
-      { name: "SQLite", level: 75 },
-      { name: "Supabase", level: 80 },
+      { name: "PostgreSQL", tier: "house" },
+      { name: "MySQL", tier: "seasonal" },
+      { name: "SQLite", tier: "seasonal" },
+      { name: "Supabase", tier: "seasonal" },
     ],
   },
   {
@@ -129,11 +152,11 @@ export const skillsData: SkillCategory[] = [
     color: "violet",
     icon: "brain",
     skills: [
-      { name: "PyTorch", level: 72 },
-      { name: "Scikit-learn", level: 75 },
-      { name: "NumPy", level: 82 },
-      { name: "Pandas", level: 80 },
-      { name: "Matplotlib", level: 75 },
+      { name: "PyTorch", tier: "experimental" },
+      { name: "Scikit-learn", tier: "experimental" },
+      { name: "NumPy", tier: "seasonal" },
+      { name: "Pandas", tier: "seasonal" },
+      { name: "Matplotlib", tier: "experimental" },
     ],
   },
   {
@@ -141,10 +164,10 @@ export const skillsData: SkillCategory[] = [
     color: "slate",
     icon: "wrench",
     skills: [
-      { name: "Git / GitHub", level: 90 },
-      { name: "Vercel", level: 85 },
-      { name: "Jupyter Notebook", level: 80 },
-      { name: "MATLAB", level: 60 },
+      { name: "Git / GitHub", tier: "house" },
+      { name: "Vercel", tier: "house" },
+      { name: "Jupyter Notebook", tier: "seasonal" },
+      { name: "MATLAB", tier: "experimental" },
     ],
   },
 ];
@@ -207,6 +230,11 @@ export interface Project {
   demoUrl: string; // Replace ADD_DEMO_URL_HERE
   repoUrl: string; // Replace ADD_REPO_URL_HERE
   image: string; // Replace: recommended 1200×675 screenshot
+  /** Optional hand-picked drink. Otherwise derived from techStack. */
+  drink?: {
+    cup?: "glass" | "mug" | "cup";
+    layers?: { name: string; color: string }[];
+  };
 }
 
 export const projectsData: Project[] = [
@@ -261,7 +289,7 @@ export const projectsData: Project[] = [
     ],
     category: "E-Commerce",
     role: "Lead Full-Stack Developer",
-    featured: true,
+    featured: false,
     demoUrl: "",
     repoUrl: "",
     image: "/merchandise-shop.png",
@@ -290,7 +318,7 @@ export const projectsData: Project[] = [
     ],
     category: "Productivity",
     role: "Full-Stack Developer",
-    featured: true,
+    featured: false,
     demoUrl: "https://smart-habit-tracker-fawn.vercel.app",
     repoUrl: "https://github.com/Romeo-04/smart-habit-tracker",
     image: "/trackhab.png",
@@ -315,9 +343,9 @@ export const projectsData: Project[] = [
       "LLM",
     ],
     category: "Developer Tool",
-    role: "Developer",
+    role: "Lead Developer · Cognee hackathon team of 4",
     featured: true,
-    demoUrl: "",
+    demoUrl: "https://kishiagaytano.github.io/archeon/",
     repoUrl: "https://github.com/kishiagaytano/archeon",
     image: "",
   },
@@ -336,7 +364,7 @@ export const projectsData: Project[] = [
     techStack: ["Python", "FastAPI", "React", "scikit-learn", "SQLite", "Pydantic"],
     category: "FinTech",
     role: "Full-Stack Developer",
-    featured: true,
+    featured: false,
     demoUrl: "",
     repoUrl: "https://github.com/Romeo-04/finhealth-saas",
     image: "",
@@ -356,7 +384,7 @@ export const projectsData: Project[] = [
     techStack: ["Python", "Streamlit"],
     category: "Construction Tech",
     role: "Developer",
-    featured: true,
+    featured: false,
     demoUrl: "",
     repoUrl: "https://github.com/Romeo-04/arki-rev",
     image: "",
@@ -376,7 +404,7 @@ export const projectsData: Project[] = [
     techStack: ["React", "Vite", "vite-plugin-pwa"],
     category: "FinTech",
     role: "Developer",
-    featured: true,
+    featured: false,
     demoUrl: "https://romeo-04.github.io/Cha-Tsing/",
     repoUrl: "https://github.com/Romeo-04/Cha-Tsing",
     image: "",
@@ -386,16 +414,16 @@ export const projectsData: Project[] = [
     title: "KitaKo",
     slug: "kitako",
     pitch:
-      "Showcase website for an undergraduate thesis addressing linguistic and cultural gaps in artificial intelligence.",
+      "Undergraduate thesis research on the linguistic and cultural gaps in artificial intelligence, presented through a public showcase site.",
     description: [
-      "Contributed to the research behind KitaKo, a thesis project studying linguistic and cultural gaps in AI systems",
-      "Website built by a teammate using React 19, Vite, Express, and a shadcn-style component system",
-      "Presents the research, methodology, and team behind the project to a public audience",
+      "Thesis research on linguistic and cultural gaps in AI systems, carried out with an undergraduate research team",
+      "Contributed to the research behind the study, which the team presents to a public audience",
+      "The showcase website was built by a teammate with React 19, Vite, Express, and a shadcn-style component system",
     ],
     techStack: ["React", "Vite", "Express", "Tailwind CSS"],
     category: "Research",
     role: "Researcher",
-    featured: false,
+    featured: true,
     demoUrl: "https://kitako-eight.vercel.app",
     repoUrl: "https://github.com/Emyol/Stochastic4-Website",
     image: "",
@@ -415,7 +443,7 @@ export const projectsData: Project[] = [
     techStack: ["Python", "FastAPI", "pandas", "Nuxt 3", "Vue 3", "Leaflet", "Chart.js"],
     category: "Civic Tech",
     role: "Backend Developer",
-    featured: true,
+    featured: false,
     demoUrl: "",
     repoUrl: "https://github.com/Romeo-04/datara",
     image: "",
@@ -438,6 +466,26 @@ export const projectsData: Project[] = [
     featured: false,
     demoUrl: "",
     repoUrl: "https://github.com/Romeo-04/codex-fuel",
+    image: "",
+  },
+  {
+    id: 11,
+    title: "Kislap",
+    slug: "kislap",
+    pitch:
+      "Free reading game for Filipino children in Grades 1–3. A speech model runs on the child's own device and checks each word they read aloud.",
+    description: [
+      "Built a read-aloud game where children read a short story sentence by sentence while Ningning the firefly reacts and awards stars and stickers",
+      "Runs speech recognition in the browser with Transformers.js, so no audio leaves the device and it works on a family phone",
+      "Saves missed words for practice and shows them in syllables, aimed at the 91% of Filipino ten-year-olds who cannot read a simple text (World Bank, 2026)",
+      "Ships as an installable PWA for Chrome on laptops and Android phones",
+    ],
+    techStack: ["React", "TypeScript", "Vite", "Transformers.js", "PWA"],
+    category: "EdTech",
+    role: "Lead Developer · team of 4",
+    featured: true,
+    demoUrl: "https://romeo-04.github.io/kislap/",
+    repoUrl: "https://github.com/Romeo-04/kislap",
     image: "",
   },
 ];

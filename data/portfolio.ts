@@ -11,8 +11,7 @@ export const siteConfig = {
   title: "Software Engineer",
   description:
     "Jhezra A. Tolentino — Software Engineer specializing in Web Development, Machine Learning, and Full-Stack Projects.",
-  url: "ADD_SITE_URL_HERE", // e.g., "https://jhezra.dev"
-  ogImage: "/images/og-image.png", // Replace: recommended 1200×630 PNG
+  url: "https://jhez-cafe.vercel.app",
   favicon: "/favicon.ico", // Replace: place your favicon in /public/
 };
 

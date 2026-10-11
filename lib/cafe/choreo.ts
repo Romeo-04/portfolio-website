@@ -52,3 +52,39 @@ export function gaugeValue(elapsedMs: number, minMs: number, loadedPct: number |
   const loaded = loadedPct === null ? 1 : clamp01(loadedPct / 100);
   return Math.min(time, loaded);
 }
+
+export const ROAST_GREEN = "#7a9a3a";
+export const ROAST_DARK = "#3b2314";
+
+function hexToRgb(hex: string): [number, number, number] {
+  const n = parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+/** Bean colour as it roasts: green at 0, dark roast at 1. */
+export function roastColor(t: number): string {
+  const x = clamp01(t);
+  const a = hexToRgb(ROAST_GREEN);
+  const b = hexToRgb(ROAST_DARK);
+  const mix = a.map((v, i) => Math.round(v + (b[i] - v) * x));
+  return `#${mix.map((v) => v.toString(16).padStart(2, "0")).join("")}`;
+}
+
+export const CONVEYOR_START = -2.2;
+export const CONVEYOR_END = 2.2;
+
+/** A bean's x on the belt: starts at `offset` and travels one belt length. */
+export function beanX(t: number, offset: number): number {
+  const span = CONVEYOR_END - CONVEYOR_START;
+  const along = (offset + clamp01(t)) % 1;
+  return CONVEYOR_START + along * span;
+}
+
+/** 1 = tray still outside the case, 0 = in place. */
+export function trayOffset(t: number, index: number, count: number): number {
+  return 1 - easeInOut(stagger(t, index, count));
+}
+
+export function receiptLength(t: number): number {
+  return easeInOut(t);
+}

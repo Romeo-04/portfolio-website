@@ -10,23 +10,28 @@
 // toon material and <Outlines>.
 // ============================================================
 
-import { Html, useProgress } from "@react-three/drei";
+import { Html, PerformanceMonitor, useProgress } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Color } from "three";
 import type { Mesh, MeshBasicMaterial, ShaderMaterial } from "three";
 import { INK, OUTLINE_THICKNESS } from "@/components/cafe/materials/toon";
+import Effects from "@/components/cafe/effects";
 import { Ink, Toon } from "@/components/cafe/kit";
+import Checkout from "@/components/cafe/stations/checkout";
 import MenuBoard from "@/components/cafe/stations/menu-board";
+import Roastery from "@/components/cafe/stations/roastery";
+import Specials, { type SpecialItem } from "@/components/cafe/stations/specials";
 import Storefront from "@/components/cafe/stations/storefront";
 import Wall from "@/components/cafe/stations/wall";
 import { createPourMaterial, setFill } from "@/components/cafe/shaders/pour";
 import { projectsData } from "@/data/portfolio";
 import { drinkFor } from "@/lib/cafe/drinks";
 import { cupFill, layerIndexAt } from "@/lib/cafe/pour";
+import { qualityFor } from "@/lib/cafe/quality";
 import { setLoading } from "@/lib/cafe/loading";
 import { getProgress } from "@/lib/cafe/scroll";
-import { STATIONS, cameraPose } from "@/lib/cafe/stations";
+import { STATIONS, cameraPose, stationYaw } from "@/lib/cafe/stations";
 
 const STATION_COLORS = ["#c0632f", "#3d5a40", "#8a5a3b", "#a8873c", "#5a3620", "#c8873a", "#7a4a2a"];
 
@@ -118,7 +123,7 @@ function SignatureCups() {
   const [x, y, z] = brewBar.camera.target;
   const signature = projectsData.filter((p) => p.featured);
   return (
-    <group position={[x, y, z]}>
+    <group position={[x, y, z]} rotation={[0, stationYaw("brew-bar"), 0]}>
       {signature.map((p, i) => (
         <PouringCup key={p.slug} project={p} index={i} count={signature.length} />
       ))}
@@ -126,9 +131,9 @@ function SignatureCups() {
   );
 }
 
-const BUILT = new Set<string>(["storefront", "menu-board", "wall"]);
+const BUILT = new Set<string>(["storefront", "menu-board", "wall", "roastery", "checkout", "specials"]);
 
-function PlaceholderShop({ reduced }: { reduced: boolean }) {
+function PlaceholderShop({ reduced, specials }: { reduced: boolean; specials: SpecialItem[] }) {
   return (
     <>
       <mesh rotation-x={-Math.PI / 2} position={[0, 0, 0]}>
@@ -138,7 +143,7 @@ function PlaceholderShop({ reduced }: { reduced: boolean }) {
       {STATIONS.filter((s) => !BUILT.has(s.id)).map((s) => {
         const i = STATIONS.indexOf(s);
         return (
-          <group key={s.id} position={[...s.camera.target]}>
+          <group key={s.id} position={[...s.camera.target]} rotation={[0, stationYaw(s.id), 0]}>
             <mesh>
               <boxGeometry args={[1.6, 1, 0.6]} />
               <Toon color={STATION_COLORS[i]} />
@@ -153,22 +158,39 @@ function PlaceholderShop({ reduced }: { reduced: boolean }) {
       <Storefront reduced={reduced} />
       <MenuBoard />
       <Wall />
+      <Roastery />
+      <Checkout />
+      <Specials items={specials} />
       <SignatureCups />
     </>
   );
 }
 
-export default function CafeScene({ cut, onReady }: { cut: boolean; onReady?: () => void }) {
+export default function CafeScene({
+  cut,
+  specials,
+  light,
+  onReady,
+}: {
+  cut: boolean;
+  specials: SpecialItem[];
+  light: boolean;
+  onReady?: () => void;
+}) {
+  const [declined, setDeclined] = useState(false);
+  const quality = qualityFor({ light, declined, reduced: cut });
   return (
     <div aria-hidden className="fixed inset-0">
-      <Canvas camera={{ fov: 50, position: [...STATIONS[0].camera.position] }} dpr={[1, 2]} onCreated={() => onReady?.()}>
+      <Canvas camera={{ fov: 50, position: [...STATIONS[0].camera.position] }} dpr={quality.dpr} onCreated={() => onReady?.()}>
+        {!declined && <PerformanceMonitor onDecline={() => setDeclined(true)} />}
         <color attach="background" args={["#1b120c"]} />
         <ambientLight intensity={0.5} />
         <directionalLight position={[5, 8, 5]} intensity={1.6} />
         <pointLight position={[0, 3, 0]} intensity={8} color="#ffb36b" />
         <LoadingReporter />
         <CameraRig cut={cut} />
-        <PlaceholderShop reduced={cut} />
+        <PlaceholderShop reduced={cut} specials={specials} />
+        {quality.effects && <Effects grain={quality.grain} />}
       </Canvas>
     </div>
   );

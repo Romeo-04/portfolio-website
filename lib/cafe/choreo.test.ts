@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
+  CONVEYOR_END,
+  CONVEYOR_START,
+  ROAST_DARK,
+  ROAST_GREEN,
+  beanX,
+  receiptLength,
+  roastColor,
+  trayOffset,
   DOOR_OPEN,
   FRAME_SWING,
   clamp01,
@@ -87,5 +95,41 @@ describe("frameAngle never sinks into the wall", () => {
         expect(frameAngle(i / 50, idx, 3)).toBeGreaterThanOrEqual(0);
       }
     }
+  });
+});
+
+describe("roastColor", () => {
+  it("goes from green beans to dark roast", () => {
+    expect(roastColor(0)).toBe(ROAST_GREEN);
+    expect(roastColor(1)).toBe(ROAST_DARK);
+    expect(roastColor(0.5)).toMatch(/^#[0-9a-f]{6}$/);
+    expect(roastColor(-1)).toBe(ROAST_GREEN);
+  });
+});
+
+describe("beanX", () => {
+  it("moves beans along the belt and wraps them", () => {
+    expect(beanX(0, 0)).toBe(CONVEYOR_START);
+    expect(beanX(0, 0.5)).toBeCloseTo((CONVEYOR_START + CONVEYOR_END) / 2);
+    const x = beanX(0.9, 0.5);
+    expect(x).toBeGreaterThanOrEqual(CONVEYOR_START);
+    expect(x).toBeLessThanOrEqual(CONVEYOR_END);
+  });
+});
+
+describe("trayOffset", () => {
+  it("slides trays in one after another over the real count", () => {
+    expect(trayOffset(0, 0, 2)).toBe(1);
+    expect(trayOffset(1, 1, 2)).toBeCloseTo(0);
+    expect(trayOffset(0.5, 1, 2)).toBe(1);
+    expect(trayOffset(1, 1, 6)).toBeCloseTo(0);
+  });
+});
+
+describe("receiptLength", () => {
+  it("prints from 0 to full and reverses", () => {
+    expect(receiptLength(0)).toBe(0);
+    expect(receiptLength(1)).toBeCloseTo(1);
+    expect(receiptLength(0.3)).toBeLessThan(receiptLength(0.6));
   });
 });

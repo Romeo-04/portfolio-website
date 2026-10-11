@@ -43,37 +43,37 @@ export const STATIONS: readonly Station[] = [
     id: "menu-board",
     label: "Menu Board",
     menuSection: "menu-about",
-    camera: { position: [0, 2, 4], target: [0, 2.6, -4] },
+    camera: { position: [0, 2, -0.5], target: [0, 2.6, -4] },
   },
   {
     id: "brew-bar",
     label: "Brew Bar",
     menuSection: "menu-drinks",
-    camera: { position: [4, 1.5, 0], target: [6, 1, -2] },
+    camera: { position: [3.5, 1.5, -2.5], target: [6, 1, -3] },
   },
   {
     id: "wall",
     label: "Wall of Fame",
     menuSection: "menu-wall",
-    camera: { position: [-3, 1.8, 0], target: [-6, 1.8, 0] },
+    camera: { position: [-3, 1.8, -3], target: [-6, 1.8, -3] },
   },
   {
     id: "roastery",
     label: "Roastery",
     menuSection: "menu-roast-log",
-    camera: { position: [0, 1.6, -8], target: [0, 1.2, -12] },
+    camera: { position: [0, 1.8, -9.9], target: [0, 1, -13.2] },
   },
   {
     id: "specials",
     label: "Today's Specials",
     menuSection: "menu-specials",
-    camera: { position: [3, 1.2, 4], target: [5, 0.8, 4] },
+    camera: { position: [3, 1.2, -6], target: [5.5, 0.8, -6] },
   },
   {
     id: "checkout",
     label: "Checkout",
     menuSection: "menu-find-us",
-    camera: { position: [-2, 1.5, 4], target: [-4, 1.1, 6] },
+    camera: { position: [-2, 1.5, -5.5], target: [-4.5, 1.1, -7] },
   },
 ];
 
@@ -106,6 +106,12 @@ export function stationProgress(progress: number, id: StationId): number {
 export function stationAnchor(id: StationId): number {
   const [start, end] = stationRange(indexOf(id));
   return start + (DWELL / 2) * (end - start);
+}
+
+/** y-rotation that turns a model's +z face toward the station's camera. */
+export function stationYaw(id: StationId): number {
+  const { position, target } = STATIONS[indexOf(id)].camera;
+  return Math.atan2(position[0] - target[0], position[2] - target[2]);
 }
 
 export function progressFromScroll(

@@ -15,6 +15,7 @@ import { Ink, Toon } from "@/components/cafe/kit";
 import { achievementsData, type Achievement } from "@/data/portfolio";
 import { dwellT, frameAngle } from "@/lib/cafe/choreo";
 import { getProgress } from "@/lib/cafe/scroll";
+import { STATIONS, stationYaw } from "@/lib/cafe/stations";
 
 const TIER_COLORS: Record<Achievement["tier"], string> = {
   gold: "#c9a227",
@@ -24,6 +25,8 @@ const TIER_COLORS: Record<Achievement["tier"], string> = {
 };
 
 const COLS = 4;
+
+const [WALL_X, WALL_Y, WALL_Z] = STATIONS.find((s) => s.id === "wall")!.camera.target;
 
 /** Nail position for frame i, in wall space (wall faces +z). */
 function nail(i: number): [number, number, number] {
@@ -49,10 +52,9 @@ export default function Wall() {
     });
   });
 
-  // The camera looks along -x at [-6, 1.8, 0], so the wall stands at
-  // x = -6.4 and faces +x.
+  // The wall stands just behind the wall station's target, facing its camera.
   return (
-    <group position={[-6.4, 1.8, 0]} rotation={[0, Math.PI / 2, 0]}>
+    <group position={[WALL_X - 0.4, WALL_Y, WALL_Z]} rotation={[0, stationYaw("wall"), 0]}>
       <mesh>
         <planeGeometry args={[6, 3.2]} />
         <Toon color="#7a4a2a" />

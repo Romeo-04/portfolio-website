@@ -34,6 +34,7 @@ function nail(i: number): [number, number, number] {
 
 export default function Wall() {
   const frames = useRef<(Group | null)[]>([]);
+  const labels = useRef<(HTMLDivElement | null)[]>([]);
   const count = achievementsData.length;
 
   useFrame(() => {
@@ -41,7 +42,10 @@ export default function Wall() {
     frames.current.forEach((g, i) => {
       if (!g) return;
       g.rotation.x = -frameAngle(t, i, count);
-      g.visible = t * count > i;
+      const shown = t * count > i;
+      g.visible = shown;
+      const label = labels.current[i];
+      if (label) label.style.visibility = shown ? "visible" : "hidden";
     });
   });
 
@@ -67,7 +71,13 @@ export default function Wall() {
             <Ink />
           </mesh>
           <Html transform position={[0, -0.3, 0.04]} distanceFactor={1.6} className="pointer-events-none">
-            <div className="font-receipt w-[220px] text-center text-[11px] leading-tight text-[#1b120c]">
+            <div
+              ref={(el) => {
+                labels.current[i] = el;
+              }}
+              style={{ visibility: "hidden" }}
+              className="font-receipt w-[220px] text-center text-[11px] leading-tight text-[#1b120c]"
+            >
               <strong className="block">{a.title}</strong>
               {a.year}
             </div>

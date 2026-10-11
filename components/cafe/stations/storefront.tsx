@@ -29,6 +29,7 @@ function Rain({ reduced }: { reduced: boolean }) {
       seed = (seed * 16807) % 2147483647;
       return seed / 2147483647;
     };
+    rand(); // warm-up: the first draw of a seed this small is near zero
     for (let i = 0; i < RAIN_COUNT; i++) {
       p[i * 3] = (rand() - 0.5) * 12;
       p[i * 3 + 1] = rand() * RAIN_TOP;
@@ -84,7 +85,7 @@ export default function Storefront({ reduced }: { reduced: boolean }) {
         <Ink />
       </mesh>
       {/* Warm light behind the door. */}
-      <mesh position={[0, 1.1, -0.3]}>
+      <mesh position={[0, 1.1, -1.2]}>
         <planeGeometry args={[1, 2.2]} />
         <meshBasicMaterial color="#ffb36b" />
       </mesh>

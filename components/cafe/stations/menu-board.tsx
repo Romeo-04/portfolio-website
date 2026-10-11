@@ -37,7 +37,7 @@ const BOARD: [number, number, number] = [0, 2.6, -4.3];
 function Portrait() {
   const texture = useTexture(personalInfo.heroImage);
   return (
-    <mesh position={[0, 0, 0.03]}>
+    <mesh position={[0, 0, 0.035]}>
       <planeGeometry args={[0.8, 0.8]} />
       <meshBasicMaterial map={texture} toneMapped={false} />
     </mesh>

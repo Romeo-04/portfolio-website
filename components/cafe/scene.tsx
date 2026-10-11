@@ -3,11 +3,11 @@
 // ============================================================
 // CAFÉ SCENE (toon blockout)
 // ============================================================
-// Build step 2: the placeholder stations get the toon look (three light
-// bands and ink outlines), and the four signature cups pour their stack
-// as the visitor scrolls through the brew bar. Step 5 swaps the boxes for
-// Blender models; every model mesh gets the same toon material and
-// <Outlines>.
+// Toon blockout: the storefront, menu board and wall of fame are built;
+// the other stations are still placeholder boxes, and the four signature
+// cups pour their stack as the visitor scrolls through the brew bar. Later
+// steps swap the boxes for Blender models; every model mesh gets the same
+// toon material and <Outlines>.
 // ============================================================
 
 import { Html } from "@react-three/drei";
@@ -33,7 +33,6 @@ const CUP_HEIGHT = 0.4;
 const LIQUID_HEIGHT = CUP_HEIGHT * 0.9;
 const LIQUID_RADIUS_TOP = 0.165;
 const LIQUID_RADIUS_BOTTOM = 0.13;
-
 
 function CameraRig({ cut }: { cut: boolean }) {
   useFrame(({ camera }) => {

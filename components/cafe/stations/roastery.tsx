@@ -12,8 +12,9 @@ import { useFrame } from "@react-three/fiber";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import { Color, Object3D, type InstancedMesh } from "three";
 import { Ink, Toon } from "@/components/cafe/kit";
+import { toonGradient } from "@/components/cafe/materials/toon";
 import { experienceData } from "@/data/portfolio";
-import { CONVEYOR_END, CONVEYOR_START, beanX, dwellT, roastColor, stagger } from "@/lib/cafe/choreo";
+import { CONVEYOR_END, CONVEYOR_START, ROAST_DARK, ROAST_GREEN, beanX, dwellT, stagger } from "@/lib/cafe/choreo";
 import { getProgress } from "@/lib/cafe/scroll";
 import { STATIONS } from "@/lib/cafe/stations";
 
@@ -26,15 +27,20 @@ export default function Roastery() {
   const labels = useRef<(HTMLDivElement | null)[]>([]);
   const dummy = useMemo(() => new Object3D(), []);
   const color = useMemo(() => new Color(), []);
+  const lastT = useRef(-1);
+  const green = useMemo(() => new Color(ROAST_GREEN), []);
+  const dark = useMemo(() => new Color(ROAST_DARK), []);
   const offsets = useMemo(() => Array.from({ length: BEANS }, (_, i) => i / BEANS), []);
 
   useLayoutEffect(() => {
     // Instance colours must exist before the first frame sets them.
-    beans.current?.setColorAt(0, color.set(roastColor(0)));
-  }, [color]);
+    beans.current?.setColorAt(0, color.copy(green));
+  }, [color, green]);
 
   useFrame(() => {
     const t = dwellT(getProgress(), "roastery");
+    if (t === lastT.current) return;
+    lastT.current = t;
     const mesh = beans.current;
     if (mesh) {
       offsets.forEach((offset, i) => {
@@ -44,7 +50,7 @@ export default function Roastery() {
         dummy.updateMatrix();
         mesh.setMatrixAt(i, dummy.matrix);
         const along = (x - CONVEYOR_START) / (CONVEYOR_END - CONVEYOR_START);
-        mesh.setColorAt(i, color.set(roastColor(along)));
+        mesh.setColorAt(i, color.lerpColors(green, dark, Math.min(Math.max(along, 0), 1)));
       });
       mesh.instanceMatrix.needsUpdate = true;
       if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
@@ -64,7 +70,7 @@ export default function Roastery() {
       </mesh>
       <instancedMesh ref={beans} args={[undefined, undefined, BEANS]}>
         <sphereGeometry args={[0.06, 8, 6]} />
-        <meshToonMaterial />
+        <meshToonMaterial gradientMap={toonGradient()} />
       </instancedMesh>
       {experienceData.map((e, i) => (
         <Html

@@ -24,9 +24,15 @@ const RECEIPT_HEIGHT = 0.9;
 export default function Checkout() {
   const paper = useRef<Group>(null);
   const text = useRef<HTMLDivElement>(null);
+  const tips = useRef<HTMLDivElement>(null);
+  const lastT = useRef(-1);
 
   useFrame(() => {
-    const len = receiptLength(dwellT(getProgress(), "checkout"));
+    const t = dwellT(getProgress(), "checkout");
+    if (t === lastT.current) return;
+    lastT.current = t;
+    const len = receiptLength(t);
+    if (tips.current) tips.current.style.opacity = String(t);
     if (paper.current) {
       paper.current.scale.y = Math.max(len, 0.001);
       paper.current.visible = len > 0;
@@ -48,13 +54,13 @@ export default function Checkout() {
         <Ink />
       </mesh>
       {/* Receipt hangs from the printer slot; scale.y grows it downward. */}
-      <group ref={paper} position={[0, 1.3, 0.21]}>
+      <group ref={paper} position={[0, 1.3, 0.42]}>
         <mesh position={[0, -RECEIPT_HEIGHT / 2, 0]}>
           <planeGeometry args={[0.4, RECEIPT_HEIGHT]} />
           <Toon color="#fbf6ee" />
         </mesh>
       </group>
-      <Html transform position={[0, 1.3 - RECEIPT_HEIGHT / 2, 0.23]} distanceFactor={1.4} className="pointer-events-none">
+      <Html transform position={[0, 1.3 - RECEIPT_HEIGHT / 2, 0.44]} distanceFactor={1.4} className="pointer-events-none">
         <div ref={text} style={{ clipPath: "inset(0 0 100% 0)" }} className="font-receipt w-[150px] text-[9px] leading-snug text-[#1b120c]">
           <p className="text-center font-bold">THANK YOU</p>
           <p>{personalInfo.email}</p>
@@ -68,7 +74,9 @@ export default function Checkout() {
         <Toon color="#f6ead8" transparent opacity={0.35} />
       </mesh>
       <Html transform position={[0.5, 1.4, 0]} distanceFactor={1.4} className="font-chalk pointer-events-none text-sm whitespace-nowrap text-[#f5e9da]">
-        Tips → GitHub · LinkedIn
+        <div ref={tips} style={{ opacity: 0 }}>
+          Tips → GitHub · LinkedIn
+        </div>
       </Html>
     </group>
   );

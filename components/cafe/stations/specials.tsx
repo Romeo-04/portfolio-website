@@ -24,17 +24,19 @@ export type SpecialItem = { id: number; name: string; language: string | null };
 
 /** Tray slot i: two shelves of three, in case space (front faces +z). */
 function slot(i: number): [number, number, number] {
-  return [((i % 3) - 1) * 0.7, i < 3 ? 0.95 : 0.45, 0];
+  return [((i % 3) - 1) * 0.7, i < 3 ? 0.86 : 0.36, 0];
 }
 
 export default function Specials({ items }: { items: SpecialItem[] }) {
   const trays = useRef<(Group | null)[]>([]);
   const labels = useRef<(HTMLDivElement | null)[]>([]);
   const light = useRef<PointLight>(null);
+  const soldOut = useRef<HTMLDivElement>(null);
 
   useFrame(() => {
     const t = dwellT(getProgress(), "specials");
     if (light.current) light.current.intensity = 3 * t;
+    if (soldOut.current) soldOut.current.style.opacity = String(t);
     trays.current.forEach((g, i) => {
       if (!g) return;
       const out = trayOffset(t, i, items.length);
@@ -65,7 +67,9 @@ export default function Specials({ items }: { items: SpecialItem[] }) {
       <pointLight ref={light} position={[0, 1.3, 0.4]} intensity={0} color="#ffd9a0" distance={3} />
       {items.length === 0 ? (
         <Html transform position={[0, 0.7, 0.2]} distanceFactor={2} className="font-chalk pointer-events-none text-3xl whitespace-nowrap text-[#ffb36b]">
-          Sold out — check back soon
+          <div ref={soldOut} style={{ opacity: 0 }}>
+            Sold out — check back soon
+          </div>
         </Html>
       ) : (
         items.map((item, i) => (

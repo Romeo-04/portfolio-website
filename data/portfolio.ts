@@ -12,7 +12,6 @@ export const siteConfig = {
   description:
     "Jhezra A. Tolentino — Software Engineer specializing in Web Development, Machine Learning, and Full-Stack Projects.",
   url: "https://jhez-cafe.vercel.app",
-  favicon: "/favicon.ico", // Replace: place your favicon in /public/
 };
 
 // --- Personal Information ---
@@ -72,8 +71,7 @@ export type CategoryColor =
   | "violet"
   | "slate";
 
-// One of the semantic icon keys mapped to a lucide-react component in
-// components/sections/skills.tsx.
+// Semantic icon label kept in the data; no component maps it to an icon now.
 export type CategoryIcon =
   | "code"
   | "layout"
@@ -229,7 +227,6 @@ export interface Project {
   featured: boolean;
   demoUrl: string; // Replace ADD_DEMO_URL_HERE
   repoUrl: string; // Replace ADD_REPO_URL_HERE
-  image: string; // Replace: recommended 1200×675 screenshot
   /** Optional hand-picked drink. Otherwise derived from techStack. */
   drink?: {
     cup?: "glass" | "mug" | "cup";
@@ -263,7 +260,6 @@ export const projectsData: Project[] = [
     featured: true,
     demoUrl: "",
     repoUrl: "https://github.com/Romeo-04/citysense-live-geo",
-    image: "/city-sense.png",
   },
   {
     id: 2,
@@ -292,7 +288,6 @@ export const projectsData: Project[] = [
     featured: false,
     demoUrl: "",
     repoUrl: "",
-    image: "/merchandise-shop.png",
   },
   {
     id: 3,
@@ -321,7 +316,6 @@ export const projectsData: Project[] = [
     featured: false,
     demoUrl: "https://smart-habit-tracker-fawn.vercel.app",
     repoUrl: "https://github.com/Romeo-04/smart-habit-tracker",
-    image: "/trackhab.png",
   },
   {
     id: 4,
@@ -347,7 +341,6 @@ export const projectsData: Project[] = [
     featured: true,
     demoUrl: "https://kishiagaytano.github.io/archeon/",
     repoUrl: "https://github.com/kishiagaytano/archeon",
-    image: "",
   },
   {
     id: 5,
@@ -367,7 +360,6 @@ export const projectsData: Project[] = [
     featured: false,
     demoUrl: "",
     repoUrl: "https://github.com/Romeo-04/finhealth-saas",
-    image: "",
   },
   {
     id: 6,
@@ -387,7 +379,6 @@ export const projectsData: Project[] = [
     featured: false,
     demoUrl: "",
     repoUrl: "https://github.com/Romeo-04/arki-rev",
-    image: "",
   },
   {
     id: 7,
@@ -407,7 +398,6 @@ export const projectsData: Project[] = [
     featured: false,
     demoUrl: "https://romeo-04.github.io/Cha-Tsing/",
     repoUrl: "https://github.com/Romeo-04/Cha-Tsing",
-    image: "",
   },
   {
     id: 8,
@@ -426,7 +416,6 @@ export const projectsData: Project[] = [
     featured: true,
     demoUrl: "https://kitako-eight.vercel.app",
     repoUrl: "https://github.com/Emyol/Stochastic4-Website",
-    image: "",
   },
   {
     id: 9,
@@ -446,7 +435,6 @@ export const projectsData: Project[] = [
     featured: false,
     demoUrl: "",
     repoUrl: "https://github.com/Romeo-04/datara",
-    image: "",
   },
   {
     id: 10,
@@ -466,7 +454,6 @@ export const projectsData: Project[] = [
     featured: false,
     demoUrl: "",
     repoUrl: "https://github.com/Romeo-04/codex-fuel",
-    image: "",
   },
   {
     id: 11,
@@ -486,7 +473,6 @@ export const projectsData: Project[] = [
     featured: true,
     demoUrl: "https://romeo-04.github.io/kislap/",
     repoUrl: "https://github.com/Romeo-04/kislap",
-    image: "",
   },
 ];
 
@@ -601,43 +587,6 @@ export const certificationsData: Certification[] = [
   //   credentialUrl: "https://coursera.org/verify/...",
   //   skills: ["Supervised Learning", "TensorFlow"],
   // },
-];
-
-// --- Navigation Links ---
-export const navLinks = [
-  { label: "Home", href: "#home" },
-  { label: "About", href: "#about" },
-  { label: "Skills", href: "#skills" },
-  { label: "Experience", href: "#experience" },
-  { label: "Projects", href: "#projects" },
-  { label: "GitHub", href: "#github" },
-  { label: "Achievements", href: "#achievements" },
-  // Uncomment once you add entries to certificationsData:
-  // { label: "Certifications", href: "#certifications" },
-  { label: "Contact", href: "#contact" },
-];
-
-// --- Category Color Map (for skill category cards) ---
-// Shades tuned for readability on light card surfaces.
-export const categoryColors: Record<
-  CategoryColor,
-  { bg: string; text: string }
-> = {
-  amber: { bg: "bg-amber-500/15", text: "text-amber-700" },
-  blue: { bg: "bg-blue-500/15", text: "text-blue-700" },
-  rose: { bg: "bg-rose-500/15", text: "text-rose-700" },
-  orange: { bg: "bg-orange-500/15", text: "text-orange-700" },
-  violet: { bg: "bg-violet-500/15", text: "text-violet-700" },
-  slate: { bg: "bg-slate-500/15", text: "text-slate-600" },
-};
-
-// --- Skill Stats (for the hero snapshot bars) ---
-export const skillStats = [
-  { label: "Frontend", value: 82 },
-  { label: "Backend", value: 85 },
-  { label: "ML / AI", value: 86 },
-  { label: "Leadership", value: 90 },
-  { label: "Problem Solving", value: 95 },
 ];
 
 // --- Off the Clock (the café's secret drink) ---

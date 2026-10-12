@@ -1,25 +1,11 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, Space_Mono } from "next/font/google";
+import { Caveat_Brush, Courier_Prime, Nunito } from "next/font/google";
 import "./globals.css";
 import { personalInfo, siteConfig } from "@/data/portfolio";
 
-const spaceGrotesk = Space_Grotesk({
-  variable: "--font-space-grotesk",
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  display: "swap",
-});
-
-const spaceMono = Space_Mono({
-  variable: "--font-space-mono",
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  display: "swap",
-});
-
-// Applied before first paint so a light-theme visitor never sees a flash of
-// the dark default. Kept tiny and dependency-free on purpose.
-const themeScript = `(function(){try{var t=localStorage.getItem("theme");if(t==="light"){document.documentElement.classList.add("light")}}catch(e){}})();`;
+const chalk = Caveat_Brush({ variable: "--font-caveat-brush", subsets: ["latin"], weight: "400", display: "swap" });
+const receipt = Courier_Prime({ variable: "--font-courier-prime", subsets: ["latin"], weight: ["400", "700"], display: "swap" });
+const cafe = Nunito({ variable: "--font-nunito", subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -74,14 +60,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
         />
       </head>
       <body
-        className={`${spaceGrotesk.variable} ${spaceMono.variable} font-sans`}
+        className={`${chalk.variable} ${receipt.variable} ${cafe.variable} font-cafe min-h-screen bg-[#1b120c] text-[#f5e9da]`}
       >
         {children}
       </body>

@@ -15,8 +15,9 @@ import type { BufferAttribute, Group, Mesh } from "three";
 import { Ink, Toon } from "@/components/cafe/kit";
 import { personalInfo } from "@/data/portfolio";
 import { doorAngle, dwellT } from "@/lib/cafe/choreo";
+import { MAX_DT } from "@/lib/cafe/damp";
 import { getProgress } from "@/lib/cafe/scroll";
-import { stationProgress } from "@/lib/cafe/stations";
+import { stationIndexAt, stationProgress } from "@/lib/cafe/stations";
 
 const RAIN_COUNT = 400;
 const RAIN_TOP = 8;
@@ -40,14 +41,18 @@ function Rain({ reduced }: { reduced: boolean }) {
   }, []);
   const attr = useRef<BufferAttribute>(null);
 
-  useFrame((_, delta) => {
+  useFrame(({ invalidate }, delta) => {
     if (reduced || !attr.current) return;
+    // Rain is only seen from the street; elsewhere it stops asking for frames.
+    if (stationIndexAt(getProgress()) > 1) return;
+    const step = Math.min(delta, MAX_DT) * 6;
     const arr = attr.current.array as Float32Array;
     for (let i = 0; i < RAIN_COUNT; i++) {
-      const y = arr[i * 3 + 1] - delta * 6;
+      const y = arr[i * 3 + 1] - step;
       arr[i * 3 + 1] = y < 0 ? RAIN_TOP : y;
     }
     attr.current.needsUpdate = true;
+    invalidate();
   });
 
   return (

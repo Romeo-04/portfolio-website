@@ -20,7 +20,7 @@ describe("toonify", () => {
   it("keeps colour, texture map and name, and adds the toon gradient", () => {
     const map = new Texture();
     const src = new MeshStandardMaterial({ color: new Color("#c0632f"), map, name: "cup" });
-    const toon = toonify(src);
+    const toon = toonify(src) as MeshToonMaterial;
     expect(toon).toBeInstanceOf(MeshToonMaterial);
     expect(toon.color.getHexString()).toBe("c0632f");
     expect(toon.map).toBe(map);
@@ -29,7 +29,11 @@ describe("toonify", () => {
   });
 
   it("uses the first material of a multi-material mesh", () => {
-    const toon = toonify([new MeshBasicMaterial({ color: "#123456" }), new MeshBasicMaterial()]);
+    const toon = toonify([
+      new MeshStandardMaterial({ color: "#123456" }),
+      new MeshStandardMaterial(),
+    ]) as MeshToonMaterial;
+    expect(toon).toBeInstanceOf(MeshToonMaterial);
     expect(toon.color.getHexString()).toBe("123456");
   });
 
@@ -83,5 +87,36 @@ describe("collectMeshes", () => {
 
   it("returns nothing for an empty model", () => {
     expect(collectMeshes(new Group())).toEqual([]);
+  });
+});
+
+describe("toonify baked lighting", () => {
+  it("passes unlit (baked) materials through untouched, so baked light is not lit twice", () => {
+    const map = new Texture();
+    const baked = new MeshBasicMaterial({ map, name: "room-baked" });
+    const out = toonify(baked);
+    expect(out).toBeInstanceOf(MeshBasicMaterial);
+    expect(out).not.toBeInstanceOf(MeshToonMaterial);
+    expect((out as MeshBasicMaterial).map).toBe(map);
+    expect(out.name).toBe("room-baked");
+    expect(out).not.toBe(baked);
+  });
+
+  it("keeps ambient occlusion and emissive glow on lit materials", () => {
+    const aoMap = new Texture();
+    const emissiveMap = new Texture();
+    const src = new MeshStandardMaterial({
+      aoMap,
+      aoMapIntensity: 0.7,
+      emissive: new Color("#ffb36b"),
+      emissiveMap,
+      emissiveIntensity: 2,
+    });
+    const toon = toonify(src) as MeshToonMaterial;
+    expect(toon.aoMap).toBe(aoMap);
+    expect(toon.aoMapIntensity).toBeCloseTo(0.7);
+    expect(toon.emissive.getHexString()).toBe("ffb36b");
+    expect(toon.emissiveMap).toBe(emissiveMap);
+    expect(toon.emissiveIntensity).toBe(2);
   });
 });

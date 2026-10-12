@@ -122,7 +122,7 @@ export default function QuickOrderMenu({ specials }: { specials: GithubRepo[] })
           {/* eslint-disable-next-line @next/next/no-img-element -- small portrait, rendered in tests outside Next */}
           <img
             src={personalInfo.heroImage}
-            alt={`${personalInfo.name}, Barista of the Month`}
+            alt={personalInfo.name}
             width={96}
             height={96}
             className="h-24 w-24 rounded-md object-cover"

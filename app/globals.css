@@ -3,6 +3,7 @@
 
 @theme inline {
   --font-chalk: var(--font-caveat-brush);
+  --font-board: var(--font-patrick-hand);
   --font-receipt: var(--font-courier-prime);
   --font-cafe: var(--font-nunito);
 

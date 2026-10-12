@@ -10,8 +10,8 @@
 
 import type { Vec3 } from "@/lib/cafe/stations";
 
-/** Higher is snappier; 6 settles in about half a second. */
-export const CAMERA_LAMBDA = 6;
+/** Higher is snappier; 3 settles in about a second (floaty glide). */
+export const CAMERA_LAMBDA = 3;
 
 /** Longest frame the damping will honour, in seconds. */
 export const MAX_DT = 1 / 30;

@@ -8,10 +8,16 @@
 // signature cups that pour their stack as the visitor scrolls. The room and
 // brew bar swap for Blender models when registered; every model mesh gets
 // the same toon material and ink outline.
+//
+// Smoothness: the camera eases toward its scroll pose (lib/cafe/damp.ts),
+// and after a short warm-up the canvas only draws when something changes —
+// scroll, a camera still settling, or rain on screen — instead of every
+// frame. The warm-up keeps continuous frames while PerformanceMonitor takes
+// its samples, so idle gaps never read as a slow device.
 // ============================================================
 
 import { PerformanceMonitor, useProgress } from "@react-three/drei";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Color } from "three";
 import type { Mesh, MeshBasicMaterial, ShaderMaterial } from "three";
@@ -33,8 +39,9 @@ import { drinkFor } from "@/lib/cafe/drinks";
 import { cupFill, layerIndexAt } from "@/lib/cafe/pour";
 import { qualityFor } from "@/lib/cafe/quality";
 import { setLoading } from "@/lib/cafe/loading";
-import { getProgress } from "@/lib/cafe/scroll";
-import { STATIONS, cameraPose, stationYaw } from "@/lib/cafe/stations";
+import { CAMERA_LAMBDA, dampVec3, distance3, shouldSnap } from "@/lib/cafe/damp";
+import { getProgress, subscribeProgress } from "@/lib/cafe/scroll";
+import { STATIONS, cameraPose, stationYaw, type Vec3 } from "@/lib/cafe/stations";
 
 const CUP_HEIGHT = 0.4;
 const LIQUID_HEIGHT = CUP_HEIGHT * 0.9;
@@ -49,11 +56,43 @@ function LoadingReporter() {
   return null;
 }
 
+/** Continuous frames for this long, then draw only on demand. */
+const WARMUP_MS = 3500;
+
+function FrameDriver() {
+  const setFrameloop = useThree((s) => s.setFrameloop);
+  const invalidate = useThree((s) => s.invalidate);
+  useEffect(() => {
+    const timer = setTimeout(() => setFrameloop("demand"), WARMUP_MS);
+    const unsubscribe = subscribeProgress(() => invalidate());
+    return () => {
+      clearTimeout(timer);
+      unsubscribe();
+    };
+  }, [setFrameloop, invalidate]);
+  return null;
+}
+
 function CameraRig({ cut }: { cut: boolean }) {
-  useFrame(({ camera }) => {
+  const pos = useRef<Vec3 | null>(null);
+  const look = useRef<Vec3 | null>(null);
+  useFrame(({ camera, invalidate }, dt) => {
     const pose = cameraPose(getProgress(), { cut });
-    camera.position.set(...pose.position);
-    camera.lookAt(...pose.target);
+    // Reduced motion cuts; the first frame and teleports (deep links,
+    // menu jumps) snap; everything else eases toward the pose.
+    if (cut || !pos.current || !look.current || shouldSnap(look.current, pose.target)) {
+      pos.current = pose.position;
+      look.current = pose.target;
+    } else {
+      pos.current = dampVec3(pos.current, pose.position, CAMERA_LAMBDA, dt);
+      look.current = dampVec3(look.current, pose.target, CAMERA_LAMBDA, dt);
+    }
+    camera.position.set(...pos.current);
+    camera.lookAt(...look.current);
+    // Keep drawing until the camera has settled on its pose.
+    if (distance3(pos.current, pose.position) > 1e-3 || distance3(look.current, pose.target) > 1e-3) {
+      invalidate();
+    }
   });
   return null;
 }
@@ -174,6 +213,7 @@ export default function CafeScene({
         <directionalLight position={[5, 8, 5]} intensity={1.6} />
         <pointLight position={[0, 3, 0]} intensity={8} color="#ffb36b" />
         <LoadingReporter />
+        <FrameDriver />
         <CameraRig cut={cut} />
         <Shop reduced={cut} specials={specials} lampLights={quality.effects} />
         {quality.effects && <Effects grain={quality.grain} />}

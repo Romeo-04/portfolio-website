@@ -27,7 +27,27 @@ replace a piece with your own model:
    Names available: `room` (walls, floor, ceiling, lamps) and `brew-bar`
    (counter and espresso machine). Animated or skinned meshes are shown in
    their rest pose.
-6. **Check** `npm run dev` → `/cafe`. If the file is missing or broken, the
+6. **Check** `npm run dev` → `http://localhost:3000`. If the file is missing or broken, the
    built-in piece shows and the console logs a `[cafe]` warning.
 
 Keep `.blend` source files out of the repo.
+
+## Baked lighting (the biggest visual upgrade)
+
+Live lights are expensive and look flat. Baking paints light, soft shadows
+and glow into the textures once, in Blender, so the browser just shows
+them. There are two ways the café accepts it:
+
+- **Fully baked (recommended for the room).** In Cycles, bake *Combined*
+  (or Diffuse with direct + indirect) into one texture per object, or one
+  atlas for the room. Connect that texture to an unlit material, which the
+  glTF exporter writes as `KHR_materials_unlit` (see the "Unlit" section of
+  Blender's glTF manual). The café keeps unlit materials as they are, so the
+  baked light is not lit a second time. Toon outlines are still added.
+- **Ambient occlusion only.** Keep a normal material and add the baked AO
+  texture as glTF occlusion. The café keeps it, along with emissive maps
+  (glowing lamps, signs), on its toon material.
+
+Baked textures are the heaviest part of a model: use one atlas where you can,
+and keep the `--texture-size 1024` compression step. Once the room is baked,
+its built-in lamp lights can go, which makes slower devices smoother.

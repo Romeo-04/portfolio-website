@@ -16,7 +16,8 @@ import { Ink, Toon } from "@/components/cafe/kit";
 import { personalInfo, skillsData, tierLabels, type SkillTier } from "@/data/portfolio";
 import { dwellT, stagger } from "@/lib/cafe/choreo";
 import { getProgress } from "@/lib/cafe/scroll";
-import { DWELL, stationRange } from "@/lib/cafe/stations";
+import { DWELL, STATIONS, stationRange } from "@/lib/cafe/stations";
+import { CHALK, OAK_DARK } from "@/components/cafe/palette";
 
 const TIERS: SkillTier[] = ["house", "seasonal", "experimental"];
 
@@ -33,7 +34,10 @@ const LINES = [
 ];
 
 // Board centre; the camera looks at [0, 2.6, -4].
-const BOARD: [number, number, number] = [0, 2.6, -4.3];
+// The chalk wall hangs on the back wall under the mezzanine, left of the
+// doorway: centred on the station's target, just proud of the wall.
+const [BX] = STATIONS.find((s) => s.id === "menu-board")!.camera.target;
+const BOARD: [number, number, number] = [BX, 1.85, -9.35];
 
 function Portrait() {
   const texture = useTexture(personalInfo.heroImage);
@@ -79,12 +83,12 @@ export default function MenuBoard() {
     <group position={BOARD}>
       <mesh>
         <boxGeometry args={[3.4, 2.2, 0.08]} />
-        <Toon color="#5a3620" />
+        <Toon color={OAK_DARK} />
         <Ink />
       </mesh>
       <mesh position={[0, 0, 0.05]}>
         <planeGeometry args={[3.2, 2]} />
-        <Toon color="#23352a" />
+        <Toon color={CHALK} />
       </mesh>
       <Html transform position={[0, 0, 0.06]} distanceFactor={2.2} className="pointer-events-none">
         <div ref={chalk} style={{ visibility: "hidden" }} className="font-chalk w-[560px] text-[#f5e9da]">
@@ -103,7 +107,7 @@ export default function MenuBoard() {
           ))}
         </div>
       </Html>
-      <group position={[2.4, 0, 0.05]}>
+      <group position={[-2.4, 0, 0.05]}>
         <mesh>
           <boxGeometry args={[0.95, 0.95, 0.06]} />
           <Toon color="#c9a227" />
@@ -115,7 +119,7 @@ export default function MenuBoard() {
           </Suspense>
         </PortraitBoundary>
         <Html transform position={[0, -0.62, 0.05]} distanceFactor={2.2} className="pointer-events-none">
-          <div ref={label} style={{ visibility: "hidden" }} className="font-receipt text-xs whitespace-nowrap text-[#f5e9da]">
+          <div ref={label} style={{ visibility: "hidden" }} className="font-receipt text-xs font-bold whitespace-nowrap text-[#2b2b2e]">
             Barista of the Month
           </div>
         </Html>

@@ -3,114 +3,137 @@
 // ============================================================
 // STATION 1: STOREFRONT
 // ============================================================
-// A rainy night street. The door swings inward while the camera holds at
-// the storefront, and warm light shows through. Rain falls in real time;
-// with reduced motion it stays still.
+// A sunny street and a modern shop front, after the user's reference:
+// black-framed floor-to-ceiling glass across the whole 14 m front, a glass
+// door in the middle with a tall handle, a black awning band carrying the
+// sign, wood cladding above, a concrete plinth, wall lights and planters.
+// The lit café shows through the glass. The door swings inward while the
+// camera holds at the storefront.
 // ============================================================
 
 import { Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
-import type { BufferAttribute, Group, Mesh } from "three";
+import type { Group } from "three";
 import { Ink, Toon } from "@/components/cafe/kit";
-import { personalInfo } from "@/data/portfolio";
+import { CHARCOAL, CONCRETE, GLASS } from "@/components/cafe/palette";
+import { Planter, Sconce } from "@/components/cafe/props";
+import { plankTexture, repeated } from "@/components/cafe/textures";
 import { doorAngle, dwellT } from "@/lib/cafe/choreo";
-import { MAX_DT } from "@/lib/cafe/damp";
 import { getProgress } from "@/lib/cafe/scroll";
-import { stationIndexAt, stationProgress } from "@/lib/cafe/stations";
+import { stationProgress } from "@/lib/cafe/stations";
 
-const RAIN_COUNT = 400;
-const RAIN_TOP = 8;
+const FRONT_W = 14;
+const GLASS_TOP = 3.0;
+const BASE = 0.15;
+const DOOR_W = 1.0;
+const SIGN = "JHEZRA'S CAFÉ";
 
-function Rain({ reduced }: { reduced: boolean }) {
-  const positions = useMemo(() => {
-    const p = new Float32Array(RAIN_COUNT * 3);
-    // Seeded so the memo stays pure (react-hooks/purity forbids Math.random).
-    let seed = 1;
-    const rand = () => {
-      seed = (seed * 16807) % 2147483647;
-      return seed / 2147483647;
-    };
-    rand(); // warm-up: the first draw of a seed this small is near zero
-    for (let i = 0; i < RAIN_COUNT; i++) {
-      p[i * 3] = (rand() - 0.5) * 12;
-      p[i * 3 + 1] = rand() * RAIN_TOP;
-      p[i * 3 + 2] = 1 + rand() * 9;
-    }
-    return p;
-  }, []);
-  const attr = useRef<BufferAttribute>(null);
+/** Mullion x positions; the door opening sits between -0.5 and 0.5. */
+const MULLIONS = [-7, -5.6, -4.2, -2.8, -1.4, -0.5, 0.5, 1.4, 2.8, 4.2, 5.6, 7];
 
-  useFrame(({ invalidate }, delta) => {
-    if (reduced || !attr.current) return;
-    // Rain is only seen from the street; elsewhere it stops asking for frames.
-    if (stationIndexAt(getProgress()) > 1) return;
-    const step = Math.min(delta, MAX_DT) * 6;
-    const arr = attr.current.array as Float32Array;
-    for (let i = 0; i < RAIN_COUNT; i++) {
-      const y = arr[i * 3 + 1] - step;
-      arr[i * 3 + 1] = y < 0 ? RAIN_TOP : y;
-    }
-    attr.current.needsUpdate = true;
-    invalidate();
-  });
-
+function Bar({ position, size }: { position: [number, number, number]; size: [number, number, number] }) {
   return (
-    <points>
-      <bufferGeometry>
-        <bufferAttribute ref={attr} attach="attributes-position" args={[positions, 3]} />
-      </bufferGeometry>
-      <pointsMaterial color="#9fb4c7" size={0.04} transparent opacity={0.6} />
-    </points>
+    <mesh position={position}>
+      <boxGeometry args={size} />
+      <Toon color={CHARCOAL} />
+    </mesh>
   );
 }
 
-export default function Storefront({ reduced }: { reduced: boolean }) {
+export default function Storefront() {
   const door = useRef<Group>(null);
-  const warm = useRef<Mesh>(null);
+  const sign = useRef<HTMLDivElement>(null);
+  const cladding = useMemo(() => repeated(plankTexture(), FRONT_W, 2.7), []);
 
   useFrame(() => {
     const p = getProgress();
     if (door.current) door.current.rotation.y = doorAngle(dwellT(p, "storefront"));
-    // Hide the glow plane once the camera is indoors so it can't block the view.
-    if (warm.current) warm.current.visible = stationProgress(p, "storefront") < 1;
+    // drei Html ignores walls: hide the sign once the camera is inside.
+    if (sign.current) sign.current.style.visibility = stationProgress(p, "storefront") < 1 ? "visible" : "hidden";
   });
+
+  const panes: [number, number][] = [];
+  for (let i = 0; i < MULLIONS.length - 1; i++) {
+    const a = MULLIONS[i];
+    const b = MULLIONS[i + 1];
+    if (a === -0.5) continue; // the door opening
+    panes.push([a, b]);
+  }
 
   return (
     <group>
-      {/* Facade: two walls and a lintel around a 1 × 2.2 doorway. */}
-      <mesh position={[-1.6, 1.4, 0]}>
-        <boxGeometry args={[2.2, 2.8, 0.3]} />
-        <Toon color="#5a3620" />
+      {/* Concrete plinth. */}
+      <mesh position={[0, BASE / 2, 0.15]}>
+        <boxGeometry args={[FRONT_W + 0.4, BASE, 0.6]} />
+        <Toon color={CONCRETE} />
         <Ink />
       </mesh>
-      <mesh position={[1.6, 1.4, 0]}>
-        <boxGeometry args={[2.2, 2.8, 0.3]} />
-        <Toon color="#5a3620" />
-        <Ink />
-      </mesh>
-      <mesh position={[0, 2.5, 0]}>
-        <boxGeometry args={[1, 0.6, 0.3]} />
-        <Toon color="#5a3620" />
-        <Ink />
-      </mesh>
-      {/* Warm light behind the door. */}
-      <mesh ref={warm} position={[0, 1.1, -1.2]}>
-        <planeGeometry args={[1, 2.2]} />
-        <meshBasicMaterial color="#ffb36b" />
-      </mesh>
-      {/* Door, hinged on its left edge; positive rotation swings it inward. */}
-      <group ref={door} position={[-0.5, 0, 0.05]}>
-        <mesh position={[0.5, 1.1, 0]}>
-          <boxGeometry args={[1, 2.2, 0.08]} />
-          <Toon color="#3d5a40" />
-          <Ink />
+
+      {/* Glass panes and their black frame. */}
+      {panes.map(([a, b]) => (
+        <mesh key={a} position={[(a + b) / 2, (BASE + GLASS_TOP) / 2, 0]}>
+          <planeGeometry args={[b - a, GLASS_TOP - BASE]} />
+          <Toon color={GLASS} transparent opacity={0.18} />
         </mesh>
+      ))}
+      {MULLIONS.map((x) => (
+        <Bar key={x} position={[x, (BASE + GLASS_TOP) / 2, 0]} size={[0.08, GLASS_TOP - BASE, 0.12]} />
+      ))}
+      <Bar position={[0, GLASS_TOP, 0]} size={[FRONT_W, 0.1, 0.14]} />
+      <Bar position={[0, BASE + 0.05, 0]} size={[FRONT_W, 0.1, 0.14]} />
+      {/* Transom over the door. */}
+      <Bar position={[0, 2.78, 0]} size={[DOOR_W, 0.06, 0.12]} />
+      <mesh position={[0, 2.89, 0]}>
+        <planeGeometry args={[DOOR_W, 0.16]} />
+        <Toon color={GLASS} transparent opacity={0.18} />
+      </mesh>
+
+      {/* Door: glass in a black frame with a tall handle, hinged on its left
+          edge; positive rotation swings it inward. */}
+      <group ref={door} position={[-DOOR_W / 2, 0, 0.02]}>
+        <group position={[DOOR_W / 2, 0, 0]}>
+          <mesh position={[0, 1.45, 0]}>
+            <planeGeometry args={[DOOR_W - 0.1, 2.5]} />
+            <Toon color={GLASS} transparent opacity={0.22} />
+          </mesh>
+          <Bar position={[-DOOR_W / 2 + 0.03, 1.45, 0]} size={[0.06, 2.6, 0.06]} />
+          <Bar position={[DOOR_W / 2 - 0.03, 1.45, 0]} size={[0.06, 2.6, 0.06]} />
+          <Bar position={[0, 2.72, 0]} size={[DOOR_W, 0.06, 0.06]} />
+          <Bar position={[0, 0.18, 0]} size={[DOOR_W, 0.08, 0.06]} />
+          {/* Tall bar handle on both faces. */}
+          <Bar position={[0.32, 1.3, 0.07]} size={[0.03, 1.1, 0.03]} />
+          <Bar position={[0.32, 1.3, -0.07]} size={[0.03, 1.1, 0.03]} />
+        </group>
       </group>
-      <Html transform position={[0, 3.3, 0.2]} distanceFactor={4} className="font-chalk pointer-events-none text-5xl whitespace-nowrap text-[#ffb36b]">
-        {personalInfo.firstName}&apos;s Café
+
+      {/* Awning band with the sign. */}
+      <mesh position={[0, GLASS_TOP + 0.3, 0.3]}>
+        <boxGeometry args={[FRONT_W + 0.6, 0.5, 0.8]} />
+        <Toon color={CHARCOAL} />
+        <Ink />
+      </mesh>
+      <Html transform position={[0, GLASS_TOP + 0.3, 0.71]} distanceFactor={4} className="pointer-events-none">
+        <div
+          ref={sign}
+          className="font-cafe text-6xl font-black tracking-[0.12em] whitespace-nowrap text-white"
+        >
+          {SIGN}
+        </div>
       </Html>
-      <Rain reduced={reduced} />
+
+      {/* Wood cladding above the awning. */}
+      <mesh position={[0, GLASS_TOP + 0.55 + 1.35, 0]}>
+        <boxGeometry args={[FRONT_W + 0.2, 2.7, 0.3]} />
+        <Toon color="#ffffff" map={cladding} />
+        <Ink />
+      </mesh>
+
+      {/* Wall lights and planters out front. */}
+      <Sconce position={[-6.4, 2.55, 0.08]} />
+      <Sconce position={[6.4, 2.55, 0.08]} />
+      <Planter position={[-4.6, 0, 0.95]} length={2.6} />
+      <Planter position={[4.6, 0, 0.95]} length={2.6} />
     </group>
   );
 }

@@ -45,12 +45,12 @@ export default function Checkout() {
     <group position={[CX, 0, CZ]} rotation={[0, stationYaw("checkout"), 0]}>
       <mesh position={[0, 0.5, 0]}>
         <boxGeometry args={[1.4, 1, 0.8]} />
-        <Toon color="#7a4a2a" />
+        <Toon color="#d9a86c" />
         <Ink />
       </mesh>
       <mesh position={[0, 1.15, 0]}>
         <boxGeometry args={[0.6, 0.3, 0.4]} />
-        <Toon color="#2b1a10" />
+        <Toon color="#2b2b2e" />
         <Ink />
       </mesh>
       {/* Receipt hangs from the printer slot; scale.y grows it downward. */}

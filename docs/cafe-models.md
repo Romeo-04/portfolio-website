@@ -7,8 +7,10 @@ replace a piece with your own model:
    1 metre). Apply all transforms (Ctrl+A → All Transforms). Plain colours
    or one texture per material are enough; the café adds the toon shading
    and ink outlines itself.
-2. **Match the layout.** The room spans x −7…7 and z 0…−9.5 (front door at
-   z 0, back doorway to the roastery at z −9.5), ceiling at y 4. The roastery behind the back doorway spans x −4…4 and z −9.5…−14. The brew
+2. **Match the layout.** The room spans x −7…7 and z 0…−9.5 (glass front
+   and door at z 0, back doorway to the roastery at z −9.5), ceiling at
+   y 6. A mezzanine covers x −7…3, z −6…−9.5 with its floor at y 3.2; the
+   bookshelf fills the double-height right wall. The roastery behind the back doorway spans x −4…4 and z −9.5…−14. The brew
    bar counter stands around x 5.6, z −3. Keep the origin at the world
    origin so the model lands in place.
 3. **Export** as glTF Binary (`.glb`), with "Apply Modifiers" on, and no

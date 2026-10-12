@@ -1,14 +1,15 @@
 // ============================================================
 // TOON MATERIAL
 // ============================================================
-// Three hard light bands instead of smooth shading (spec section 3,
+// Four hard light bands instead of smooth shading (spec section 3,
 // "Toon look"). Every MeshToonMaterial in the café uses this one
 // gradient texture, so the whole shop shares one lighting style.
 // ============================================================
 
 import { DataTexture, NearestFilter, RedFormat } from "three";
 
-export const TOON_BANDS = [0.45, 0.75, 1] as const;
+/** Four bands: softer shading that still reads as illustrated. */
+export const TOON_BANDS = [0.5, 0.7, 0.86, 1] as const;
 
 /** Ink colour for outlines: the café's darkest roast. */
 export const INK = "#1b120c";

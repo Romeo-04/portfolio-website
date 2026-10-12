@@ -16,7 +16,7 @@ import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import type { Group } from "three";
 import { Ink, Toon } from "@/components/cafe/kit";
-import { CHARCOAL, CONCRETE, GLASS } from "@/components/cafe/palette";
+import { CHARCOAL, CONCRETE, GLASS, OAK } from "@/components/cafe/palette";
 import { Planter, Sconce } from "@/components/cafe/props";
 import { plankTexture, repeated } from "@/components/cafe/textures";
 import { doorAngle, dwellT } from "@/lib/cafe/choreo";
@@ -24,7 +24,8 @@ import { getProgress } from "@/lib/cafe/scroll";
 import { stationProgress } from "@/lib/cafe/stations";
 
 const FRONT_W = 14;
-const GLASS_TOP = 3.0;
+const GLASS_TOP = 3.4;
+const ROOF = 6.2;
 const BASE = 0.15;
 const DOOR_W = 1.0;
 const SIGN = "JHEZRA'S CAFÉ";
@@ -44,7 +45,8 @@ function Bar({ position, size }: { position: [number, number, number]; size: [nu
 export default function Storefront() {
   const door = useRef<Group>(null);
   const sign = useRef<HTMLDivElement>(null);
-  const cladding = useMemo(() => repeated(plankTexture(), FRONT_W, 2.7), []);
+  const claddingH = ROOF - (GLASS_TOP + 0.55);
+  const cladding = useMemo(() => repeated(plankTexture(), FRONT_W, ROOF - (GLASS_TOP + 0.55)), []);
 
   useFrame(() => {
     const p = getProgress();
@@ -74,9 +76,18 @@ export default function Storefront() {
       {panes.map(([a, b]) => (
         <mesh key={a} position={[(a + b) / 2, (BASE + GLASS_TOP) / 2, 0]}>
           <planeGeometry args={[b - a, GLASS_TOP - BASE]} />
-          <Toon color={GLASS} transparent opacity={0.18} />
+          <Toon color={GLASS} transparent opacity={0.16} />
         </mesh>
       ))}
+      {/* Soft diagonal sheen on alternate panes, so the glass reads as glass. */}
+      {panes
+        .filter((_, i) => i % 2 === 0)
+        .map(([a, b]) => (
+          <mesh key={`sheen${a}`} position={[(a + b) / 2, GLASS_TOP * 0.6, 0.01]} rotation-z={0.55}>
+            <planeGeometry args={[0.22, GLASS_TOP * 0.9]} />
+            <meshBasicMaterial color="#ffffff" transparent opacity={0.14} depthWrite={false} />
+          </mesh>
+        ))}
       {MULLIONS.map((x) => (
         <Bar key={x} position={[x, (BASE + GLASS_TOP) / 2, 0]} size={[0.08, GLASS_TOP - BASE, 0.12]} />
       ))}
@@ -84,8 +95,8 @@ export default function Storefront() {
       <Bar position={[0, BASE + 0.05, 0]} size={[FRONT_W, 0.1, 0.14]} />
       {/* Transom over the door. */}
       <Bar position={[0, 2.78, 0]} size={[DOOR_W, 0.06, 0.12]} />
-      <mesh position={[0, 2.89, 0]}>
-        <planeGeometry args={[DOOR_W, 0.16]} />
+      <mesh position={[0, (2.81 + GLASS_TOP) / 2, 0]}>
+        <planeGeometry args={[DOOR_W, GLASS_TOP - 2.81]} />
         <Toon color={GLASS} transparent opacity={0.18} />
       </mesh>
 
@@ -123,8 +134,8 @@ export default function Storefront() {
       </Html>
 
       {/* Wood cladding above the awning. */}
-      <mesh position={[0, GLASS_TOP + 0.55 + 1.35, 0]}>
-        <boxGeometry args={[FRONT_W + 0.2, 2.7, 0.3]} />
+      <mesh position={[0, GLASS_TOP + 0.55 + claddingH / 2, 0]}>
+        <boxGeometry args={[FRONT_W + 0.2, claddingH, 0.3]} />
         <Toon color="#ffffff" map={cladding} />
         <Ink />
       </mesh>
@@ -133,6 +144,24 @@ export default function Storefront() {
       <Sconce position={[-6.4, 2.55, 0.08]} />
       <Sconce position={[6.4, 2.55, 0.08]} />
       <Planter position={[-4.6, 0, 0.95]} length={2.6} />
+      {/* Doormat and a bench out front. */}
+      <mesh rotation-x={-Math.PI / 2} position={[0, 0.006, 0.6]}>
+        <planeGeometry args={[1.3, 0.6]} />
+        <Toon color={CHARCOAL} />
+      </mesh>
+      <group position={[2.4, 0, 1.0]}>
+        <mesh position={[0, 0.45, 0]}>
+          <boxGeometry args={[1.4, 0.06, 0.4]} />
+          <Toon color={OAK} />
+          <Ink />
+        </mesh>
+        {[-0.6, 0.6].map((x) => (
+          <mesh key={x} position={[x, 0.22, 0]}>
+            <boxGeometry args={[0.06, 0.44, 0.36]} />
+            <Toon color={CHARCOAL} />
+          </mesh>
+        ))}
+      </group>
       <Planter position={[4.6, 0, 0.95]} length={2.6} />
     </group>
   );

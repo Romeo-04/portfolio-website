@@ -19,7 +19,7 @@
 import { PerformanceMonitor, useProgress } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { BackSide, Color, ShaderMaterial } from "three";
+import { BackSide, Color, Mesh as ThreeMesh, Object3D, ShaderMaterial } from "three";
 import type { Mesh, MeshBasicMaterial } from "three";
 import { INK, OUTLINE_THICKNESS } from "@/components/cafe/materials/toon";
 import Effects from "@/components/cafe/effects";
@@ -172,6 +172,62 @@ function SignatureCups() {
   );
 }
 
+/** The sun: a warm key light that casts soft shadows on desktop. */
+function Sun({ shadows }: { shadows: boolean }) {
+  const target = useMemo(() => new Object3D(), []);
+  return (
+    <>
+      <primitive object={target} position={[0, 0, -4]} />
+      <directionalLight
+        position={[7, 13, 12]}
+        intensity={2.6}
+        color="#fff1d6"
+        target={target}
+        castShadow={shadows}
+        shadow-mapSize={[2048, 2048]}
+        shadow-camera-left={-11}
+        shadow-camera-right={11}
+        shadow-camera-top={11}
+        shadow-camera-bottom={-11}
+        shadow-camera-near={1}
+        shadow-camera-far={45}
+        shadow-bias={-0.0004}
+        shadow-normalBias={0.03}
+        shadow-radius={4}
+      />
+    </>
+  );
+}
+
+/**
+ * Turns shadows on for every solid mesh, including model pieces that load
+ * later. Glass and other transparent surfaces neither cast nor receive, and
+ * the sky is skipped, so sunlight still pours through the shop front.
+ */
+function ShadowFlags({ enabled }: { enabled: boolean }) {
+  const scene = useThree((s) => s.scene);
+  const seen = useRef(-1);
+  useFrame(() => {
+    let count = 0;
+    scene.traverse(() => count++);
+    if (count === seen.current) return;
+    seen.current = count;
+    scene.traverse((obj) => {
+      if (!(obj instanceof ThreeMesh)) return;
+      const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+      // Custom shaders (ink outlines, the pour, the sky) are left out: an
+      // outline hull would fatten every shadow.
+      const solid = obj.name !== "sky" && mats.every((m) => !m.transparent && !(m instanceof ShaderMaterial));
+      obj.castShadow = enabled && solid;
+      obj.receiveShadow = enabled && solid;
+    });
+  });
+  useEffect(() => {
+    seen.current = -1;
+  }, [enabled]);
+  return null;
+}
+
 /** Toon sky: a big inside-out sphere fading from blue overhead to cream. */
 function SkyDome() {
   const material = useMemo(
@@ -206,7 +262,7 @@ function SkyDome() {
   );
   useEffect(() => () => material.dispose(), [material]);
   return (
-    <mesh material={material} renderOrder={-1}>
+    <mesh name="sky" material={material} renderOrder={-1}>
       <sphereGeometry args={[80, 32, 16]} />
     </mesh>
   );
@@ -258,21 +314,22 @@ export default function CafeScene({
   onReady?: () => void;
 }) {
   const [declined, setDeclined] = useState(false);
-  const quality = qualityFor({ light, declined, reduced: cut });
+  const quality = qualityFor({ light, declined });
   return (
     <div aria-hidden className="fixed inset-0">
-      <Canvas camera={{ fov: 50, position: [...STATIONS[0].camera.position] }} dpr={quality.dpr} onCreated={() => onReady?.()}>
+      <Canvas shadows="percentage" camera={{ fov: 50, position: [...STATIONS[0].camera.position] }} dpr={quality.dpr} onCreated={() => onReady?.()}>
         {!declined && <PerformanceMonitor onDecline={() => setDeclined(true)} />}
         <color attach="background" args={["#bfe3f7"]} />
         {/* Daylight: blue sky above, warm bounce below, and a warm sun. */}
-        <hemisphereLight args={["#d6ecff", "#f3dcb8", 1.3]} />
-        <directionalLight position={[8, 12, 10]} intensity={2.2} color="#fff3dc" />
-        <ambientLight intensity={0.25} />
+        <hemisphereLight args={["#d6ecff", "#f3dcb8", 1.05]} />
+        <Sun shadows={quality.shadows} />
+        <ambientLight intensity={0.15} />
+        <ShadowFlags enabled={quality.shadows} />
         <LoadingReporter />
         <FrameDriver />
         <CameraRig cut={cut} />
         <Shop specials={specials} lampLights={quality.effects} />
-        {quality.effects && <Effects grain={quality.grain} />}
+        {quality.effects && <Effects />}
       </Canvas>
     </div>
   );

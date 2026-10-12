@@ -4,20 +4,19 @@
 // STATION 2: MENU BOARD
 // ============================================================
 // A chalkboard: the tagline and the three skill tiers write themselves on,
-// line by line, while the camera holds here. Beside it hangs the
-// "Barista of the Month" portrait. Text is visual only; the Quick Order
-// menu carries the readable copy.
+// line by line, while the camera holds here. Text is visual only; the
+// Quick Order menu carries the readable copy.
 // ============================================================
 
-import { Html, useTexture } from "@react-three/drei";
+import { Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { Component, Suspense, useRef, type ReactNode } from "react";
+import { useRef } from "react";
 import { Ink, Toon } from "@/components/cafe/kit";
+import { CHALK, OAK_DARK } from "@/components/cafe/palette";
 import { personalInfo, skillsData, tierLabels, type SkillTier } from "@/data/portfolio";
 import { dwellT, stagger } from "@/lib/cafe/choreo";
 import { getProgress } from "@/lib/cafe/scroll";
 import { DWELL, STATIONS, stationRange } from "@/lib/cafe/stations";
-import { CHALK, OAK_DARK } from "@/components/cafe/palette";
 
 const TIERS: SkillTier[] = ["house", "seasonal", "experimental"];
 
@@ -33,44 +32,21 @@ const LINES = [
   ),
 ];
 
-// Board centre; the camera looks at [0, 2.6, -4].
 // The chalk wall hangs on the back wall under the mezzanine, left of the
 // doorway: centred on the station's target, just proud of the wall.
 const [BX] = STATIONS.find((s) => s.id === "menu-board")!.camera.target;
 const BOARD: [number, number, number] = [BX, 1.85, -9.35];
 
-function Portrait() {
-  const texture = useTexture(personalInfo.heroImage);
-  return (
-    <mesh position={[0, 0, 0.035]}>
-      <planeGeometry args={[0.8, 0.8]} />
-      <meshBasicMaterial map={texture} toneMapped={false} />
-    </mesh>
-  );
-}
-
-/** A missing photo must not take the board down with it. */
-class PortraitBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
-  state = { failed: false };
-  static getDerivedStateFromError() {
-    return { failed: true };
-  }
-  render() {
-    return this.state.failed ? null : this.props.children;
-  }
-}
-
 export default function MenuBoard() {
   const lines = useRef<(HTMLSpanElement | null)[]>([]);
-
   const chalk = useRef<HTMLDivElement>(null);
-  const label = useRef<HTMLDivElement>(null);
 
   useFrame(() => {
+    // drei Html ignores walls: keep the chalk text hidden while outside.
     const [a, b] = stationRange(0);
-    const v = getProgress() >= a + DWELL * (b - a) ? "visible" : "hidden";
-    if (chalk.current) chalk.current.style.visibility = v;
-    if (label.current) label.current.style.visibility = v;
+    if (chalk.current) {
+      chalk.current.style.visibility = getProgress() >= a + DWELL * (b - a) ? "visible" : "hidden";
+    }
     const t = dwellT(getProgress(), "menu-board");
     lines.current.forEach((el, i) => {
       if (!el) return;
@@ -91,7 +67,7 @@ export default function MenuBoard() {
         <Toon color={CHALK} />
       </mesh>
       <Html transform position={[0, 0, 0.06]} distanceFactor={2.2} className="pointer-events-none">
-        <div ref={chalk} style={{ visibility: "hidden" }} className="font-chalk w-[560px] text-[#f5e9da]">
+        <div ref={chalk} style={{ visibility: "hidden" }} className="font-board w-[560px] text-[#f5e9da]">
           <p className="mb-3 text-center text-4xl">Menu</p>
           {LINES.map((line, i) => (
             <span
@@ -107,23 +83,6 @@ export default function MenuBoard() {
           ))}
         </div>
       </Html>
-      <group position={[-2.4, 0, 0.05]}>
-        <mesh>
-          <boxGeometry args={[0.95, 0.95, 0.06]} />
-          <Toon color="#c9a227" />
-          <Ink />
-        </mesh>
-        <PortraitBoundary>
-          <Suspense fallback={null}>
-            <Portrait />
-          </Suspense>
-        </PortraitBoundary>
-        <Html transform position={[0, -0.62, 0.05]} distanceFactor={2.2} className="pointer-events-none">
-          <div ref={label} style={{ visibility: "hidden" }} className="font-receipt text-xs font-bold whitespace-nowrap text-[#2b2b2e]">
-            Barista of the Month
-          </div>
-        </Html>
-      </group>
     </group>
   );
 }

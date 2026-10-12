@@ -1,14 +1,11 @@
-// Render quality (spec section 3, "Performance"). Phone light 3D and slow
-// devices drop to DPR 1 with no post-processing; a decline is sticky so
-// quality never flickers back. Reduced motion turns off the animated grain.
+// Render quality (spec section 3, "Performance"). Desktop gets high DPR,
+// post-processing (bloom, ambient occlusion, antialiasing) and real-time
+// sun shadows. Phone light 3D and slow devices drop to DPR 1 with none of
+// those; a decline is sticky so quality never flickers back.
 
-export type Quality = { dpr: [number, number]; effects: boolean; grain: boolean };
+export type Quality = { dpr: [number, number]; effects: boolean; shadows: boolean };
 
-export function qualityFor(opts: {
-  light: boolean;
-  declined: boolean;
-  reduced: boolean;
-}): Quality {
-  if (opts.light || opts.declined) return { dpr: [1, 1], effects: false, grain: false };
-  return { dpr: [1, 2], effects: true, grain: !opts.reduced };
+export function qualityFor(opts: { light: boolean; declined: boolean }): Quality {
+  if (opts.light || opts.declined) return { dpr: [1, 1], effects: false, shadows: false };
+  return { dpr: [1, 2], effects: true, shadows: true };
 }

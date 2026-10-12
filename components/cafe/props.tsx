@@ -24,8 +24,9 @@ export function Chair({ position, rotation = 0 }: { position: V3; rotation?: num
   return (
     <group position={position} rotation={[0, rotation, 0]}>
       <mesh position={[0, 0.45, 0]}>
-        <boxGeometry args={[0.42, 0.04, 0.42]} />
-        <Toon color={CHARCOAL} />
+        <boxGeometry args={[0.42, 0.05, 0.42]} />
+        <Toon color={OAK} />
+        <Ink />
       </mesh>
       {legs.map(([x, z]) => (
         <mesh key={`${x}${z}`} position={[x, 0.22, z]}>

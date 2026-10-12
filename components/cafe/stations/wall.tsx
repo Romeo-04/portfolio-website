@@ -12,17 +12,25 @@ import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import type { Group } from "three";
 import { Ink, Toon } from "@/components/cafe/kit";
+import { BRASS, CHARCOAL, CREAM, OAK_DARK } from "@/components/cafe/palette";
 import { brickTexture, repeated } from "@/components/cafe/textures";
 import { achievementsData, type Achievement } from "@/data/portfolio";
 import { dwellT, frameAngle } from "@/lib/cafe/choreo";
 import { getProgress } from "@/lib/cafe/scroll";
 import { STATIONS, stationYaw } from "@/lib/cafe/stations";
 
-const TIER_COLORS: Record<Achievement["tier"], string> = {
-  gold: "#c9a227",
-  silver: "#b8b8b8",
-  bronze: "#a0643c",
-  special: "#7b4fa0",
+/** Frame moulding per tier, and a lively accent band for the art. */
+const FRAME_COLORS: Record<Achievement["tier"], string> = {
+  gold: BRASS,
+  silver: "#c9ccd1",
+  bronze: OAK_DARK,
+  special: CHARCOAL,
+};
+const ACCENT_COLORS: Record<Achievement["tier"], string> = {
+  gold: "#f3a712",
+  silver: "#669bbc",
+  bronze: "#e4572e",
+  special: "#8cb369",
 };
 
 const COLS = 4;
@@ -69,18 +77,27 @@ export default function Wall() {
             frames.current[i] = g;
           }}
         >
+          {/* Moulding, cream mat, and an accent band like a print. */}
           <mesh position={[0, -0.3, 0]}>
-            <boxGeometry args={[1.05, 0.6, 0.05]} />
-            <Toon color={TIER_COLORS[a.tier]} />
+            <boxGeometry args={[1.05, 0.62, 0.05]} />
+            <Toon color={FRAME_COLORS[a.tier]} />
             <Ink />
           </mesh>
-          <Html transform position={[0, -0.3, 0.09]} distanceFactor={2.4} className="pointer-events-none">
+          <mesh position={[0, -0.3, 0.027]}>
+            <planeGeometry args={[0.93, 0.5]} />
+            <Toon color={CREAM} />
+          </mesh>
+          <mesh position={[0, -0.12, 0.029]}>
+            <planeGeometry args={[0.81, 0.08]} />
+            <Toon color={ACCENT_COLORS[a.tier]} />
+          </mesh>
+          <Html transform position={[0, -0.34, 0.035]} distanceFactor={2.4} className="pointer-events-none">
             <div
               ref={(el) => {
                 labels.current[i] = el;
               }}
               style={{ visibility: "hidden" }}
-              className="font-receipt w-[220px] text-center text-[11px] leading-tight text-[#1b120c]"
+              className="font-receipt w-[150px] text-center text-[10px] leading-tight text-[#2b2b2e]"
             >
               <strong className="block">{a.title}</strong>
               {a.year}

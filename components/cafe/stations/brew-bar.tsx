@@ -8,19 +8,31 @@
 // The cups themselves stay in scene.tsx because they pour with scroll.
 // ============================================================
 
+import { useMemo } from "react";
 import { Ink, Toon } from "@/components/cafe/kit";
+import { plankTexture, repeated } from "@/components/cafe/textures";
 import { BRASS, CHARCOAL, GLASS, OAK, OAK_DARK, TERRACOTTA, WHITE } from "@/components/cafe/palette";
 
 const JAR_COLORS = ["#e4572e", "#f3a712", "#8cb369", "#669bbc", "#f0c987", "#bc4b51"];
 
 // Counter top at y 1.1; front edge near x 5.2, facing the brew-bar camera.
 export default function BrewBar() {
+  const slats = useMemo(() => repeated(plankTexture(), 3.8, 1), []);
   return (
     <group>
       <mesh position={[5.6, 0.55, -2.8]}>
         <boxGeometry args={[0.8, 1.1, 3.8]} />
         <Toon color={OAK_DARK} />
         <Ink />
+      </mesh>
+      {/* Wood slats on the customer side, and a dark kick plate. */}
+      <mesh position={[5.195, 0.62, -2.8]} rotation-y={-Math.PI / 2}>
+        <planeGeometry args={[3.8, 0.92]} />
+        <Toon color="#ffffff" map={slats} />
+      </mesh>
+      <mesh position={[5.19, 0.08, -2.8]}>
+        <boxGeometry args={[0.03, 0.16, 3.8]} />
+        <Toon color={CHARCOAL} />
       </mesh>
       <mesh position={[5.6, 1.12, -2.8]}>
         <boxGeometry args={[0.9, 0.04, 3.8]} />

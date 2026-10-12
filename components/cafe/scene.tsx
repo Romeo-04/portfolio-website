@@ -272,7 +272,7 @@ export default function CafeScene({
         <FrameDriver />
         <CameraRig cut={cut} />
         <Shop specials={specials} lampLights={quality.effects} />
-        {quality.effects && <Effects grain={quality.grain} />}
+        {quality.effects && <Effects />}
       </Canvas>
     </div>
   );

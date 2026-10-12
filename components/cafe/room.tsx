@@ -109,6 +109,18 @@ export default function Room({ lampLights }: { lampLights: boolean }) {
       {/* ---------- Mezzanine ---------- */}
       <mesh position={[-2, MEZZ_Y - 0.1, -7.75]}>
         <boxGeometry args={[10, 0.2, 3.5]} />
+        <Toon color={CREAM} />
+        <Ink />
+      </mesh>
+      {/* Slim oak beams under the mezzanine and an oak edge trim. */}
+      {[-6, -4, -2, 0, 2].map((x) => (
+        <mesh key={x} position={[x, MEZZ_Y - 0.26, -7.75]}>
+          <boxGeometry args={[0.1, 0.12, 3.5]} />
+          <Toon color={OAK} />
+        </mesh>
+      ))}
+      <mesh position={[-2, MEZZ_Y - 0.08, -6]}>
+        <boxGeometry args={[10, 0.26, 0.08]} />
         <Toon color={OAK_DARK} />
         <Ink />
       </mesh>
@@ -123,6 +135,7 @@ export default function Room({ lampLights }: { lampLights: boolean }) {
         <mesh key={`${x}${z}`} position={[x, (MEZZ_Y - 0.2) / 2, z]}>
           <boxGeometry args={[0.16, MEZZ_Y - 0.2, 0.16]} />
           <Toon color={CHARCOAL} />
+          <Ink />
         </mesh>
       ))}
       <Railing from={[-6.9, -6]} to={[3, -6]} y={MEZZ_Y} />

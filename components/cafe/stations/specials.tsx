@@ -1,103 +1,183 @@
 "use client";
 
 // ============================================================
-// STATION 6: TODAY'S SPECIALS
+// STATION 6: TODAY'S SPECIALS (the bookshelf)
 // ============================================================
-// A lit pastry case. Recent GitHub repos slide in on trays as the visitor
-// scrolls in; with none, a "Sold out" sign (spec station 6, section 5).
+// A tall black bookshelf of colourful books fills the double-height wall,
+// after the user's reference. The visitor's recent GitHub repos are the
+// highlighted books at eye level: they pull out one after another as the
+// camera arrives, each with its name and language. With no repos, a
+// "Sold out" card sits on the shelf instead (spec section 5).
 // ============================================================
 
 import { Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { useRef } from "react";
-import type { Group, PointLight } from "three";
+import { useLayoutEffect, useMemo, useRef } from "react";
+import { Color, Object3D, type Group, type InstancedMesh, type PointLight } from "three";
 import { Ink, Toon } from "@/components/cafe/kit";
+import { BOOK_COLORS, CHARCOAL } from "@/components/cafe/palette";
 import { dwellT, trayOffset } from "@/lib/cafe/choreo";
 import { getProgress } from "@/lib/cafe/scroll";
 import { STATIONS, stationYaw } from "@/lib/cafe/stations";
 
-const [SX, , SZ] = STATIONS.find((s) => s.id === "specials")!.camera.target;
-const CASE_X = SX + 0.4;
-const CASE_Z = SZ;
-
 export type SpecialItem = { id: number; name: string; language: string | null };
 
-/** Tray slot i: two shelves of three, in case space (front faces +z). */
-function slot(i: number): [number, number, number] {
-  return [((i % 3) - 1) * 0.7, i < 3 ? 0.86 : 0.36, 0];
+const [SX, , SZ] = STATIONS.find((s) => s.id === "specials")!.camera.target;
+
+const WIDTH = 3.8;
+const HEIGHT = 5.7;
+const DEPTH = 0.32;
+const ROW = 0.47;
+const ROWS = 12;
+/** Shelf board heights (bottom of each row). */
+const BOARDS = Array.from({ length: ROWS }, (_, k) => 0.1 + k * ROW);
+/** The eye-level row that holds the highlighted repo books. */
+const FEATURED_ROW = 3;
+const FEATURED_W = 0.14;
+const FEATURED_GAP = 0.34;
+
+type Book = { x: number; y: number; w: number; h: number; color: string };
+
+function rng(seed: number) {
+  let s = seed;
+  return () => {
+    s = (s * 16807) % 2147483647;
+    return s / 2147483647;
+  };
+}
+
+/** Filler books for every row, leaving room for the featured books. */
+function fillerBooks(featuredSpan: number): Book[] {
+  const r = rng(42);
+  const books: Book[] = [];
+  BOARDS.forEach((y, row) => {
+    let x = -WIDTH / 2 + 0.06;
+    while (x < WIDTH / 2 - 0.08) {
+      const w = 0.05 + r() * 0.06;
+      const inFeatured = row === FEATURED_ROW && Math.abs(x + w / 2) < featuredSpan / 2 + 0.05;
+      if (!inFeatured && r() > 0.06) {
+        const h = 0.26 + r() * 0.14;
+        books.push({ x: x + w / 2, y: y + 0.02 + h / 2, w, h, color: BOOK_COLORS[Math.floor(r() * BOOK_COLORS.length)] });
+      }
+      x += w + 0.004;
+    }
+  });
+  return books;
 }
 
 export default function Specials({ items }: { items: SpecialItem[] }) {
-  const trays = useRef<(Group | null)[]>([]);
+  const span = items.length > 0 ? items.length * FEATURED_GAP : 1.6;
+  const books = useMemo(() => fillerBooks(span), [span]);
+  const filler = useRef<InstancedMesh>(null);
+  const featured = useRef<(Group | null)[]>([]);
   const labels = useRef<(HTMLDivElement | null)[]>([]);
-  const light = useRef<PointLight>(null);
   const soldOut = useRef<HTMLDivElement>(null);
+  const light = useRef<PointLight>(null);
+  const lastT = useRef(-1);
+
+  useLayoutEffect(() => {
+    const mesh = filler.current;
+    if (!mesh) return;
+    const o = new Object3D();
+    const c = new Color();
+    books.forEach((b, i) => {
+      o.position.set(b.x, b.y, -DEPTH / 2 + 0.13);
+      o.scale.set(b.w, b.h, 0.24);
+      o.updateMatrix();
+      mesh.setMatrixAt(i, o.matrix);
+      mesh.setColorAt(i, c.set(b.color));
+    });
+    mesh.instanceMatrix.needsUpdate = true;
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  }, [books]);
 
   useFrame(() => {
     const t = dwellT(getProgress(), "specials");
-    if (light.current) light.current.intensity = 3 * t;
+    if (t === lastT.current) return;
+    lastT.current = t;
+    if (light.current) light.current.intensity = 2.5 * t;
     if (soldOut.current) soldOut.current.style.opacity = String(t);
-    trays.current.forEach((g, i) => {
+    featured.current.forEach((g, i) => {
       if (!g) return;
-      const out = trayOffset(t, i, items.length);
-      const [x, y, z] = slot(i);
-      g.position.set(x + out * 2.5, y, z);
-      g.visible = out < 1;
-      // drei Html ignores the parent's visible flag, so hide the label too.
+      const pulled = 1 - trayOffset(t, i, items.length);
+      g.position.z = -0.1 + pulled * 0.26;
       const label = labels.current[i];
-      if (label) label.style.visibility = out < 1 ? "visible" : "hidden";
+      if (label) label.style.visibility = pulled > 0.05 ? "visible" : "hidden";
     });
   });
 
-  // The case stands just behind the specials target, facing its camera.
+  const rowY = BOARDS[FEATURED_ROW] + 0.02;
+
+  // The shelf stands against the right wall, facing its camera.
   return (
-    <group position={[CASE_X, 0, CASE_Z]} rotation={[0, stationYaw("specials"), 0]}>
-      <mesh position={[0, 0.7, -0.3]}>
-        <boxGeometry args={[2.3, 1.4, 0.1]} />
-        <Toon color="#5a3620" />
-        <Ink />
+    <group position={[SX, 0, SZ]} rotation={[0, stationYaw("specials"), 0]}>
+      {/* Carcass: back, sides, top and shelf boards. */}
+      <mesh position={[0, HEIGHT / 2, -DEPTH + 0.02]}>
+        <boxGeometry args={[WIDTH, HEIGHT, 0.04]} />
+        <Toon color={CHARCOAL} />
       </mesh>
-      {[0.3, 0.8].map((y) => (
-        <mesh key={y} position={[0, y, 0]}>
-          <boxGeometry args={[2.3, 0.05, 0.6]} />
-          <Toon color="#8a5a3b" />
+      {[-WIDTH / 2, WIDTH / 2].map((x) => (
+        <mesh key={x} position={[x, HEIGHT / 2, -DEPTH / 2]}>
+          <boxGeometry args={[0.06, HEIGHT, DEPTH]} />
+          <Toon color={CHARCOAL} />
           <Ink />
         </mesh>
       ))}
-      <pointLight ref={light} position={[0, 1.3, 0.4]} intensity={0} color="#ffd9a0" distance={3} />
+      {[...BOARDS, HEIGHT].map((y) => (
+        <mesh key={y} position={[0, y, -DEPTH / 2]}>
+          <boxGeometry args={[WIDTH, 0.04, DEPTH]} />
+          <Toon color={CHARCOAL} />
+        </mesh>
+      ))}
+
+      <instancedMesh ref={filler} args={[undefined, undefined, books.length]}>
+        <boxGeometry args={[1, 1, 1]} />
+        <Toon color="#ffffff" />
+      </instancedMesh>
+
+      <pointLight ref={light} position={[0, rowY + 0.8, 0.9]} intensity={0} color="#ffe2b0" distance={4} />
+
       {items.length === 0 ? (
-        <Html transform position={[0, 0.7, 0.2]} distanceFactor={2} className="font-chalk pointer-events-none text-3xl whitespace-nowrap text-[#ffb36b]">
-          <div ref={soldOut} style={{ opacity: 0 }}>
+        <Html transform position={[0, rowY + 0.2, 0.05]} distanceFactor={2} className="pointer-events-none">
+          <div
+            ref={soldOut}
+            style={{ opacity: 0 }}
+            className="font-chalk rounded-sm bg-[#20262a] px-3 py-1 text-2xl whitespace-nowrap text-[#f6efe2]"
+          >
             Sold out — check back soon
           </div>
         </Html>
       ) : (
-        items.map((item, i) => (
-          <group
-            key={item.id}
-            ref={(g) => {
-              trays.current[i] = g;
-            }}
-          >
-            <mesh>
-              <boxGeometry args={[0.6, 0.06, 0.4]} />
-              <Toon color="#f6ead8" />
-              <Ink />
-            </mesh>
-            <Html transform position={[0, 0.16, 0.1]} distanceFactor={1.4} className="pointer-events-none">
-              <div
-                ref={(el) => {
-                  labels.current[i] = el;
-                }}
-                style={{ visibility: "hidden" }}
-                className="font-receipt w-[120px] text-center text-[10px] leading-tight text-[#f5e9da]"
-              >
-                <strong className="block">{item.name}</strong>
-                {item.language ?? ""}
-              </div>
-            </Html>
-          </group>
-        ))
+        items.map((item, i) => {
+          const x = (i - (items.length - 1) / 2) * FEATURED_GAP;
+          return (
+            <group
+              key={item.id}
+              ref={(g) => {
+                featured.current[i] = g;
+              }}
+              position={[x, rowY, -0.1]}
+            >
+              <mesh position={[0, 0.2, 0]}>
+                <boxGeometry args={[FEATURED_W, 0.4, 0.28]} />
+                <Toon color={BOOK_COLORS[(i * 5) % BOOK_COLORS.length]} />
+                <Ink />
+              </mesh>
+              <Html transform position={[0, 0.5, 0.16]} distanceFactor={1.4} className="pointer-events-none">
+                <div
+                  ref={(el) => {
+                    labels.current[i] = el;
+                  }}
+                  style={{ visibility: "hidden" }}
+                  className="font-receipt w-[120px] rounded-sm bg-[#fbfaf6] px-1 py-0.5 text-center text-[10px] leading-tight text-[#20262a] shadow"
+                >
+                  <strong className="block">{item.name}</strong>
+                  {item.language ?? ""}
+                </div>
+              </Html>
+            </group>
+          );
+        })
       )}
     </group>
   );

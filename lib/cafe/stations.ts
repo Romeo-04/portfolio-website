@@ -43,7 +43,7 @@ export const STATIONS: readonly Station[] = [
     id: "menu-board",
     label: "Menu Board",
     menuSection: "menu-about",
-    camera: { position: [0, 2, -0.5], target: [0, 2.6, -4] },
+    camera: { position: [-0.6, 1.8, -5.3], target: [-2.5, 1.9, -9.4] },
   },
   {
     id: "brew-bar",
@@ -55,7 +55,7 @@ export const STATIONS: readonly Station[] = [
     id: "wall",
     label: "Wall of Fame",
     menuSection: "menu-wall",
-    camera: { position: [-1.4, 1.8, -3], target: [-6, 1.8, -3] },
+    camera: { position: [-2.4, 1.8, -3], target: [-6.3, 1.8, -3] },
   },
   {
     id: "roastery",
@@ -67,13 +67,13 @@ export const STATIONS: readonly Station[] = [
     id: "specials",
     label: "Today's Specials",
     menuSection: "menu-specials",
-    camera: { position: [3, 1.2, -6], target: [5.5, 0.8, -6] },
+    camera: { position: [3.4, 1.9, -7.4], target: [6.6, 2, -7.4] },
   },
   {
     id: "checkout",
     label: "Checkout",
     menuSection: "menu-find-us",
-    camera: { position: [-2, 1.5, -5.5], target: [-4.5, 1.1, -7] },
+    camera: { position: [0.8, 1.6, -1.9], target: [-0.9, 0.9, -4.9] },
   },
 ];
 

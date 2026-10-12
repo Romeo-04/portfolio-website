@@ -9,9 +9,10 @@
 
 import { Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import type { Group } from "three";
 import { Ink, Toon } from "@/components/cafe/kit";
+import { brickTexture, repeated } from "@/components/cafe/textures";
 import { achievementsData, type Achievement } from "@/data/portfolio";
 import { dwellT, frameAngle } from "@/lib/cafe/choreo";
 import { getProgress } from "@/lib/cafe/scroll";
@@ -38,6 +39,7 @@ function nail(i: number): [number, number, number] {
 export default function Wall() {
   const frames = useRef<(Group | null)[]>([]);
   const labels = useRef<(HTMLDivElement | null)[]>([]);
+  const brick = useMemo(() => repeated(brickTexture(), 6, 3.2), []);
   const count = achievementsData.length;
 
   useFrame(() => {
@@ -57,7 +59,7 @@ export default function Wall() {
     <group position={[WALL_X - 0.4, WALL_Y, WALL_Z]} rotation={[0, stationYaw("wall"), 0]}>
       <mesh>
         <planeGeometry args={[6, 3.2]} />
-        <Toon color="#7a4a2a" />
+        <Toon color="#ffffff" map={brick} />
       </mesh>
       {achievementsData.map((a, i) => (
         <group
@@ -72,7 +74,7 @@ export default function Wall() {
             <Toon color={TIER_COLORS[a.tier]} />
             <Ink />
           </mesh>
-          <Html transform position={[0, -0.3, 0.04]} distanceFactor={1.6} className="pointer-events-none">
+          <Html transform position={[0, -0.3, 0.09]} distanceFactor={2.4} className="pointer-events-none">
             <div
               ref={(el) => {
                 labels.current[i] = el;

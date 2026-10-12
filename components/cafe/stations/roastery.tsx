@@ -16,7 +16,7 @@ import { toonGradient } from "@/components/cafe/materials/toon";
 import { experienceData } from "@/data/portfolio";
 import { CONVEYOR_END, CONVEYOR_START, ROAST_DARK, ROAST_GREEN, beanX, dwellT, stagger } from "@/lib/cafe/choreo";
 import { getProgress } from "@/lib/cafe/scroll";
-import { STATIONS } from "@/lib/cafe/stations";
+import { STATIONS, stationIndexAt } from "@/lib/cafe/stations";
 
 const RZ = STATIONS.find((s) => s.id === "roastery")!.camera.target[2];
 const BEANS = 48;
@@ -37,8 +37,19 @@ export default function Roastery() {
     beans.current?.setColorAt(0, color.copy(green));
   }, [color, green]);
 
+  const lastHere = useRef<boolean | null>(null);
+
   useFrame(() => {
-    const t = dwellT(getProgress(), "roastery");
+    const p = getProgress();
+    // drei Html shows through walls: keep the job labels to the roastery.
+    const here = STATIONS[stationIndexAt(p)].id === "roastery";
+    if (here !== lastHere.current) {
+      lastHere.current = here;
+      labels.current.forEach((el) => {
+        if (el) el.style.visibility = here ? "visible" : "hidden";
+      });
+    }
+    const t = dwellT(p, "roastery");
     if (t === lastT.current) return;
     lastT.current = t;
     const mesh = beans.current;
@@ -65,7 +76,7 @@ export default function Roastery() {
     <group position={[0, 0, RZ]}>
       <mesh position={[0, BELT_Y / 2, 0]}>
         <boxGeometry args={[CONVEYOR_END - CONVEYOR_START + 0.4, BELT_Y, 0.5]} />
-        <Toon color="#2b1a10" />
+        <Toon color="#3a3a3e" />
         <Ink />
       </mesh>
       <instancedMesh ref={beans} args={[undefined, undefined, BEANS]}>

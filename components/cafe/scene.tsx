@@ -19,11 +19,12 @@
 import { PerformanceMonitor, useProgress } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Color } from "three";
-import type { Mesh, MeshBasicMaterial, ShaderMaterial } from "three";
+import { BackSide, Color, ShaderMaterial } from "three";
+import type { Mesh, MeshBasicMaterial } from "three";
 import { INK, OUTLINE_THICKNESS } from "@/components/cafe/materials/toon";
 import Effects from "@/components/cafe/effects";
 import { Toon } from "@/components/cafe/kit";
+import { PAVEMENT } from "@/components/cafe/palette";
 import Model from "@/components/cafe/model";
 import Room from "@/components/cafe/room";
 import BrewBar from "@/components/cafe/stations/brew-bar";
@@ -171,16 +172,70 @@ function SignatureCups() {
   );
 }
 
-function Shop({ reduced, specials, lampLights }: { reduced: boolean; specials: SpecialItem[]; lampLights: boolean }) {
+/** Toon sky: a big inside-out sphere fading from blue overhead to cream. */
+function SkyDome() {
+  const material = useMemo(
+    () =>
+      new ShaderMaterial({
+        side: BackSide,
+        depthWrite: false,
+        uniforms: {
+          top: { value: new Color("#7fc4f0") },
+          horizon: { value: new Color("#fdf1d8") },
+        },
+        vertexShader: /* glsl */ `
+          varying float vY;
+          void main() {
+            vY = normalize(position).y;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: /* glsl */ `
+          uniform vec3 top;
+          uniform vec3 horizon;
+          varying float vY;
+          void main() {
+            float t = smoothstep(-0.05, 0.6, vY);
+            gl_FragColor = vec4(mix(horizon, top, t), 1.0);
+            #include <tonemapping_fragment>
+            #include <colorspace_fragment>
+          }
+        `,
+      }),
+    [],
+  );
+  useEffect(() => () => material.dispose(), [material]);
+  return (
+    <mesh material={material} renderOrder={-1}>
+      <sphereGeometry args={[80, 32, 16]} />
+    </mesh>
+  );
+}
+
+/** Pavement out front, with grass beds either side. */
+function Street() {
+  return (
+    <group>
+      <mesh rotation-x={-Math.PI / 2} position={[0, -0.001, 6]}>
+        <planeGeometry args={[60, 60]} />
+        <Toon color="#9fcf7c" />
+      </mesh>
+      <mesh rotation-x={-Math.PI / 2} position={[0, 0, 4]}>
+        <planeGeometry args={[18, 8]} />
+        <Toon color={PAVEMENT} />
+      </mesh>
+    </group>
+  );
+}
+
+function Shop({ specials, lampLights }: { specials: SpecialItem[]; lampLights: boolean }) {
   return (
     <>
-      <mesh rotation-x={-Math.PI / 2} position={[0, 0, 0]}>
-        <planeGeometry args={[40, 40]} />
-        <Toon color="#3a2618" />
-      </mesh>
+      <SkyDome />
+      <Street />
       <Model name="room" fallback={<Room lampLights={lampLights} />} />
       <Model name="brew-bar" fallback={<BrewBar />} />
-      <Storefront reduced={reduced} />
+      <Storefront />
       <MenuBoard />
       <Wall />
       <Roastery />
@@ -208,14 +263,15 @@ export default function CafeScene({
     <div aria-hidden className="fixed inset-0">
       <Canvas camera={{ fov: 50, position: [...STATIONS[0].camera.position] }} dpr={quality.dpr} onCreated={() => onReady?.()}>
         {!declined && <PerformanceMonitor onDecline={() => setDeclined(true)} />}
-        <color attach="background" args={["#1b120c"]} />
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[5, 8, 5]} intensity={1.6} />
-        <pointLight position={[0, 3, 0]} intensity={8} color="#ffb36b" />
+        <color attach="background" args={["#bfe3f7"]} />
+        {/* Daylight: blue sky above, warm bounce below, and a warm sun. */}
+        <hemisphereLight args={["#d6ecff", "#f3dcb8", 1.3]} />
+        <directionalLight position={[8, 12, 10]} intensity={2.2} color="#fff3dc" />
+        <ambientLight intensity={0.25} />
         <LoadingReporter />
         <FrameDriver />
         <CameraRig cut={cut} />
-        <Shop reduced={cut} specials={specials} lampLights={quality.effects} />
+        <Shop specials={specials} lampLights={quality.effects} />
         {quality.effects && <Effects grain={quality.grain} />}
       </Canvas>
     </div>

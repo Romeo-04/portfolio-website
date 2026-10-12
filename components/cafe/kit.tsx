@@ -4,16 +4,23 @@
 // ink outline, so the style is set in one place.
 
 import { Outlines } from "@react-three/drei";
+import type { Texture } from "three";
 import { INK, OUTLINE_THICKNESS, toonGradient } from "@/components/cafe/materials/toon";
 
 export function Toon({
   color,
   transparent = false,
   opacity = 1,
+  map,
+  emissive,
+  emissiveIntensity = 1,
 }: {
   color: string;
   transparent?: boolean;
   opacity?: number;
+  map?: Texture;
+  emissive?: string;
+  emissiveIntensity?: number;
 }) {
   return (
     <meshToonMaterial
@@ -21,6 +28,10 @@ export function Toon({
       gradientMap={toonGradient()}
       transparent={transparent}
       opacity={opacity}
+      map={map ?? null}
+      emissive={emissive ?? "#000000"}
+      emissiveIntensity={emissiveIntensity}
+      depthWrite={!transparent}
     />
   );
 }

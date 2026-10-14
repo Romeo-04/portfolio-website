@@ -39,7 +39,7 @@ function Section({
   return (
     <section id={id} className="border-t border-dashed border-[#2b1a10]/30 py-6">
       <div className="flex items-baseline justify-between">
-        <h2 className="font-chalk text-2xl">{title}</h2>
+        <h2 className="font-display text-2xl">{title}</h2>
         {station && (
           <a
             href={`#${station}`}
@@ -104,7 +104,7 @@ export default function QuickOrderMenu({ specials }: { specials: GithubRepo[] })
     <div className="font-cafe text-[#2b1a10]">
       <header id="menu-top" className="pb-4 text-center">
         <p className="font-receipt text-xs tracking-[0.3em]">QUICK ORDER</p>
-        <h1 className="font-chalk text-4xl">{personalInfo.name}</h1>
+        <h1 className="font-display text-4xl">{personalInfo.name}</h1>
         <p>{personalInfo.role}</p>
         <p className="mt-2 text-sm">{personalInfo.tagline}</p>
       </header>
@@ -173,7 +173,7 @@ export default function QuickOrderMenu({ specials }: { specials: GithubRepo[] })
 
       <Section id="menu-specials" title="Today's Specials" station="specials">
         {specials.length === 0 ? (
-          <p className="font-chalk text-xl">Sold out — check back soon.</p>
+          <p className="font-display text-xl">Sold out — check back soon.</p>
         ) : (
           <ul className="space-y-2 text-sm">
             {specials.map((r) => (

@@ -123,7 +123,7 @@ export default function Intro({
         />
         <circle cx="60" cy="60" r="5" fill="#ffb36b" />
       </svg>
-      <p className="font-chalk mt-4 text-5xl">{personalInfo.name}</p>
+      <p className="font-display mt-4 text-5xl">{personalInfo.name}</p>
       <p className="font-receipt mt-1 text-sm">{personalInfo.role}</p>
       <p role="status" className="font-receipt mt-4 text-xs">
         Brewing… <span aria-hidden>{Math.round(value * 100)}%</span>
@@ -132,7 +132,7 @@ export default function Intro({
         ref={skipRef}
         type="button"
         onClick={skip}
-        className="font-receipt mt-6 rounded-sm border border-[#f5e9da]/40 px-4 py-2 text-sm"
+        className="game-button mt-6 px-5 py-2 text-sm"
       >
         Skip intro
       </button>

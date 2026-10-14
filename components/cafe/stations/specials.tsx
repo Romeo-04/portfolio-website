@@ -10,11 +10,11 @@
 // "Sold out" card sits on the shelf instead (spec section 5).
 // ============================================================
 
-import { Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useLayoutEffect, useMemo, useRef } from "react";
 import { Color, Object3D, type Group, type InstancedMesh, type PointLight } from "three";
 import { Ink, Toon } from "@/components/cafe/kit";
+import { Label } from "@/components/cafe/text3d";
 import { BOOK_COLORS, CHARCOAL } from "@/components/cafe/palette";
 import { dwellT, trayOffset } from "@/lib/cafe/choreo";
 import { getProgress } from "@/lib/cafe/scroll";
@@ -70,8 +70,8 @@ export default function Specials({ items }: { items: SpecialItem[] }) {
   const books = useMemo(() => fillerBooks(span), [span]);
   const filler = useRef<InstancedMesh>(null);
   const featured = useRef<(Group | null)[]>([]);
-  const labels = useRef<(HTMLDivElement | null)[]>([]);
-  const soldOut = useRef<HTMLDivElement>(null);
+  const labels = useRef<(Group | null)[]>([]);
+  const soldOut = useRef<Group>(null);
   const light = useRef<PointLight>(null);
   const lastT = useRef(-1);
 
@@ -96,13 +96,13 @@ export default function Specials({ items }: { items: SpecialItem[] }) {
     if (t === lastT.current) return;
     lastT.current = t;
     if (light.current) light.current.intensity = 2.5 * t;
-    if (soldOut.current) soldOut.current.style.opacity = String(t);
+    if (soldOut.current) soldOut.current.visible = t > 0.05;
     featured.current.forEach((g, i) => {
       if (!g) return;
       const pulled = 1 - trayOffset(t, i, items.length);
       g.position.z = -0.1 + pulled * 0.26;
       const label = labels.current[i];
-      if (label) label.style.visibility = pulled > 0.05 ? "visible" : "hidden";
+      if (label) label.visible = pulled > 0.05;
     });
   });
 
@@ -138,15 +138,15 @@ export default function Specials({ items }: { items: SpecialItem[] }) {
       <pointLight ref={light} position={[0, rowY + 0.8, 0.9]} intensity={0} color="#ffe2b0" distance={4} />
 
       {items.length === 0 ? (
-        <Html transform position={[0, rowY + 0.2, 0.05]} distanceFactor={2} className="pointer-events-none">
-          <div
-            ref={soldOut}
-            style={{ opacity: 0 }}
-            className="font-chalk rounded-sm bg-[#20262a] px-3 py-1 text-2xl whitespace-nowrap text-[#f6efe2]"
-          >
+        <group ref={soldOut} position={[0, rowY + 0.2, 0.06]} visible={false}>
+          <mesh>
+            <planeGeometry args={[1.5, 0.3]} />
+            <Toon color={CHARCOAL} />
+          </mesh>
+          <Label font="chalk" fontSize={0.1} color="#f6efe2" position={[0, 0, 0.005]}>
             Sold out — check back soon
-          </div>
-        </Html>
+          </Label>
+        </group>
       ) : (
         items.map((item, i) => {
           const x = (i - (items.length - 1) / 2) * FEATURED_GAP;
@@ -163,18 +163,25 @@ export default function Specials({ items }: { items: SpecialItem[] }) {
                 <Toon color={BOOK_COLORS[(i * 5) % BOOK_COLORS.length]} />
                 <Ink />
               </mesh>
-              <Html transform position={[0, 0.5, 0.16]} distanceFactor={1.4} className="pointer-events-none">
-                <div
-                  ref={(el) => {
-                    labels.current[i] = el;
-                  }}
-                  style={{ visibility: "hidden" }}
-                  className="font-receipt w-[120px] rounded-sm bg-[#fbfaf6] px-1 py-0.5 text-center text-[10px] leading-tight text-[#20262a] shadow"
-                >
-                  <strong className="block">{item.name}</strong>
+              {/* A little shelf tag that pops up with the repo's name. */}
+              <group
+                ref={(g) => {
+                  labels.current[i] = g;
+                }}
+                position={[0, 0.52, 0.16]}
+                visible={false}
+              >
+                <mesh>
+                  <planeGeometry args={[0.32, 0.13]} />
+                  <Toon color="#fbfaf6" />
+                </mesh>
+                <Label font="display" fontSize={0.034} maxWidth={0.3} textAlign="center" color="#20262a" position={[0, 0.02, 0.004]}>
+                  {item.name}
+                </Label>
+                <Label font="body" fontSize={0.026} color="#6b5d4f" position={[0, -0.035, 0.004]}>
                   {item.language ?? ""}
-                </div>
-              </Html>
+                </Label>
+              </group>
             </group>
           );
         })

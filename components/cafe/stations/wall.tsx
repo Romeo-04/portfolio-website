@@ -7,11 +7,11 @@
 // here, the frames swing in one after another and settle on their nails.
 // ============================================================
 
-import { Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import type { Group } from "three";
 import { Ink, Toon } from "@/components/cafe/kit";
+import { Label } from "@/components/cafe/text3d";
 import { BRASS, CHARCOAL, CREAM, OAK_DARK } from "@/components/cafe/palette";
 import { brickTexture, repeated } from "@/components/cafe/textures";
 import { achievementsData, type Achievement } from "@/data/portfolio";
@@ -46,7 +46,6 @@ function nail(i: number): [number, number, number] {
 
 export default function Wall() {
   const frames = useRef<(Group | null)[]>([]);
-  const labels = useRef<(HTMLDivElement | null)[]>([]);
   const brick = useMemo(() => repeated(brickTexture(), 6, 3.2), []);
   const count = achievementsData.length;
 
@@ -57,8 +56,6 @@ export default function Wall() {
       g.rotation.x = -frameAngle(t, i, count);
       const shown = t * count > i;
       g.visible = shown;
-      const label = labels.current[i];
-      if (label) label.style.visibility = shown ? "visible" : "hidden";
     });
   });
 
@@ -91,18 +88,12 @@ export default function Wall() {
             <planeGeometry args={[0.81, 0.08]} />
             <Toon color={ACCENT_COLORS[a.tier]} />
           </mesh>
-          <Html transform position={[0, -0.34, 0.035]} distanceFactor={2.4} className="pointer-events-none">
-            <div
-              ref={(el) => {
-                labels.current[i] = el;
-              }}
-              style={{ visibility: "hidden" }}
-              className="font-receipt w-[150px] text-center text-[10px] leading-tight text-[#2b2b2e]"
-            >
-              <strong className="block">{a.title}</strong>
-              {a.year}
-            </div>
-          </Html>
+          <Label font="display" fontSize={0.06} maxWidth={0.8} textAlign="center" lineHeight={1.1} color="#2b2b2e" position={[0, -0.3, 0.032]}>
+            {a.title}
+          </Label>
+          <Label font="body" fontSize={0.042} color="#6b5d4f" position={[0, -0.47, 0.032]}>
+            {a.year}
+          </Label>
         </group>
       ))}
     </group>

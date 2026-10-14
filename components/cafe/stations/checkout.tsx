@@ -8,11 +8,11 @@
 // only: the links live in the Quick Order menu.
 // ============================================================
 
-import { Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import type { Group } from "three";
 import { Ink, Toon } from "@/components/cafe/kit";
+import { Label } from "@/components/cafe/text3d";
 import { personalInfo } from "@/data/portfolio";
 import { dwellT, receiptLength } from "@/lib/cafe/choreo";
 import { getProgress } from "@/lib/cafe/scroll";
@@ -23,8 +23,10 @@ const RECEIPT_HEIGHT = 0.9;
 
 export default function Checkout() {
   const paper = useRef<Group>(null);
-  const text = useRef<HTMLDivElement>(null);
-  const tips = useRef<HTMLDivElement>(null);
+  // troika text mesh; typed loosely because drei doesn't export the type.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const text = useRef<any>(null);
+  const tips = useRef<Group>(null);
   const lastT = useRef(-1);
 
   useFrame(() => {
@@ -32,12 +34,13 @@ export default function Checkout() {
     if (t === lastT.current) return;
     lastT.current = t;
     const len = receiptLength(t);
-    if (tips.current) tips.current.style.opacity = String(t);
+    if (tips.current) tips.current.visible = t > 0.05;
     if (paper.current) {
       paper.current.scale.y = Math.max(len, 0.001);
       paper.current.visible = len > 0;
     }
-    if (text.current) text.current.style.clipPath = `inset(0 0 ${(1 - len) * 100}% 0)`;
+    // Printed lines appear from the top as the paper feeds out.
+    if (text.current) text.current.clipRect = [-1, -len * RECEIPT_HEIGHT, 1, 1];
   });
 
   // The register stands at the checkout target, facing its camera.
@@ -60,24 +63,35 @@ export default function Checkout() {
           <Toon color="#fbf6ee" />
         </mesh>
       </group>
-      <Html transform position={[0, 1.3 - RECEIPT_HEIGHT / 2, 0.44]} distanceFactor={1.4} className="pointer-events-none">
-        <div ref={text} style={{ clipPath: "inset(0 0 100% 0)" }} className="font-receipt w-[130px] text-[9px] leading-snug text-[#1b120c]">
-          <p className="text-center font-bold">THANK YOU</p>
-          <p>{personalInfo.email}</p>
-          <p>{personalInfo.github.replace("https://", "")}</p>
-          <p>linkedin.com/in/…</p>
-          <p className="mt-1 text-center">Come again ☕</p>
-        </div>
-      </Html>
+      <Label
+        ref={text}
+        font="receipt"
+        fontSize={0.034}
+        lineHeight={1.5}
+        maxWidth={0.5}
+        textAlign="center"
+        anchorY="top"
+        color="#1b120c"
+        position={[0, 1.24, 0.44]}
+        clipRect={[-1, 0, 1, 1]}
+      >
+        {`THANK YOU
+
+${personalInfo.email}
+${personalInfo.github.replace("https://", "")}
+linkedin.com/in/jhezra-tolentino
+
+Come again!`}
+      </Label>
       <mesh position={[0.5, 1.12, 0]}>
         <cylinderGeometry args={[0.1, 0.1, 0.25, 16, 1, true]} />
         <Toon color="#f6ead8" transparent opacity={0.35} />
       </mesh>
-      <Html transform position={[0.5, 1.4, 0]} distanceFactor={1.4} className="font-chalk pointer-events-none text-sm whitespace-nowrap text-[#f5e9da]">
-        <div ref={tips} style={{ opacity: 0 }}>
+      <group ref={tips} position={[0.5, 1.42, 0]} visible={false}>
+        <Label font="display" fontSize={0.06} color="#2b2b2e">
           Tips → GitHub · LinkedIn
-        </div>
-      </Html>
+        </Label>
+      </group>
     </group>
   );
 }

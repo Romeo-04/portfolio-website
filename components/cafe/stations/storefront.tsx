@@ -11,17 +11,16 @@
 // camera holds at the storefront.
 // ============================================================
 
-import { Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import type { Group } from "three";
 import { Ink, Toon } from "@/components/cafe/kit";
+import { Label } from "@/components/cafe/text3d";
 import { CHARCOAL, CONCRETE, GLASS, OAK } from "@/components/cafe/palette";
 import { Planter, Sconce } from "@/components/cafe/props";
 import { plankTexture, repeated } from "@/components/cafe/textures";
 import { doorAngle, dwellT } from "@/lib/cafe/choreo";
 import { getProgress } from "@/lib/cafe/scroll";
-import { stationProgress } from "@/lib/cafe/stations";
 
 const FRONT_W = 14;
 const GLASS_TOP = 3.4;
@@ -44,15 +43,12 @@ function Bar({ position, size }: { position: [number, number, number]; size: [nu
 
 export default function Storefront() {
   const door = useRef<Group>(null);
-  const sign = useRef<HTMLDivElement>(null);
   const claddingH = ROOF - (GLASS_TOP + 0.55);
   const cladding = useMemo(() => repeated(plankTexture(), FRONT_W, ROOF - (GLASS_TOP + 0.55)), []);
 
   useFrame(() => {
     const p = getProgress();
     if (door.current) door.current.rotation.y = doorAngle(dwellT(p, "storefront"));
-    // drei Html ignores walls: hide the sign once the camera is inside.
-    if (sign.current) sign.current.style.visibility = stationProgress(p, "storefront") < 1 ? "visible" : "hidden";
   });
 
   const panes: [number, number][] = [];
@@ -124,14 +120,13 @@ export default function Storefront() {
         <Toon color={CHARCOAL} />
         <Ink />
       </mesh>
-      <Html transform position={[0, GLASS_TOP + 0.3, 0.71]} distanceFactor={4} className="pointer-events-none">
-        <div
-          ref={sign}
-          className="font-cafe text-6xl font-black tracking-[0.12em] whitespace-nowrap text-white"
-        >
-          {SIGN}
-        </div>
-      </Html>
+      {/* The sign: chunky display letters with a soft drop shadow. */}
+      <Label font="display" fontSize={0.4} letterSpacing={0.06} color="#1a1a1c" position={[0.025, GLASS_TOP + 0.275, 0.705]}>
+        {SIGN}
+      </Label>
+      <Label font="display" fontSize={0.4} letterSpacing={0.06} color="#fff8ec" position={[0, GLASS_TOP + 0.3, 0.71]}>
+        {SIGN}
+      </Label>
 
       {/* Wood cladding above the awning. */}
       <mesh position={[0, GLASS_TOP + 0.55 + claddingH / 2, 0]}>

@@ -18,7 +18,7 @@
 
 import { PerformanceMonitor, useProgress } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { BackSide, Color, Mesh as ThreeMesh, Object3D, ShaderMaterial } from "three";
 import type { Mesh, MeshBasicMaterial } from "three";
 import { INK, OUTLINE_THICKNESS } from "@/components/cafe/materials/toon";
@@ -328,7 +328,10 @@ export default function CafeScene({
         <LoadingReporter />
         <FrameDriver />
         <CameraRig cut={cut} />
-        <Shop specials={specials} lampLights={quality.effects} />
+        {/* Fonts for the 3D text load first; the intro covers the wait. */}
+        <Suspense fallback={null}>
+          <Shop specials={specials} lampLights={quality.effects} />
+        </Suspense>
         {quality.effects && <Effects />}
       </Canvas>
     </div>

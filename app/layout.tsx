@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Caveat_Brush, Courier_Prime, Nunito, Patrick_Hand } from "next/font/google";
+import { Courier_Prime, Kalam, Lilita_One, Varela_Round } from "next/font/google";
 import "./globals.css";
 import { personalInfo, siteConfig } from "@/data/portfolio";
 
-const chalk = Caveat_Brush({ variable: "--font-caveat-brush", subsets: ["latin"], weight: "400", display: "swap" });
+const display = Lilita_One({ variable: "--font-lilita", subsets: ["latin"], weight: "400", display: "swap" });
 const receipt = Courier_Prime({ variable: "--font-courier-prime", subsets: ["latin"], weight: ["400", "700"], display: "swap" });
-const cafe = Nunito({ variable: "--font-nunito", subsets: ["latin"], display: "swap" });
-const board = Patrick_Hand({ variable: "--font-patrick-hand", subsets: ["latin"], weight: "400", display: "swap" });
+const cafe = Varela_Round({ variable: "--font-varela", subsets: ["latin"], weight: "400", display: "swap" });
+const board = Kalam({ variable: "--font-kalam", subsets: ["latin"], weight: "700", display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -67,7 +67,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${chalk.variable} ${receipt.variable} ${cafe.variable} ${board.variable} font-cafe min-h-screen bg-[#1b120c] text-[#f5e9da]`}
+        className={`${display.variable} ${receipt.variable} ${cafe.variable} ${board.variable} font-cafe min-h-screen bg-[#1b120c] text-[#f5e9da]`}
       >
         {children}
       </body>

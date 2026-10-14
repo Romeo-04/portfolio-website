@@ -135,7 +135,7 @@ export default function CafeShell({ children, specials }: { children: ReactNode;
     return (
       <main onClick={onLinkClick} aria-label="Quick Order menu" className="mx-auto max-w-2xl px-5 py-10">
         {mode === "closed" && (
-          <p role="status" className="font-chalk mb-6 text-center text-2xl">
+          <p role="status" className="font-display mb-6 text-center text-2xl">
             The café is closed today ☕
           </p>
         )}
@@ -143,7 +143,7 @@ export default function CafeShell({ children, specials }: { children: ReactNode;
           <button
             type="button"
             onClick={() => setEntered(true)}
-            className="font-receipt mb-6 w-full rounded-md border border-[#f5e9da]/40 px-4 py-3"
+            className="game-button game-button-accent mb-6 w-full px-4 py-3"
           >
             Step inside the café →
           </button>
@@ -167,7 +167,7 @@ export default function CafeShell({ children, specials }: { children: ReactNode;
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         aria-controls="quick-order"
-        className="font-receipt fixed top-4 right-4 z-20 rounded-sm bg-[#f6ead8] px-4 py-2 text-sm text-[#2b1a10] shadow-lg"
+        className="game-button fixed top-4 right-4 z-20 px-5 py-2 text-sm"
       >
         {open ? "Close menu" : "Quick Order (M)"}
       </button>

@@ -7,16 +7,16 @@
 // scrolls; each job is one batch label along the belt (spec station 5).
 // ============================================================
 
-import { Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useLayoutEffect, useMemo, useRef } from "react";
-import { Color, Object3D, type InstancedMesh } from "three";
+import { Color, Object3D, type Group, type InstancedMesh } from "three";
 import { Ink, Toon } from "@/components/cafe/kit";
+import { Label } from "@/components/cafe/text3d";
 import { toonGradient } from "@/components/cafe/materials/toon";
 import { experienceData } from "@/data/portfolio";
-import { CONVEYOR_END, CONVEYOR_START, ROAST_DARK, ROAST_GREEN, beanX, dwellT, stagger } from "@/lib/cafe/choreo";
+import { CONVEYOR_END, CONVEYOR_START, ROAST_DARK, ROAST_GREEN, beanX, dwellT, easeOutBack, stagger } from "@/lib/cafe/choreo";
 import { getProgress } from "@/lib/cafe/scroll";
-import { STATIONS, stationIndexAt } from "@/lib/cafe/stations";
+import { STATIONS } from "@/lib/cafe/stations";
 
 const RZ = STATIONS.find((s) => s.id === "roastery")!.camera.target[2];
 const BEANS = 48;
@@ -24,7 +24,7 @@ const BELT_Y = 0.55;
 
 export default function Roastery() {
   const beans = useRef<InstancedMesh>(null);
-  const labels = useRef<(HTMLDivElement | null)[]>([]);
+  const labels = useRef<(Group | null)[]>([]);
   const dummy = useMemo(() => new Object3D(), []);
   const color = useMemo(() => new Color(), []);
   const lastT = useRef(-1);
@@ -37,19 +37,8 @@ export default function Roastery() {
     beans.current?.setColorAt(0, color.copy(green));
   }, [color, green]);
 
-  const lastHere = useRef<boolean | null>(null);
-
   useFrame(() => {
-    const p = getProgress();
-    // drei Html shows through walls: keep the job labels to the roastery.
-    const here = STATIONS[stationIndexAt(p)].id === "roastery";
-    if (here !== lastHere.current) {
-      lastHere.current = here;
-      labels.current.forEach((el) => {
-        if (el) el.style.visibility = here ? "visible" : "hidden";
-      });
-    }
-    const t = dwellT(p, "roastery");
+    const t = dwellT(getProgress(), "roastery");
     if (t === lastT.current) return;
     lastT.current = t;
     const mesh = beans.current;
@@ -66,8 +55,12 @@ export default function Roastery() {
       mesh.instanceMatrix.needsUpdate = true;
       if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
     }
-    labels.current.forEach((el, i) => {
-      if (el) el.style.opacity = String(stagger(t, i, experienceData.length));
+    // Each batch sign pops in with a little overshoot, one after another.
+    labels.current.forEach((g, i) => {
+      if (!g) return;
+      const s = stagger(t, i, experienceData.length);
+      g.visible = s > 0;
+      g.scale.setScalar(Math.max(0.001, easeOutBack(s)));
     });
   });
 
@@ -84,26 +77,31 @@ export default function Roastery() {
         <meshToonMaterial gradientMap={toonGradient()} />
       </instancedMesh>
       {experienceData.map((e, i) => (
-        <Html
+        <group
           key={`${e.title}-${e.organization}`}
-          transform
-          distanceFactor={2}
-          position={[CONVEYOR_START + ((i + 0.5) / experienceData.length) * (CONVEYOR_END - CONVEYOR_START), 1.4, 0]}
-          className="pointer-events-none"
+          ref={(g) => {
+            labels.current[i] = g;
+          }}
+          position={[CONVEYOR_START + ((i + 0.5) / experienceData.length) * (CONVEYOR_END - CONVEYOR_START), 1.45, 0]}
+          visible={false}
         >
-          <div
-            ref={(el) => {
-              labels.current[i] = el;
-            }}
-            style={{ opacity: 0 }}
-            className="font-receipt w-[200px] rounded-sm bg-[#f6ead8] p-2 text-center text-[11px] leading-tight text-[#1b120c]"
-          >
-            <strong className="block">{e.title}</strong>
-            {e.organization}
-            <br />
-            {e.period}
-          </div>
-        </Html>
+          <mesh position={[0, 0, -0.02]}>
+            <boxGeometry args={[1.32, 0.5, 0.03]} />
+            <Toon color="#a8743f" />
+            <Ink />
+          </mesh>
+          <mesh>
+            <planeGeometry args={[1.24, 0.42]} />
+            <Toon color="#f6efe2" />
+          </mesh>
+          <Label font="display" fontSize={0.068} maxWidth={1.12} textAlign="center" lineHeight={1.05} color="#2b2b2e" position={[0, 0.08, 0.005]}>
+            {e.title}
+          </Label>
+          <Label font="body" fontSize={0.045} maxWidth={1.12} textAlign="center" color="#6b5d4f" position={[0, -0.1, 0.005]}>
+            {`${e.organization}
+${e.period}`}
+          </Label>
+        </group>
       ))}
     </group>
   );

@@ -63,14 +63,14 @@ export default function Hud({ reduced }: { reduced: boolean }) {
             : `Loyalty card: ${stamps.length} of ${STATIONS.length} stamps`
         }
         aria-disabled={!complete}
-        className="font-receipt fixed top-4 left-4 z-20 rounded-sm bg-[#f6ead8] px-3 py-2 text-[#2b1a10] shadow-lg"
+        className="game-panel fixed top-4 left-4 z-20 px-3 py-2"
       >
-        <span className="block text-[10px] tracking-[0.2em]">LOYALTY CARD</span>
+        <span className="font-display block text-sm tracking-[0.08em]">Loyalty Card</span>
         <span aria-hidden className="mt-1 flex gap-1">
           {STATIONS.map((s) => (
             <span
               key={s.id}
-              className={`grid h-5 w-5 place-items-center rounded-full border border-[#2b1a10]/40 text-[10px] ${stamps.includes(s.id) ? "bg-[#c0632f] text-[#f6ead8]" : ""}`}
+              className={`grid h-6 w-6 place-items-center rounded-full border-2 border-[#2b2b2e] text-[11px] transition-transform ${stamps.includes(s.id) ? "scale-110 bg-[#e4572e] text-[#fff8ec]" : "bg-[#efe3cf]"}`}
             >
               {stamps.includes(s.id) ? "☕" : ""}
             </span>
@@ -86,7 +86,7 @@ export default function Hud({ reduced }: { reduced: boolean }) {
               key={id}
               type="button"
               onClick={() => goTo(id, { immediate: reduced })}
-              className="font-receipt rounded-sm bg-[#f6ead8]/90 px-2 py-1 text-[11px] text-[#2b1a10] shadow"
+              className="game-button px-3 py-1 text-xs"
             >
               {station?.label}
             </button>
@@ -105,9 +105,9 @@ export default function Hud({ reduced }: { reduced: boolean }) {
           onClick={(e) => {
             if (e.target === dialogRef.current) dialogRef.current?.close();
           }}
-          className="m-auto max-h-[80vh] w-full max-w-sm overflow-y-auto rounded-md bg-[#f6ead8] p-6 text-[#2b1a10] shadow-2xl backdrop:bg-[#1b120c]/70"
+          className="game-panel m-auto max-h-[80vh] w-full max-w-sm overflow-y-auto p-6 backdrop:bg-[#1b120c]/70"
         >
-          <h2 id={titleId} className="font-chalk text-3xl">
+          <h2 id={titleId} className="font-display text-3xl">
             Off the Clock
           </h2>
           {offTheClock ? (
@@ -128,7 +128,7 @@ export default function Hud({ reduced }: { reduced: boolean }) {
           <button
             type="button"
             onClick={() => dialogRef.current?.close()}
-            className="font-receipt mt-5 rounded-sm border border-[#2b1a10]/40 px-4 py-2 text-sm"
+            className="game-button game-button-accent mt-5 px-5 py-2 text-sm"
           >
             Close
           </button>

@@ -12,13 +12,13 @@
 // ============================================================
 
 import { useFrame } from "@react-three/fiber";
-import { useMemo, useRef } from "react";
+import { useRef } from "react";
 import type { Group } from "three";
 import { Ink, Toon } from "@/components/cafe/kit";
 import { Label } from "@/components/cafe/text3d";
-import { CHARCOAL, CONCRETE, GLASS, OAK } from "@/components/cafe/palette";
+import { CEDAR_TINT, CHARCOAL, CONCRETE, GLASS, OAK } from "@/components/cafe/palette";
 import { Planter, Sconce } from "@/components/cafe/props";
-import { plankTexture, repeated } from "@/components/cafe/textures";
+import { useCafeTexture } from "@/components/cafe/textures";
 import { doorAngle, dwellT } from "@/lib/cafe/choreo";
 import { getProgress } from "@/lib/cafe/scroll";
 
@@ -44,7 +44,7 @@ function Bar({ position, size }: { position: [number, number, number]; size: [nu
 export default function Storefront() {
   const door = useRef<Group>(null);
   const claddingH = ROOF - (GLASS_TOP + 0.55);
-  const cladding = useMemo(() => repeated(plankTexture(), FRONT_W, ROOF - (GLASS_TOP + 0.55)), []);
+  const cladding = useCafeTexture("cladding", FRONT_W, claddingH);
 
   useFrame(() => {
     const p = getProgress();
@@ -131,7 +131,7 @@ export default function Storefront() {
       {/* Wood cladding above the awning. */}
       <mesh position={[0, GLASS_TOP + 0.55 + claddingH / 2, 0]}>
         <boxGeometry args={[FRONT_W + 0.2, claddingH, 0.3]} />
-        <Toon color="#ffffff" map={cladding} />
+        <Toon color={CEDAR_TINT} map={cladding} />
         <Ink />
       </mesh>
 

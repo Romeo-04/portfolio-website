@@ -12,7 +12,8 @@ import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import { Ink, Toon } from "@/components/cafe/kit";
 import { Label } from "@/components/cafe/text3d";
-import { CHALK, OAK_DARK } from "@/components/cafe/palette";
+import { OAK_DARK } from "@/components/cafe/palette";
+import { useCafeTexture } from "@/components/cafe/textures";
 import { personalInfo, skillsData, tierLabels, type SkillTier } from "@/data/portfolio";
 import { dwellT, stagger } from "@/lib/cafe/choreo";
 import { getProgress } from "@/lib/cafe/scroll";
@@ -48,6 +49,8 @@ export default function MenuBoard() {
   const lines = useRef<any[]>([]);
   /** Measured height of each wrapped line, filled in as troika lays them out. */
   const heights = useRef<number[]>([]);
+  const slate = useCafeTexture("chalkboard");
+  const doodles = useCafeTexture("doodles");
 
   useFrame(() => {
     const t = dwellT(getProgress(), "menu-board");
@@ -72,7 +75,13 @@ export default function MenuBoard() {
       </mesh>
       <mesh position={[0, 0, 0.05]}>
         <planeGeometry args={[3.2, 2]} />
-        <Toon color={CHALK} />
+        <Toon color="#ffffff" map={slate} />
+      </mesh>
+      {/* Chalk doodles framing the menu (the mask is wiped clear where the
+          text sits), in chalk white. */}
+      <mesh position={[0, 0, 0.052]}>
+        <planeGeometry args={[3.2, 2]} />
+        <meshBasicMaterial color="#f3ede0" alphaMap={doodles} transparent opacity={0.7} depthWrite={false} />
       </mesh>
       <Label font="display" fontSize={0.24} color="#f6efe2" position={[0, 0.7, 0.06]}>
         MENU

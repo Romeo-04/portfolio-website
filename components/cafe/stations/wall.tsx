@@ -8,12 +8,12 @@
 // ============================================================
 
 import { useFrame } from "@react-three/fiber";
-import { useMemo, useRef } from "react";
+import { useRef } from "react";
 import type { Group } from "three";
 import { Ink, Toon } from "@/components/cafe/kit";
 import { Label } from "@/components/cafe/text3d";
-import { BRASS, CHARCOAL, CREAM, OAK_DARK } from "@/components/cafe/palette";
-import { brickTexture, repeated } from "@/components/cafe/textures";
+import { BRASS, BRICK_TINT, CHARCOAL, CREAM, OAK_DARK } from "@/components/cafe/palette";
+import { useCafeTexture } from "@/components/cafe/textures";
 import { achievementsData, type Achievement } from "@/data/portfolio";
 import { dwellT, frameAngle } from "@/lib/cafe/choreo";
 import { getProgress } from "@/lib/cafe/scroll";
@@ -46,7 +46,7 @@ function nail(i: number): [number, number, number] {
 
 export default function Wall() {
   const frames = useRef<(Group | null)[]>([]);
-  const brick = useMemo(() => repeated(brickTexture(), 6, 3.2), []);
+  const brick = useCafeTexture("brick", 6, 3.2);
   const count = achievementsData.length;
 
   useFrame(() => {
@@ -64,7 +64,7 @@ export default function Wall() {
     <group position={[WALL_X - 0.4, WALL_Y, WALL_Z]} rotation={[0, stationYaw("wall"), 0]}>
       <mesh>
         <planeGeometry args={[6, 3.2]} />
-        <Toon color="#ffffff" map={brick} />
+        <Toon color={BRICK_TINT} map={brick} />
       </mesh>
       {achievementsData.map((a, i) => (
         <group

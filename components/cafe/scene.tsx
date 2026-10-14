@@ -36,6 +36,7 @@ import Specials, { type SpecialItem } from "@/components/cafe/stations/specials"
 import Storefront from "@/components/cafe/stations/storefront";
 import Wall from "@/components/cafe/stations/wall";
 import { createPourMaterial, setFill } from "@/components/cafe/shaders/pour";
+import { preloadCafeTextures } from "@/components/cafe/textures";
 import { projectsData } from "@/data/portfolio";
 import { drinkFor } from "@/lib/cafe/drinks";
 import { cupFill, layerIndexAt } from "@/lib/cafe/pour";
@@ -284,6 +285,9 @@ function Street() {
     </group>
   );
 }
+
+// Fetch the painted textures alongside the fonts, before Shop suspends on them.
+preloadCafeTextures();
 
 function Shop({ specials, lampLights }: { specials: SpecialItem[]; lampLights: boolean }) {
   return (

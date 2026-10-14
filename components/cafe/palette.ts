@@ -17,6 +17,9 @@ export const PAVEMENT = "#d9d2c5";
 export const CONCRETE = "#bdb6aa";
 export const CHALK = "#20262a";
 export const BULB = "#fff2c8";
+/** Multipliers that calm the painted cedar and brick textures. */
+export const CEDAR_TINT = "#d9c2a8";
+export const BRICK_TINT = "#e6d2c8";
 
 /** Lively spines for the bookshelf. */
 export const BOOK_COLORS = [

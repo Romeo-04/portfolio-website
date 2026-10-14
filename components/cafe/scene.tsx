@@ -27,6 +27,7 @@ import { Toon } from "@/components/cafe/kit";
 import { PAVEMENT } from "@/components/cafe/palette";
 import Model from "@/components/cafe/model";
 import Room from "@/components/cafe/room";
+import Barista from "@/components/cafe/barista";
 import BrewBar from "@/components/cafe/stations/brew-bar";
 import Checkout from "@/components/cafe/stations/checkout";
 import MenuBoard from "@/components/cafe/stations/menu-board";
@@ -291,6 +292,7 @@ function Shop({ specials, lampLights }: { specials: SpecialItem[]; lampLights: b
       <Street />
       <Model name="room" fallback={<Room lampLights={lampLights} />} />
       <Model name="brew-bar" fallback={<BrewBar />} />
+      <Barista />
       <Storefront />
       <MenuBoard />
       <Wall />

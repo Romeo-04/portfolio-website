@@ -37,7 +37,7 @@ export const STATIONS: readonly Station[] = [
     id: "storefront",
     label: "Storefront",
     menuSection: "menu-top",
-    camera: { position: [0, 1.6, 12], target: [0, 1.5, 0] },
+    camera: { position: [0, 2.1, 15.5], target: [0, 2.7, 0] },
   },
   {
     id: "menu-board",

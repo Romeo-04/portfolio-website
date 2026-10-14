@@ -24,10 +24,11 @@ import type { Mesh, MeshBasicMaterial } from "three";
 import { INK, OUTLINE_THICKNESS } from "@/components/cafe/materials/toon";
 import Effects from "@/components/cafe/effects";
 import { Toon } from "@/components/cafe/kit";
-import { PAVEMENT } from "@/components/cafe/palette";
 import Model from "@/components/cafe/model";
 import Room from "@/components/cafe/room";
 import Barista from "@/components/cafe/barista";
+import City from "@/components/cafe/city";
+import CityLife from "@/components/cafe/city-life";
 import BrewBar from "@/components/cafe/stations/brew-bar";
 import Checkout from "@/components/cafe/stations/checkout";
 import MenuBoard from "@/components/cafe/stations/menu-board";
@@ -215,8 +216,19 @@ function ShadowFlags({ enabled }: { enabled: boolean }) {
     scene.traverse(() => count++);
     if (count === seen.current) return;
     seen.current = count;
+    // Moving figures are marked noShadow: their shadows would force the
+    // shadow map to redraw every frame. They keep soft blob shadows instead.
+    const skip = new Set<Object3D>();
+    scene.traverse((obj) => {
+      if (obj.userData.noShadow) obj.traverse((child) => skip.add(child));
+    });
     scene.traverse((obj) => {
       if (!(obj instanceof ThreeMesh)) return;
+      if (skip.has(obj)) {
+        obj.castShadow = false;
+        obj.receiveShadow = false;
+        return;
+      }
       const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
       // Custom shaders (ink outlines, the pour, the sky) are left out: an
       // outline hull would fatten every shadow.
@@ -301,29 +313,24 @@ function SkyDome() {
 }
 
 /** Pavement out front, with grass beds either side. */
-function Street() {
-  return (
-    <group>
-      <mesh rotation-x={-Math.PI / 2} position={[0, -0.001, 6]}>
-        <planeGeometry args={[60, 60]} />
-        <Toon color="#9fcf7c" />
-      </mesh>
-      <mesh rotation-x={-Math.PI / 2} position={[0, 0, 4]}>
-        <planeGeometry args={[18, 8]} />
-        <Toon color={PAVEMENT} />
-      </mesh>
-    </group>
-  );
-}
 
 // Fetch the painted textures alongside the fonts, before Shop suspends on them.
 preloadCafeTextures();
 
-function Shop({ specials, lampLights }: { specials: SpecialItem[]; lampLights: boolean }) {
+function Shop({
+  specials,
+  lampLights,
+  still,
+}: {
+  specials: SpecialItem[];
+  lampLights: boolean;
+  still: boolean;
+}) {
   return (
     <>
       <SkyDome />
-      <Street />
+      <City />
+      <CityLife still={still} busy={lampLights} />
       <Model name="room" fallback={<Room lampLights={lampLights} />} />
       <Model name="brew-bar" fallback={<BrewBar />} />
       <Barista />
@@ -367,7 +374,7 @@ export default function CafeScene({
         <CameraRig cut={cut} />
         {/* Fonts for the 3D text load first; the intro covers the wait. */}
         <Suspense fallback={null}>
-          <Shop specials={specials} lampLights={quality.effects} />
+          <Shop specials={specials} lampLights={quality.effects} still={cut} />
         </Suspense>
         {quality.effects && <Effects />}
       </Canvas>

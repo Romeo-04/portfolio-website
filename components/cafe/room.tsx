@@ -19,6 +19,7 @@
 import { Ink, Toon } from "@/components/cafe/kit";
 import { BRICK_TINT, BULB, CEDAR_TINT, CHARCOAL, CREAM, OAK, OAK_DARK } from "@/components/cafe/palette";
 import { ArtPrint, MarqueeJ, Plant, Planter, Railing, Sconce, Sofa, TableSet, RoundTable } from "@/components/cafe/props";
+import Merged from "@/components/cafe/merged";
 import { useCafeTexture } from "@/components/cafe/textures";
 
 /** Textured surfaces use white so the texture shows its own colours. */
@@ -70,7 +71,7 @@ export default function Room({ lampLights }: { lampLights: boolean }) {
   const rug = useCafeTexture("rug");
 
   return (
-    <group>
+    <Merged>
       {/* ---------- Floor and ceiling ---------- */}
       <mesh rotation-x={-Math.PI / 2} position={[0, 0.002, -4.75]}>
         <planeGeometry args={[14, 9.5]} />
@@ -193,6 +194,6 @@ export default function Room({ lampLights }: { lampLights: boolean }) {
         <planeGeometry args={[8, 4.5]} />
         <Toon color={CREAM} />
       </mesh>
-    </group>
+    </Merged>
   );
 }

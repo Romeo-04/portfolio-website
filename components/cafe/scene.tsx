@@ -44,6 +44,7 @@ import { qualityFor } from "@/lib/cafe/quality";
 import { setLoading } from "@/lib/cafe/loading";
 import { CAMERA_LAMBDA, dampVec3, distance3, shouldSnap } from "@/lib/cafe/damp";
 import { getProgress, subscribeProgress } from "@/lib/cafe/scroll";
+import { requestShadowUpdate, takeShadowUpdate } from "@/lib/cafe/shadows";
 import { STATIONS, cameraPose, stationYaw, type Vec3 } from "@/lib/cafe/stations";
 
 const CUP_HEIGHT = 0.4;
@@ -223,10 +224,39 @@ function ShadowFlags({ enabled }: { enabled: boolean }) {
       obj.castShadow = enabled && solid;
       obj.receiveShadow = enabled && solid;
     });
+    requestShadowUpdate();
   });
   useEffect(() => {
     seen.current = -1;
   }, [enabled]);
+  return null;
+}
+
+/**
+ * Draws the sun's shadow map only when the shop changed: while scroll
+ * progress moves (every station animates from it), during the warm-up,
+ * and when something asks via requestShadowUpdate. Frames where only the
+ * camera glides reuse the last map, which skips a full scene pass.
+ */
+function ShadowRefresh() {
+  const get = useThree((s) => s.get);
+  const last = useRef<number | null>(null);
+  const start = useRef(0);
+  useEffect(() => {
+    const { shadowMap } = get().gl;
+    shadowMap.autoUpdate = false;
+    shadowMap.needsUpdate = true;
+    start.current = performance.now();
+    return () => {
+      shadowMap.autoUpdate = true;
+    };
+  }, [get]);
+  useFrame(({ gl }) => {
+    const p = getProgress();
+    const warming = performance.now() - start.current < WARMUP_MS;
+    if (takeShadowUpdate() || warming || p !== last.current) gl.shadowMap.needsUpdate = true;
+    last.current = p;
+  });
   return null;
 }
 
@@ -331,6 +361,7 @@ export default function CafeScene({
         <Sun shadows={quality.shadows} />
         <ambientLight intensity={0.15} />
         <ShadowFlags enabled={quality.shadows} />
+        <ShadowRefresh />
         <LoadingReporter />
         <FrameDriver />
         <CameraRig cut={cut} />

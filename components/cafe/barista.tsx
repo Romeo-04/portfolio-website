@@ -21,6 +21,7 @@ import { Label } from "@/components/cafe/text3d";
 import { personalInfo } from "@/data/portfolio";
 import { dwellT } from "@/lib/cafe/choreo";
 import { getProgress } from "@/lib/cafe/scroll";
+import { requestShadowUpdate } from "@/lib/cafe/shadows";
 import { stationIndexAt } from "@/lib/cafe/stations";
 
 const SKIN = "#f1c6a2";
@@ -66,6 +67,8 @@ export default function Barista() {
       const t = dwellT(p, "brew-bar");
       const waving = t > 0.05 && t < 0.95 ? 1 : 0;
       waveArm.current.rotation.z = 0.2 + waving * (2.3 + Math.sin(time * 9) * 0.35);
+      // The wave is the one move big enough to show in his shadow.
+      if (waving) requestShadowUpdate();
     }
 
     // Keep animating only while the visitor is at the brew bar.

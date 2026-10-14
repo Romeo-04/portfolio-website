@@ -16,11 +16,10 @@
 // the bookshelf (specials station).
 // ============================================================
 
-import { useMemo } from "react";
 import { Ink, Toon } from "@/components/cafe/kit";
-import { BULB, CHARCOAL, CREAM, OAK, OAK_DARK, TERRACOTTA } from "@/components/cafe/palette";
-import { MarqueeJ, Plant, Planter, Railing, Sconce, Sofa, TableSet, RoundTable } from "@/components/cafe/props";
-import { brickTexture, floorTexture, plankTexture, repeated } from "@/components/cafe/textures";
+import { BRICK_TINT, BULB, CEDAR_TINT, CHARCOAL, CREAM, OAK, OAK_DARK } from "@/components/cafe/palette";
+import { ArtPrint, MarqueeJ, Plant, Planter, Railing, Sconce, Sofa, TableSet, RoundTable } from "@/components/cafe/props";
+import { useCafeTexture } from "@/components/cafe/textures";
 
 /** Textured surfaces use white so the texture shows its own colours. */
 const WHITE_TINT = "#ffffff";
@@ -29,11 +28,13 @@ const MEZZ_Y = 3.2;
 
 type V3 = [number, number, number];
 
-function Wall({ size, position, color = CREAM }: { size: V3; position: V3; color?: string }) {
+/** A plaster wall; the plaster tiles every 3 m along its widest face. */
+function Wall({ size, position }: { size: V3; position: V3 }) {
+  const plaster = useCafeTexture("plaster", Math.max(size[0], size[2]) / 3, size[1] / 3);
   return (
     <mesh position={position}>
       <boxGeometry args={size} />
-      <Toon color={color} />
+      <Toon color="#ffffff" map={plaster} />
       <Ink />
     </mesh>
   );
@@ -62,10 +63,11 @@ function Lamp({ position, light }: { position: V3; light: boolean }) {
 }
 
 export default function Room({ lampLights }: { lampLights: boolean }) {
-  const floorMap = useMemo(() => repeated(floorTexture(), 7, 4.75), []);
-  const mezzMap = useMemo(() => repeated(floorTexture(), 5, 1.75), []);
-  const brickUp = useMemo(() => repeated(brickTexture(), 3.5, 2.8), []);
-  const sideCladding = useMemo(() => repeated(plankTexture(), 9.5, 1), []);
+  const floorMap = useCafeTexture("floor", 7, 4.75);
+  const mezzMap = useCafeTexture("floor", 5, 1.75);
+  const brickUp = useCafeTexture("brick", 3.5, 2.8);
+  const sideCladding = useCafeTexture("cladding", 9.5, 1);
+  const rug = useCafeTexture("rug");
 
   return (
     <group>
@@ -89,7 +91,7 @@ export default function Room({ lampLights }: { lampLights: boolean }) {
       {/* Upstairs brick on the left wall, behind the marquee letter. */}
       <mesh position={[-6.89, MEZZ_Y + (H - MEZZ_Y) / 2, -7.75]} rotation-y={Math.PI / 2}>
         <planeGeometry args={[3.5, H - MEZZ_Y]} />
-        <Toon color="#ffffff" map={brickUp} />
+        <Toon color={BRICK_TINT} map={brickUp} />
       </mesh>
 
       {/* Exterior side cladding: charcoal below the awning line, wood above. */}
@@ -101,7 +103,7 @@ export default function Room({ lampLights }: { lampLights: boolean }) {
           </mesh>
           <mesh position={[side * 7.11, 4.6, -4.75]} rotation-y={(side * Math.PI) / 2}>
             <planeGeometry args={[9.5, 3.2]} />
-            <Toon color="#ffffff" map={sideCladding} />
+            <Toon color={CEDAR_TINT} map={sideCladding} />
           </mesh>
         </group>
       ))}
@@ -144,17 +146,19 @@ export default function Room({ lampLights }: { lampLights: boolean }) {
       {/* Upstairs: rug, tables, plant, marquee letter. */}
       <mesh rotation-x={-Math.PI / 2} position={[-3, MEZZ_Y + 0.01, -7.9]}>
         <planeGeometry args={[3, 2]} />
-        <Toon color={TERRACOTTA} />
-      </mesh>
-      <mesh rotation-x={-Math.PI / 2} position={[-3, MEZZ_Y + 0.012, -7.9]}>
-        <planeGeometry args={[2.6, 1.6]} />
-        <Toon color="#f0b27a" />
+        <Toon color="#ffffff" map={rug} />
       </mesh>
       <TableSet position={[-5.2, MEZZ_Y, -7.4]} />
       <TableSet position={[-1.6, MEZZ_Y, -8.3]} chairs={2} />
       <TableSet position={[1.4, MEZZ_Y, -7.6]} chairs={2} />
       <Plant position={[2.3, MEZZ_Y, -9.0]} />
       <MarqueeJ position={[-6.82, 4.3, -7.8]} rotation={Math.PI / 2} />
+      {/* Painted prints: two over the mezzanine tables, two high on the
+          brew-bar wall. */}
+      <ArtPrint art="art-latte" position={[-4.6, 4.75, -9.38]} />
+      <ArtPrint art="art-city" position={[-1.6, 4.75, -9.38]} size={1.2} />
+      <ArtPrint art="art-plant" position={[6.88, 3.9, -1.6]} rotation={-Math.PI / 2} />
+      <ArtPrint art="art-beans" position={[6.88, 3.9, -4.0]} rotation={-Math.PI / 2} />
 
       {/* ---------- Ground floor ---------- */}
       <TableSet position={[-4.6, 0, -1.4]} />

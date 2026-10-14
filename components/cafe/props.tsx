@@ -4,13 +4,14 @@
 // CAFÉ PROPS (built-in)
 // ============================================================
 // Furniture and decor for the daytime café: chairs, round tables, the
-// chesterfield sofa, plants, planters, railings, wall sconces and the
-// marquee letter. Low-poly toon pieces in the shared palette; each takes
+// chesterfield sofa, plants, planters, railings, wall sconces, framed art
+// prints and the marquee letter. Low-poly toon pieces in the shared palette; each takes
 // a position (and a y-rotation) so the room can arrange them.
 // ============================================================
 
 import { Ink, Toon } from "@/components/cafe/kit";
-import { BULB, CHARCOAL, GREEN, GREEN_DARK, OAK, TERRACOTTA, WHITE } from "@/components/cafe/palette";
+import { BULB, CHARCOAL, CREAM, GREEN, GREEN_DARK, OAK, TERRACOTTA, WHITE } from "@/components/cafe/palette";
+import { useCafeTexture, type TextureName } from "@/components/cafe/textures";
 
 type V3 = [number, number, number];
 
@@ -240,6 +241,38 @@ export function MarqueeJ({ position, rotation = 0 }: { position: V3; rotation?: 
           <meshBasicMaterial color={BULB} toneMapped={false} />
         </mesh>
       ))}
+    </group>
+  );
+}
+
+/** A square painted print in a thin oak frame with a cream mat; faces +z. */
+export function ArtPrint({
+  art,
+  position,
+  rotation = 0,
+  size = 0.9,
+}: {
+  art: Extract<TextureName, `art-${string}`>;
+  position: V3;
+  rotation?: number;
+  size?: number;
+}) {
+  const map = useCafeTexture(art);
+  return (
+    <group position={position} rotation={[0, rotation, 0]}>
+      <mesh>
+        <boxGeometry args={[size + 0.1, size + 0.1, 0.04]} />
+        <Toon color={OAK} />
+        <Ink />
+      </mesh>
+      <mesh position={[0, 0, 0.021]}>
+        <planeGeometry args={[size, size]} />
+        <Toon color={CREAM} />
+      </mesh>
+      <mesh position={[0, 0, 0.023]}>
+        <planeGeometry args={[size * 0.84, size * 0.84]} />
+        <meshBasicMaterial map={map} toneMapped={false} />
+      </mesh>
     </group>
   );
 }

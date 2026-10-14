@@ -8,16 +8,16 @@
 // The cups themselves stay in scene.tsx because they pour with scroll.
 // ============================================================
 
-import { useMemo } from "react";
 import { Ink, Toon } from "@/components/cafe/kit";
-import { plankTexture, repeated } from "@/components/cafe/textures";
-import { BRASS, CHARCOAL, GLASS, OAK, OAK_DARK, TERRACOTTA, WHITE } from "@/components/cafe/palette";
+import { useCafeTexture } from "@/components/cafe/textures";
+import { BRASS, CEDAR_TINT, CHARCOAL, GLASS, OAK, OAK_DARK, TERRACOTTA, WHITE } from "@/components/cafe/palette";
 
 const JAR_COLORS = ["#e4572e", "#f3a712", "#8cb369", "#669bbc", "#f0c987", "#bc4b51"];
 
 // Counter top at y 1.1; front edge near x 5.2, facing the brew-bar camera.
 export default function BrewBar() {
-  const slats = useMemo(() => repeated(plankTexture(), 3.8, 1), []);
+  const slats = useCafeTexture("cladding", 3.8, 1);
+  const marble = useCafeTexture("marble", 0.6, 2.4);
   return (
     <group>
       <mesh position={[5.6, 0.55, -2.8]}>
@@ -28,7 +28,7 @@ export default function BrewBar() {
       {/* Wood slats on the customer side, and a dark kick plate. */}
       <mesh position={[5.195, 0.62, -2.8]} rotation-y={-Math.PI / 2}>
         <planeGeometry args={[3.8, 0.92]} />
-        <Toon color="#ffffff" map={slats} />
+        <Toon color={CEDAR_TINT} map={slats} />
       </mesh>
       <mesh position={[5.19, 0.08, -2.8]}>
         <boxGeometry args={[0.03, 0.16, 3.8]} />
@@ -36,7 +36,7 @@ export default function BrewBar() {
       </mesh>
       <mesh position={[5.6, 1.12, -2.8]}>
         <boxGeometry args={[0.9, 0.04, 3.8]} />
-        <Toon color={WHITE} />
+        <Toon color="#ffffff" map={marble} />
         <Ink />
       </mesh>
       {/* Espresso machine: x 5.595..6.045, z -4.65..-3.95, clear of the cups (z -3 +- 0.9 + 0.18) */}

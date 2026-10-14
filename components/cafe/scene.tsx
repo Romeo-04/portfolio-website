@@ -18,12 +18,13 @@
 
 import { PerformanceMonitor, useProgress } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import { BackSide, Color, Mesh as ThreeMesh, Object3D, ShaderMaterial } from "three";
-import type { Mesh, MeshBasicMaterial } from "three";
+import type { Group, Mesh, MeshBasicMaterial } from "three";
 import { INK, OUTLINE_THICKNESS } from "@/components/cafe/materials/toon";
 import Effects from "@/components/cafe/effects";
-import { Toon } from "@/components/cafe/kit";
+import { Ink, Toon } from "@/components/cafe/kit";
+import { Label } from "@/components/cafe/text3d";
 import Model from "@/components/cafe/model";
 import Room from "@/components/cafe/room";
 import Barista from "@/components/cafe/barista";
@@ -47,6 +48,7 @@ import { CAMERA_LAMBDA, dampVec3, distance3, shouldSnap } from "@/lib/cafe/damp"
 import { getProgress, subscribeProgress } from "@/lib/cafe/scroll";
 import { requestShadowUpdate, takeShadowUpdate } from "@/lib/cafe/shadows";
 import { STATIONS, cameraPose, stationYaw, type Vec3 } from "@/lib/cafe/stations";
+import { easeOutBack } from "@/lib/cafe/choreo";
 
 const CUP_HEIGHT = 0.4;
 const LIQUID_HEIGHT = CUP_HEIGHT * 0.9;
@@ -102,6 +104,71 @@ function CameraRig({ cut }: { cut: boolean }) {
   return null;
 }
 
+const CARD_W = 0.54;
+const CARD_H = 0.25;
+/** The plaque hangs on the counter's front face, just under the cup. */
+const CARD_TOP = -0.27;
+const CARD_Z = 0.225;
+
+/**
+ * A plaque on the counter front under each signature cup, like a drink
+ * label: the project's initial in a badge, its name and category, and the
+ * drink recipe its stack makes. It drops in as the cup starts to fill.
+ */
+const CupCard = forwardRef<Group, { project: (typeof projectsData)[number]; recipe: string[]; mark: string }>(function CupCard(
+  { project, recipe, mark },
+  ref,
+) {
+  return (
+    <group ref={ref} position={[0, CARD_TOP, CARD_Z]} visible={false}>
+      <group position={[0, -CARD_H / 2, 0]}>
+        <mesh>
+          <boxGeometry args={[CARD_W, CARD_H, 0.012]} />
+          <Toon color="#fbf3e4" />
+          <Ink />
+        </mesh>
+        <mesh position={[0, CARD_H / 2 - 0.018, 0.007]}>
+          <planeGeometry args={[CARD_W, 0.036]} />
+          <Toon color="#d0603f" />
+        </mesh>
+        {/* Badge with the project's initial. */}
+        <mesh position={[-CARD_W / 2 + 0.055, -0.01, 0.007]}>
+          <circleGeometry args={[0.038, 24]} />
+          <Toon color="#3b2314" />
+        </mesh>
+        <Label font="display" fontSize={0.046} color="#fbf3e4" position={[-CARD_W / 2 + 0.055, -0.008, 0.009]}>
+          {mark}
+        </Label>
+        <Label
+          font="display"
+          fontSize={0.044}
+          maxWidth={CARD_W - 0.13}
+          anchorX="left"
+          color="#2b2b2e"
+          position={[-CARD_W / 2 + 0.11, 0.04, 0.009]}
+        >
+          {project.title}
+        </Label>
+        <Label font="body" fontSize={0.024} anchorX="left" color="#8a5a3b" position={[-CARD_W / 2 + 0.11, -0.002, 0.009]}>
+          {project.category.toUpperCase()}
+        </Label>
+        <Label
+          font="body"
+          fontSize={0.024}
+          lineHeight={1.15}
+          maxWidth={CARD_W - 0.13}
+          anchorX="left"
+          anchorY="top"
+          color="#5a4a3e"
+          position={[-CARD_W / 2 + 0.11, -0.025, 0.009]}
+        >
+          {recipe.join(" · ")}
+        </Label>
+      </group>
+    </group>
+  );
+});
+
 function PouringCup({
   project,
   index,
@@ -121,9 +188,16 @@ function PouringCup({
   const lastIdx = useRef(-1);
   const surfaceRef = useRef<Mesh>(null);
   const surfaceMat = useRef<MeshBasicMaterial>(null);
+  const card = useRef<Group>(null);
   useFrame(() => {
     const fill = cupFill(getProgress(), index, count);
     setFill(liquid, fill);
+    // The name card pops up as its cup starts to fill.
+    if (card.current) {
+      const s = easeOutBack(Math.min(1, fill * 3));
+      card.current.scale.setScalar(Math.max(0.001, s));
+      card.current.visible = fill > 0;
+    }
     const surface = surfaceRef.current;
     const mat = surfaceMat.current;
     if (!surface || !mat) return;
@@ -158,6 +232,22 @@ function PouringCup({
         <circleGeometry args={[1, 24]} />
         <meshBasicMaterial ref={surfaceMat} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
       </mesh>
+      {/* The cup's shape follows the drink: a mug gets a handle, a cup a saucer. */}
+      {drink.cup === "mug" && (
+        <mesh position={[0.2, 0.02, 0]}>
+          <torusGeometry args={[0.07, 0.018, 8, 20, Math.PI * 1.3]} />
+          <Toon color="#f6ead8" />
+          <Ink />
+        </mesh>
+      )}
+      {drink.cup === "cup" && (
+        <mesh position={[0, -CUP_HEIGHT / 2 - 0.005, 0]}>
+          <cylinderGeometry args={[0.26, 0.22, 0.02, 28]} />
+          <Toon color="#fbf7ef" />
+          <Ink />
+        </mesh>
+      )}
+      <CupCard ref={card} project={project} recipe={drink.layers.map((l) => l.name)} mark={drink.mark} />
     </group>
   );
 }

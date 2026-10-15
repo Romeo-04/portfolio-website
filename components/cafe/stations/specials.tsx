@@ -20,7 +20,7 @@ import { dwellT, trayOffset } from "@/lib/cafe/choreo";
 import { getProgress } from "@/lib/cafe/scroll";
 import { STATIONS, stationYaw } from "@/lib/cafe/stations";
 
-export type SpecialItem = { id: number; name: string; language: string | null };
+export type SpecialItem = { id: number; name: string; language: string | null; url: string };
 
 const [SX, , SZ] = STATIONS.find((s) => s.id === "specials")!.camera.target;
 

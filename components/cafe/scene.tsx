@@ -20,7 +20,7 @@ import { PerformanceMonitor, useProgress } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Suspense, forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import { BackSide, Color, Mesh as ThreeMesh, Object3D, ShaderMaterial } from "three";
-import type { Group, Mesh, MeshBasicMaterial } from "three";
+import type { Group, Mesh, MeshBasicMaterial, PerspectiveCamera } from "three";
 import { INK, OUTLINE_THICKNESS } from "@/components/cafe/materials/toon";
 import Effects from "@/components/cafe/effects";
 import { Ink, Toon } from "@/components/cafe/kit";
@@ -49,6 +49,8 @@ import { getProgress, subscribeProgress } from "@/lib/cafe/scroll";
 import { requestShadowUpdate, takeShadowUpdate } from "@/lib/cafe/shadows";
 import { STATIONS, cameraPose, stationYaw, type Vec3 } from "@/lib/cafe/stations";
 import { easeOutBack } from "@/lib/cafe/choreo";
+import { openProject } from "@/lib/cafe/project-sheet";
+import { getViewInset, subscribeViewInset } from "@/lib/cafe/view-inset";
 
 const CUP_HEIGHT = 0.4;
 const LIQUID_HEIGHT = CUP_HEIGHT * 0.9;
@@ -77,6 +79,30 @@ function FrameDriver() {
       unsubscribe();
     };
   }, [setFrameloop, invalidate]);
+  return null;
+}
+
+/**
+ * Shifts the rendered view right while a station panel is open, so the café
+ * stays centred in the free space beside it, easing in and out.
+ */
+function ViewShift({ cut }: { cut: boolean }) {
+  const current = useRef(0);
+  const invalidate = useThree((s) => s.invalidate);
+  useEffect(() => subscribeViewInset(() => invalidate()), [invalidate]);
+  useFrame(({ camera, size }, dt) => {
+    const target = getViewInset();
+    const k = cut ? 1 : 1 - Math.exp(-6 * dt);
+    current.current += (target - current.current) * k;
+    if (Math.abs(target - current.current) < 0.5) current.current = target;
+    const cam = camera as PerspectiveCamera;
+    if (current.current === 0) {
+      if (cam.view?.enabled) cam.clearViewOffset();
+    } else {
+      cam.setViewOffset(size.width, size.height, -current.current, 0, size.width, size.height);
+    }
+    if (current.current !== target) invalidate();
+  });
   return null;
 }
 
@@ -213,7 +239,21 @@ function PouringCup({
   });
 
   return (
-    <group position={[(index - (count - 1) / 2) * 0.6, CUP_HEIGHT / 2 + 0.15, 0.6]}>
+    <group
+      position={[(index - (count - 1) / 2) * 0.6, CUP_HEIGHT / 2 + 0.15, 0.6]}
+      // Clicking a cup or its plaque opens the project, growing from the pointer.
+      onClick={(e) => {
+        e.stopPropagation();
+        openProject(project.slug, { x: e.nativeEvent.clientX - 30, y: e.nativeEvent.clientY - 30, w: 60, h: 60 });
+      }}
+      onPointerOver={(e) => {
+        e.stopPropagation();
+        document.body.style.cursor = "pointer";
+      }}
+      onPointerOut={() => {
+        document.body.style.cursor = "";
+      }}
+    >
       {/* Glass: a see-through toon shell with an ink rim. */}
       <mesh>
         <cylinderGeometry args={[0.18, 0.14, CUP_HEIGHT, 24, 1, true]} />
@@ -462,6 +502,7 @@ export default function CafeScene({
         <LoadingReporter />
         <FrameDriver />
         <CameraRig cut={cut} />
+        <ViewShift cut={cut} />
         {/* Fonts for the 3D text load first; the intro covers the wait. */}
         <Suspense fallback={null}>
           <Shop specials={specials} lampLights={quality.effects} still={cut} />

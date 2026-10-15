@@ -5,9 +5,12 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type Re
 import SceneBoundary from "@/components/cafe/scene-boundary";
 import Hud from "@/components/cafe/hud";
 import Intro from "@/components/cafe/intro";
+import ProjectSheet from "@/components/cafe/project-sheet";
+import StationPanel from "@/components/cafe/station-panel";
 import type { SpecialItem } from "@/components/cafe/stations/specials";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { detectWebGL, isPhoneViewport, resolveMode } from "@/lib/cafe/mode";
+import { openProject, originOf } from "@/lib/cafe/project-sheet";
 import { goTo, pauseScroll, startScroll } from "@/lib/cafe/scroll";
 import { STATIONS, menuTargetForHash, resolveHash } from "@/lib/cafe/stations";
 
@@ -115,6 +118,13 @@ export default function CafeShell({ children, specials }: { children: ReactNode;
   // the café, or jump to the matching menu section when the menu is the page.
   function onLinkClick(e: React.MouseEvent) {
     if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+    // Any element marked data-project (menu tickets) opens that project's sheet.
+    const opener = (e.target as HTMLElement).closest<HTMLElement>("[data-project]");
+    if (opener?.dataset.project) {
+      e.preventDefault();
+      openProject(opener.dataset.project, originOf(opener));
+      return;
+    }
     const link = (e.target as HTMLElement).closest("a");
     const href = link?.getAttribute("href");
     if (!href?.startsWith("#")) return;
@@ -149,6 +159,7 @@ export default function CafeShell({ children, specials }: { children: ReactNode;
           </button>
         )}
         <div className="rounded-lg bg-[#f6ead8] p-6">{children}</div>
+        <ProjectSheet reduced={reduced} />
       </main>
     );
   }
@@ -172,6 +183,7 @@ export default function CafeShell({ children, specials }: { children: ReactNode;
         {open ? "Close menu" : "Quick Order (M)"}
       </button>
       <Hud reduced={reduced} />
+      {!introActive && <StationPanel specials={specials} reduced={reduced} />}
       <aside
         ref={asideRef}
         tabIndex={-1}
@@ -185,6 +197,7 @@ export default function CafeShell({ children, specials }: { children: ReactNode;
       </aside>
       </div>
       <Intro reduced={reduced} ready={sceneReady} onActiveChange={onIntroActive} />
+      <ProjectSheet reduced={reduced} />
     </div>
   );
 }

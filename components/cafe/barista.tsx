@@ -83,7 +83,7 @@ export default function Barista() {
           <group key={x}>
             <mesh position={[x, 0.36, 0]}>
               <capsuleGeometry args={[0.075, 0.5, 4, 12]} />
-              <Toon color={PANTS} />
+              <Toon color={PANTS} surface="linen" />
             </mesh>
             <mesh position={[x, 0.05, 0.04]}>
               <boxGeometry args={[0.13, 0.08, 0.24]} />
@@ -95,20 +95,20 @@ export default function Barista() {
         {/* Torso: white shirt. */}
         <mesh position={[0, 0.95, 0]}>
           <capsuleGeometry args={[0.2, 0.32, 6, 18]} />
-          <Toon color={WHITE} />
+          <Toon color={WHITE} surface="linen" />
           <Ink />
         </mesh>
 
         {/* Apron, straps and name tag. */}
         <mesh position={[0, 0.86, 0.17]}>
           <boxGeometry args={[0.34, 0.56, 0.04]} />
-          <Toon color={TERRACOTTA} />
+          <Toon color={TERRACOTTA} surface="linen" />
           <Ink />
         </mesh>
         {[-0.11, 0.11].map((x) => (
           <mesh key={x} position={[x, 1.2, 0.15]} rotation-z={x > 0 ? -0.25 : 0.25}>
             <boxGeometry args={[0.035, 0.22, 0.03]} />
-            <Toon color={TERRACOTTA} />
+            <Toon color={TERRACOTTA} surface="linen" />
           </mesh>
         ))}
         <mesh position={[0.07, 1.0, 0.195]}>
@@ -123,7 +123,7 @@ export default function Barista() {
         <group position={[-0.25, 1.15, 0]} rotation-z={-0.2}>
           <mesh position={[0, -0.2, 0]}>
             <capsuleGeometry args={[0.058, 0.3, 4, 10]} />
-            <Toon color={WHITE} />
+            <Toon color={WHITE} surface="linen" />
             <Ink />
           </mesh>
           <mesh position={[0, -0.42, 0]}>
@@ -135,7 +135,7 @@ export default function Barista() {
         <group ref={waveArm} position={[0.25, 1.15, 0]} rotation-z={0.2}>
           <mesh position={[0, -0.2, 0]}>
             <capsuleGeometry args={[0.058, 0.3, 4, 10]} />
-            <Toon color={WHITE} />
+            <Toon color={WHITE} surface="linen" />
             <Ink />
           </mesh>
           <mesh position={[0, -0.42, 0]}>

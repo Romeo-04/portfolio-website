@@ -49,28 +49,28 @@ export default function Checkout() {
       {/* Counter: oak body with inset panels, a dark top and a kick plate. */}
       <mesh position={[0, 0.48, 0]}>
         <boxGeometry args={[1.4, 0.96, 0.8]} />
-        <Toon color="#d9a86c" />
+        <Toon color="#d9a86c" surface="wood" />
         <Ink />
       </mesh>
       {[-0.35, 0.35].map((x) => (
         <mesh key={x} position={[x, 0.52, 0.405]}>
           <boxGeometry args={[0.56, 0.62, 0.02]} />
-          <Toon color="#c8955c" />
+          <Toon color="#c8955c" surface="wood" />
         </mesh>
       ))}
       <mesh position={[0, 0.04, 0.41]}>
         <boxGeometry args={[1.4, 0.08, 0.02]} />
-        <Toon color="#2b2b2e" />
+        <Toon color="#2b2b2e" surface="metal" />
       </mesh>
       <mesh position={[0, 0.985, 0]}>
         <boxGeometry args={[1.5, 0.05, 0.88]} />
-        <Toon color="#5a3620" />
+        <Toon color="#5a3620" surface="wood" />
         <Ink />
       </mesh>
       {/* Receipt printer with a paper roll and a slot. */}
       <mesh position={[0, 1.15, 0]}>
         <boxGeometry args={[0.6, 0.28, 0.4]} />
-        <Toon color="#2b2b2e" />
+        <Toon color="#2b2b2e" surface="metal" />
         <Ink />
       </mesh>
       <mesh position={[0, 1.3, -0.08]} rotation-z={Math.PI / 2}>
@@ -91,11 +91,11 @@ export default function Checkout() {
       <group position={[-0.52, 1.01, -0.05]} rotation-y={0.35}>
         <mesh position={[0, 0.12, 0]}>
           <cylinderGeometry args={[0.02, 0.05, 0.24, 10]} />
-          <Toon color="#2b2b2e" />
+          <Toon color="#2b2b2e" surface="metal" />
         </mesh>
         <mesh position={[0, 0.3, 0.02]} rotation-x={-0.25}>
           <boxGeometry args={[0.3, 0.2, 0.02]} />
-          <Toon color="#2b2b2e" />
+          <Toon color="#2b2b2e" surface="metal" />
           <Ink />
         </mesh>
         <mesh position={[0, 0.3, 0.033]} rotation-x={-0.25}>
@@ -107,16 +107,16 @@ export default function Checkout() {
       <group position={[0.3, 1.01, 0.25]}>
         <mesh position={[0, 0.01, 0]}>
           <cylinderGeometry args={[0.06, 0.06, 0.02, 16]} />
-          <Toon color="#2b2b2e" />
+          <Toon color="#2b2b2e" surface="metal" />
         </mesh>
         <mesh position={[0, 0.04, 0]}>
           <sphereGeometry args={[0.05, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2]} />
-          <Toon color="#d9a441" />
+          <Toon color="#d9a441" surface="metal" />
           <Ink />
         </mesh>
         <mesh position={[0, 0.1, 0]}>
           <cylinderGeometry args={[0.008, 0.008, 0.03, 6]} />
-          <Toon color="#d9a441" />
+          <Toon color="#d9a441" surface="metal" />
         </mesh>
       </group>
       {/* Receipt hangs from the printer slot; scale.y grows it downward. */}
@@ -153,7 +153,7 @@ Come again!`}
       </mesh>
       <mesh position={[0.5, 1.04, 0]}>
         <cylinderGeometry args={[0.095, 0.095, 0.06, 16]} />
-        <Toon color="#d9a441" />
+        <Toon color="#d9a441" surface="metal" />
       </mesh>
       <mesh position={[0.5, 1.265, 0]} rotation-x={Math.PI / 2}>
         <torusGeometry args={[0.1, 0.008, 6, 20]} />

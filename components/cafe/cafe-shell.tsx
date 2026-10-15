@@ -180,7 +180,12 @@ export default function CafeShell({ children, specials }: { children: ReactNode;
         aria-controls="quick-order"
         className="game-button fixed top-4 right-4 z-20 px-5 py-2 text-sm"
       >
-        {open ? "Close menu" : "Quick Order (M)"}
+        {open ? "Close menu" : (
+          <>
+            <span className="sm:hidden">Menu</span>
+            <span className="hidden sm:inline">Quick Order (M)</span>
+          </>
+        )}
       </button>
       <Hud reduced={reduced} />
       {!introActive && <StationPanel specials={specials} reduced={reduced} />}

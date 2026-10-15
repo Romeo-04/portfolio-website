@@ -376,3 +376,13 @@
     .station-panel { transition: opacity 200ms ease; transform: none; }
   }
 }
+
+/* Phones: the project sheet opens with a compact drink header. */
+@media (max-width: 767px) {
+  .sheet-dialog { padding: 12px; }
+  .sheet-visual { flex-direction: row; align-items: center; gap: 20px; padding: 22px 24px 4px; }
+  .sheet-visual svg { width: 64px; height: auto; }
+  .sheet-visual > :nth-child(2) { margin-top: 0; }
+  .sheet-body { padding: 16px 24px 24px; }
+  .sheet-footer { padding: 12px 16px; }
+}

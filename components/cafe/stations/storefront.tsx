@@ -36,7 +36,7 @@ function Bar({ position, size }: { position: [number, number, number]; size: [nu
   return (
     <mesh position={position}>
       <boxGeometry args={size} />
-      <Toon color={CHARCOAL} />
+      <Toon color={CHARCOAL} surface="metal" />
     </mesh>
   );
 }
@@ -64,7 +64,7 @@ export default function Storefront() {
       {/* Concrete plinth. */}
       <mesh position={[0, BASE / 2, 0.15]}>
         <boxGeometry args={[FRONT_W + 0.4, BASE, 0.6]} />
-        <Toon color={CONCRETE} />
+        <Toon color={CONCRETE} surface="concrete" surfaceRepeat={[8, 1]} />
         <Ink />
       </mesh>
 
@@ -117,7 +117,7 @@ export default function Storefront() {
       {/* Awning band with the sign. */}
       <mesh position={[0, GLASS_TOP + 0.3, 0.3]}>
         <boxGeometry args={[FRONT_W + 0.6, 0.5, 0.8]} />
-        <Toon color={CHARCOAL} />
+        <Toon color={CHARCOAL} surface="metal" />
         <Ink />
       </mesh>
       {/* The sign: chunky display letters with a soft drop shadow. */}
@@ -142,18 +142,18 @@ export default function Storefront() {
       {/* Doormat and a bench out front. */}
       <mesh rotation-x={-Math.PI / 2} position={[0, 0.006, 0.6]}>
         <planeGeometry args={[1.3, 0.6]} />
-        <Toon color={CHARCOAL} />
+        <Toon color={CHARCOAL} surface="metal" />
       </mesh>
       <group position={[2.4, 0, 1.0]}>
         <mesh position={[0, 0.45, 0]}>
           <boxGeometry args={[1.4, 0.06, 0.4]} />
-          <Toon color={OAK} />
+          <Toon color={OAK} surface="wood" />
           <Ink />
         </mesh>
         {[-0.6, 0.6].map((x) => (
           <mesh key={x} position={[x, 0.22, 0]}>
             <boxGeometry args={[0.06, 0.44, 0.36]} />
-            <Toon color={CHARCOAL} />
+            <Toon color={CHARCOAL} surface="metal" />
           </mesh>
         ))}
       </group>

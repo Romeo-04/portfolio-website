@@ -23,39 +23,39 @@ export function Chair({ position, rotation = 0 }: { position: V3; rotation?: num
     <group position={position} rotation={[0, rotation, 0]}>
       <mesh position={[0, 0.46, 0]}>
         <cylinderGeometry args={[0.21, 0.2, 0.05, 24]} />
-        <Toon color={OAK} />
+        <Toon color={OAK} surface="wood" />
         <Ink />
       </mesh>
       <mesh position={[0, 0.495, 0]}>
         <cylinderGeometry args={[0.18, 0.19, 0.025, 24]} />
-        <Toon color={TERRACOTTA} />
+        <Toon color={TERRACOTTA} surface="linen" />
       </mesh>
       {legs.map((a) => (
         <mesh key={a} position={[Math.sin(a) * 0.14, 0.22, Math.cos(a) * 0.14]} rotation={[Math.cos(a) * 0.12, 0, -Math.sin(a) * 0.12]}>
           <cylinderGeometry args={[0.017, 0.013, 0.46, 8]} />
-          <Toon color={CHARCOAL} />
+          <Toon color={CHARCOAL} surface="metal" />
         </mesh>
       ))}
       <mesh position={[0, 0.17, 0]} rotation-x={Math.PI / 2}>
         <torusGeometry args={[0.15, 0.01, 6, 24]} />
-        <Toon color={CHARCOAL} />
+        <Toon color={CHARCOAL} surface="metal" />
       </mesh>
       {/* Curved back rail on two posts, with spindles. */}
       {[-0.14, 0.14].map((x) => (
         <mesh key={x} position={[x, 0.68, -0.15]} rotation-x={-0.12}>
           <cylinderGeometry args={[0.016, 0.016, 0.44, 8]} />
-          <Toon color={CHARCOAL} />
+          <Toon color={CHARCOAL} surface="metal" />
         </mesh>
       ))}
       {[-0.06, 0, 0.06].map((x) => (
         <mesh key={x} position={[x, 0.66, -0.16]} rotation-x={-0.12}>
           <cylinderGeometry args={[0.008, 0.008, 0.36, 6]} />
-          <Toon color={CHARCOAL} />
+          <Toon color={CHARCOAL} surface="metal" />
         </mesh>
       ))}
       <mesh position={[0, 0.88, -0.05]} rotation={[Math.PI / 2, 0, Math.PI]}>
         <torusGeometry args={[0.17, 0.022, 8, 20, Math.PI]} />
-        <Toon color={OAK_DARK} />
+        <Toon color={OAK_DARK} surface="wood" />
         <Ink />
       </mesh>
     </group>
@@ -68,25 +68,25 @@ export function RoundTable({ position }: { position: V3 }) {
     <group position={position}>
       <mesh position={[0, 0.745, 0]}>
         <cylinderGeometry args={[0.45, 0.45, 0.035, 32]} />
-        <Toon color={OAK} />
+        <Toon color={OAK} surface="wood" />
         <Ink />
       </mesh>
       <mesh position={[0, 0.72, 0]}>
         <cylinderGeometry args={[0.43, 0.4, 0.02, 32]} />
-        <Toon color={OAK_DARK} />
+        <Toon color={OAK_DARK} surface="wood" />
       </mesh>
       <mesh position={[0, 0.38, 0]}>
         <cylinderGeometry args={[0.035, 0.05, 0.68, 12]} />
-        <Toon color={CHARCOAL} />
+        <Toon color={CHARCOAL} surface="metal" />
       </mesh>
       <mesh position={[0, 0.7, 0]}>
         <cylinderGeometry args={[0.12, 0.05, 0.03, 12]} />
-        <Toon color={CHARCOAL} />
+        <Toon color={CHARCOAL} surface="metal" />
       </mesh>
       {[0, Math.PI / 2].map((a) => (
         <mesh key={a} position={[0, 0.025, 0]} rotation-y={a}>
           <boxGeometry args={[0.56, 0.04, 0.06]} />
-          <Toon color={CHARCOAL} />
+          <Toon color={CHARCOAL} surface="metal" />
         </mesh>
       ))}
       {/* Cup on a saucer, with coffee. */}
@@ -150,7 +150,7 @@ export function Sofa({ position, rotation = 0 }: { position: V3; rotation?: numb
     <group position={position} rotation={[0, rotation, 0]}>
       {/* Base and feet. */}
       <RoundedBox args={[2.2, 0.3, 0.85]} radius={0.05} smoothness={2} position={[0, 0.24, 0]}>
-        <Toon color={LEATHER} />
+        <Toon color={LEATHER} surface="leather" surfaceRepeat={[3, 2]} />
         <Ink />
       </RoundedBox>
       {[
@@ -161,19 +161,19 @@ export function Sofa({ position, rotation = 0 }: { position: V3; rotation?: numb
       ].map(([x, z]) => (
         <mesh key={`${x}${z}`} position={[x, 0.05, z]}>
           <cylinderGeometry args={[0.04, 0.03, 0.1, 10]} />
-          <Toon color="#5a3620" />
+          <Toon color="#5a3620" surface="wood" />
         </mesh>
       ))}
       {/* Seat cushions. */}
       {[-0.68, 0, 0.68].map((x) => (
         <RoundedBox key={x} args={[0.66, 0.14, 0.66]} radius={0.05} smoothness={2} position={[x, 0.45, 0.06]}>
-          <Toon color={LEATHER} />
+          <Toon color={LEATHER} surface="leather" surfaceRepeat={[3, 2]} />
           <Ink />
         </RoundedBox>
       ))}
       {/* Buttoned back. */}
       <RoundedBox args={[2.2, 0.52, 0.22]} radius={0.07} smoothness={2} position={[0, 0.66, -0.32]}>
-        <Toon color={LEATHER} />
+        <Toon color={LEATHER} surface="leather" surfaceRepeat={[3, 2]} />
         <Ink />
       </RoundedBox>
       {[-0.8, -0.4, 0, 0.4, 0.8].flatMap((x) =>
@@ -188,12 +188,12 @@ export function Sofa({ position, rotation = 0 }: { position: V3; rotation?: numb
       {[-1.1, 1.1].map((x) => (
         <group key={x} position={[x, 0, 0]}>
           <RoundedBox args={[0.24, 0.5, 0.85]} radius={0.06} smoothness={2} position={[0, 0.4, 0]}>
-            <Toon color={LEATHER} />
+            <Toon color={LEATHER} surface="leather" surfaceRepeat={[3, 2]} />
             <Ink />
           </RoundedBox>
           <mesh position={[0, 0.66, 0]} rotation-x={Math.PI / 2}>
             <cylinderGeometry args={[0.14, 0.14, 0.85, 16]} />
-            <Toon color={LEATHER} />
+            <Toon color={LEATHER} surface="leather" surfaceRepeat={[3, 2]} />
             <Ink />
           </mesh>
         </group>
@@ -206,7 +206,7 @@ export function Sofa({ position, rotation = 0 }: { position: V3; rotation?: numb
         ] as const
       ).map(([x, color, tilt]) => (
         <RoundedBox key={x} args={[0.36, 0.34, 0.12]} radius={0.05} smoothness={2} position={[x, 0.66, -0.12]} rotation={[-0.25, 0, tilt]}>
-          <Toon color={color} />
+          <Toon color={color} surface="linen" />
           <Ink />
         </RoundedBox>
       ))}
@@ -225,7 +225,7 @@ function Leaf({ angle, tilt, length, color, y }: { angle: number; tilt: number; 
         </mesh>
         <mesh position={[0, length * 0.95, 0]} scale={[0.5, 1, 0.12]}>
           <sphereGeometry args={[length * 0.42, 12, 8]} />
-          <Toon color={color} />
+          <Toon color={color} surface="foliage" />
           <Ink />
         </mesh>
       </group>
@@ -245,12 +245,12 @@ export function Plant({ position, scale = 1 }: { position: V3; scale?: number })
     <group position={position} scale={scale}>
       <mesh position={[0, 0.2, 0]}>
         <cylinderGeometry args={[0.2, 0.15, 0.4, 18]} />
-        <Toon color={WHITE} />
+        <Toon color={WHITE} surface="clay" />
         <Ink />
       </mesh>
       <mesh position={[0, 0.39, 0]}>
         <cylinderGeometry args={[0.22, 0.22, 0.05, 18]} />
-        <Toon color={WHITE} />
+        <Toon color={WHITE} surface="clay" />
       </mesh>
       <mesh position={[0, 0.405, 0]}>
         <cylinderGeometry args={[0.19, 0.19, 0.02, 18]} />
@@ -272,12 +272,12 @@ export function Planter({ position, length = 1.6, rotation = 0 }: { position: V3
     <group position={position} rotation={[0, rotation, 0]}>
       <mesh position={[0, 0.25, 0]}>
         <boxGeometry args={[length, 0.5, 0.45]} />
-        <Toon color={CHARCOAL} />
+        <Toon color={CHARCOAL} surface="metal" />
         <Ink />
       </mesh>
       <mesh position={[0, 0.51, 0]}>
         <boxGeometry args={[length + 0.06, 0.04, 0.51]} />
-        <Toon color={OAK} />
+        <Toon color={OAK} surface="wood" />
       </mesh>
       {Array.from({ length: bushes }, (_, i) => {
         const x = -length / 2 + (i + 0.5) * (length / bushes);
@@ -285,12 +285,12 @@ export function Planter({ position, length = 1.6, rotation = 0 }: { position: V3
           <group key={i} position={[x, 0.6, 0]}>
             <mesh>
               <icosahedronGeometry args={[0.24, 1]} />
-              <Toon color={i % 2 ? GREEN_DARK : GREEN} />
+              <Toon color={i % 2 ? GREEN_DARK : GREEN} surface="foliage" />
               <Ink />
             </mesh>
             <mesh position={[0.08, 0.1, 0.06]}>
               <icosahedronGeometry args={[0.15, 1]} />
-              <Toon color={i % 2 ? GREEN : GREEN_DARK} />
+              <Toon color={i % 2 ? GREEN : GREEN_DARK} surface="foliage" />
             </mesh>
             <mesh position={[-0.06, 0.16, 0.16]}>
               <sphereGeometry args={[0.035, 8, 6]} />
@@ -315,13 +315,13 @@ export function Railing({ from, to, y }: { from: [number, number]; to: [number, 
       {Array.from({ length: posts }, (_, i) => (
         <mesh key={i} position={[0, 0.5, (i / (posts - 1)) * len]}>
           <boxGeometry args={[0.04, 1, 0.04]} />
-          <Toon color={CHARCOAL} />
+          <Toon color={CHARCOAL} surface="metal" />
         </mesh>
       ))}
       {[1, 0.5].map((h) => (
         <mesh key={h} position={[0, h, len / 2]}>
           <boxGeometry args={[0.04, 0.04, len]} />
-          <Toon color={CHARCOAL} />
+          <Toon color={CHARCOAL} surface="metal" />
         </mesh>
       ))}
     </group>
@@ -334,15 +334,15 @@ export function Sconce({ position, rotation = 0 }: { position: V3; rotation?: nu
     <group position={position} rotation={[0, rotation, 0]}>
       <mesh position={[0, 0, 0.01]} rotation-x={Math.PI / 2}>
         <cylinderGeometry args={[0.06, 0.06, 0.02, 16]} />
-        <Toon color={BRASS} />
+        <Toon color={BRASS} surface="metal" />
       </mesh>
       <mesh position={[0, 0.02, 0.13]}>
         <boxGeometry args={[0.03, 0.03, 0.24]} />
-        <Toon color={CHARCOAL} />
+        <Toon color={CHARCOAL} surface="metal" />
       </mesh>
       <mesh position={[0, -0.02, 0.24]}>
         <cylinderGeometry args={[0.03, 0.03, 0.05, 12]} />
-        <Toon color={BRASS} />
+        <Toon color={BRASS} surface="metal" />
       </mesh>
       <mesh position={[0, -0.1, 0.24]}>
         <sphereGeometry args={[0.055, 12, 8]} />
@@ -384,7 +384,7 @@ export function MarqueeJ({ position, rotation = 0 }: { position: V3; rotation?: 
       {bars.map((b) => (
         <mesh key={b.p.join()} position={b.p}>
           <boxGeometry args={b.s} />
-          <Toon color="#e8b04a" />
+          <Toon color="#e8b04a" surface="metal" />
           <Ink />
         </mesh>
       ))}
@@ -415,7 +415,7 @@ export function ArtPrint({
     <group position={position} rotation={[0, rotation, 0]}>
       <mesh>
         <boxGeometry args={[size + 0.1, size + 0.1, 0.04]} />
-        <Toon color={OAK} />
+        <Toon color={OAK} surface="wood" />
         <Ink />
       </mesh>
       <mesh position={[0, 0, 0.021]}>

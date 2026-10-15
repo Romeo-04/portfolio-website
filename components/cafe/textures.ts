@@ -33,7 +33,35 @@ export const TEXTURES = {
   "art-plant": "/textures/art-plant.webp",
   "art-city": "/textures/art-city.webp",
   "art-beans": "/textures/art-beans.webp",
+  // Surface detail maps: light, nearly neutral, multiplied by each part's
+  // colour so the palette stays in charge (see Toon's `surface`).
+  wood: "/textures/surface-wood.webp",
+  leather: "/textures/surface-leather.webp",
+  linen: "/textures/surface-linen.webp",
+  metal: "/textures/surface-metal.webp",
+  copper: "/textures/surface-copper.webp",
+  burlap: "/textures/surface-burlap.webp",
+  clay: "/textures/surface-clay.webp",
+  stucco: "/textures/surface-stucco.webp",
+  concrete: "/textures/surface-concrete.webp",
+  asphalt: "/textures/surface-asphalt.webp",
+  foliage: "/textures/surface-foliage.webp",
+  canvas: "/textures/surface-canvas.webp",
 } as const;
+
+export type Surface =
+  | "wood"
+  | "leather"
+  | "linen"
+  | "metal"
+  | "copper"
+  | "burlap"
+  | "clay"
+  | "stucco"
+  | "concrete"
+  | "asphalt"
+  | "foliage"
+  | "canvas";
 
 export type TextureName = keyof typeof TEXTURES;
 
@@ -48,12 +76,23 @@ export function repeated(tex: Texture, x: number, y: number): Texture {
   return t;
 }
 
+/**
+ * One copy per image and repeat, shared by every surface that asks for the
+ * same thing: thirty chairs reuse one seat texture, so the static merge can
+ * still batch them into a single draw.
+ */
+const copies = new Map<string, Texture>();
+
 /** Loads a café texture (suspends until ready) and repeats it x × y times. */
 export function useCafeTexture(name: TextureName, x = 1, y = 1): Texture {
   const base = useTexture(TEXTURES[name]);
   return useMemo(() => {
+    const key = `${base.uuid}|${x}|${y}`;
+    const cached = copies.get(key);
+    if (cached) return cached;
     // Settings live on the copy; the loaded original stays untouched.
     const t = repeated(base, x, y);
+    copies.set(key, t);
     t.colorSpace = DATA_TEXTURES.has(name) ? NoColorSpace : SRGBColorSpace;
     t.wrapS = RepeatWrapping;
     t.wrapT = RepeatWrapping;

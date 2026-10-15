@@ -51,7 +51,7 @@ function Lamp({ position, light }: { position: V3; light: boolean }) {
       </mesh>
       <mesh>
         <coneGeometry args={[0.28, 0.3, 18, 1, true]} />
-        <Toon color={CHARCOAL} />
+        <Toon color={CHARCOAL} surface="metal" />
         <Ink />
       </mesh>
       <mesh position={[0, -0.12, 0]}>
@@ -66,6 +66,7 @@ function Lamp({ position, light }: { position: V3; light: boolean }) {
 export default function Room({ lampLights }: { lampLights: boolean }) {
   const floorMap = useCafeTexture("floor", 7, 4.75);
   const mezzMap = useCafeTexture("floor", 5, 1.75);
+  const roastFloor = useCafeTexture("floor", 4, 2.25);
   const brickUp = useCafeTexture("brick", 3.5, 2.8);
   const sideCladding = useCafeTexture("cladding", 9.5, 1);
   const rug = useCafeTexture("rug");
@@ -79,7 +80,7 @@ export default function Room({ lampLights }: { lampLights: boolean }) {
       </mesh>
       <mesh rotation-x={Math.PI / 2} position={[0, H, -4.75]}>
         <planeGeometry args={[14, 9.5]} />
-        <Toon color={CREAM} />
+        <Toon color={CREAM} surface="stucco" surfaceRepeat={[3, 3]} />
       </mesh>
 
       {/* ---------- Walls (the glass front is the storefront) ---------- */}
@@ -100,7 +101,7 @@ export default function Room({ lampLights }: { lampLights: boolean }) {
         <group key={side}>
           <mesh position={[side * 7.11, 1.5, -4.75]} rotation-y={(side * Math.PI) / 2}>
             <planeGeometry args={[9.5, 3]} />
-            <Toon color={CHARCOAL} />
+            <Toon color={CHARCOAL} surface="metal" />
           </mesh>
           <mesh position={[side * 7.11, 4.6, -4.75]} rotation-y={(side * Math.PI) / 2}>
             <planeGeometry args={[9.5, 3.2]} />
@@ -112,19 +113,19 @@ export default function Room({ lampLights }: { lampLights: boolean }) {
       {/* ---------- Mezzanine ---------- */}
       <mesh position={[-2, MEZZ_Y - 0.1, -7.75]}>
         <boxGeometry args={[10, 0.2, 3.5]} />
-        <Toon color={CREAM} />
+        <Toon color={CREAM} surface="stucco" surfaceRepeat={[3, 3]} />
         <Ink />
       </mesh>
       {/* Slim oak beams under the mezzanine and an oak edge trim. */}
       {[-6, -4, -2, 0, 2].map((x) => (
         <mesh key={x} position={[x, MEZZ_Y - 0.26, -7.75]}>
           <boxGeometry args={[0.1, 0.12, 3.5]} />
-          <Toon color={OAK} />
+          <Toon color={OAK} surface="wood" />
         </mesh>
       ))}
       <mesh position={[-2, MEZZ_Y - 0.08, -6]}>
         <boxGeometry args={[10, 0.26, 0.08]} />
-        <Toon color={OAK_DARK} />
+        <Toon color={OAK_DARK} surface="wood" />
         <Ink />
       </mesh>
       <mesh rotation-x={-Math.PI / 2} position={[-2, MEZZ_Y + 0.002, -7.75]}>
@@ -137,7 +138,7 @@ export default function Room({ lampLights }: { lampLights: boolean }) {
       ].map(([x, z]) => (
         <mesh key={`${x}${z}`} position={[x, (MEZZ_Y - 0.2) / 2, z]}>
           <boxGeometry args={[0.16, MEZZ_Y - 0.2, 0.16]} />
-          <Toon color={CHARCOAL} />
+          <Toon color={CHARCOAL} surface="metal" />
           <Ink />
         </mesh>
       ))}
@@ -185,14 +186,14 @@ export default function Room({ lampLights }: { lampLights: boolean }) {
       {/* ---------- Roastery: x -4..4, z -9.5..-14 ---------- */}
       <mesh rotation-x={-Math.PI / 2} position={[0, 0.002, -11.75]}>
         <planeGeometry args={[8, 4.5]} />
-        <Toon color={OAK} />
+        <Toon color={WHITE_TINT} map={roastFloor} />
       </mesh>
       <Wall size={[0.2, 4, 4.5]} position={[-4, 2, -11.75]} />
       <Wall size={[0.2, 4, 4.5]} position={[4, 2, -11.75]} />
       <Wall size={[8, 4, 0.2]} position={[0, 2, -14]} />
       <mesh rotation-x={Math.PI / 2} position={[0, 4, -11.75]}>
         <planeGeometry args={[8, 4.5]} />
-        <Toon color={CREAM} />
+        <Toon color={CREAM} surface="stucco" surfaceRepeat={[3, 3]} />
       </mesh>
     </Merged>
   );

@@ -46,16 +46,79 @@ export default function Checkout() {
   // The register stands at the checkout target, facing its camera.
   return (
     <group position={[CX, 0, CZ]} rotation={[0, stationYaw("checkout"), 0]}>
-      <mesh position={[0, 0.5, 0]}>
-        <boxGeometry args={[1.4, 1, 0.8]} />
+      {/* Counter: oak body with inset panels, a dark top and a kick plate. */}
+      <mesh position={[0, 0.48, 0]}>
+        <boxGeometry args={[1.4, 0.96, 0.8]} />
         <Toon color="#d9a86c" />
         <Ink />
       </mesh>
+      {[-0.35, 0.35].map((x) => (
+        <mesh key={x} position={[x, 0.52, 0.405]}>
+          <boxGeometry args={[0.56, 0.62, 0.02]} />
+          <Toon color="#c8955c" />
+        </mesh>
+      ))}
+      <mesh position={[0, 0.04, 0.41]}>
+        <boxGeometry args={[1.4, 0.08, 0.02]} />
+        <Toon color="#2b2b2e" />
+      </mesh>
+      <mesh position={[0, 0.985, 0]}>
+        <boxGeometry args={[1.5, 0.05, 0.88]} />
+        <Toon color="#5a3620" />
+        <Ink />
+      </mesh>
+      {/* Receipt printer with a paper roll and a slot. */}
       <mesh position={[0, 1.15, 0]}>
-        <boxGeometry args={[0.6, 0.3, 0.4]} />
+        <boxGeometry args={[0.6, 0.28, 0.4]} />
         <Toon color="#2b2b2e" />
         <Ink />
       </mesh>
+      <mesh position={[0, 1.3, -0.08]} rotation-z={Math.PI / 2}>
+        <cylinderGeometry args={[0.09, 0.09, 0.56, 18]} />
+        <Toon color="#fbf6ee" />
+      </mesh>
+      <mesh position={[0, 1.3, 0.205]}>
+        <boxGeometry args={[0.58, 0.015, 0.02]} />
+        <Toon color="#111113" />
+      </mesh>
+      {[-0.22, -0.17].map((x) => (
+        <mesh key={x} position={[x, 1.12, 0.205]}>
+          <boxGeometry args={[0.03, 0.03, 0.01]} />
+          <meshBasicMaterial color={x < -0.2 ? "#8cb369" : "#f3a712"} toneMapped={false} />
+        </mesh>
+      ))}
+      {/* POS screen on a stand, turned toward the customer. */}
+      <group position={[-0.52, 1.01, -0.05]} rotation-y={0.35}>
+        <mesh position={[0, 0.12, 0]}>
+          <cylinderGeometry args={[0.02, 0.05, 0.24, 10]} />
+          <Toon color="#2b2b2e" />
+        </mesh>
+        <mesh position={[0, 0.3, 0.02]} rotation-x={-0.25}>
+          <boxGeometry args={[0.3, 0.2, 0.02]} />
+          <Toon color="#2b2b2e" />
+          <Ink />
+        </mesh>
+        <mesh position={[0, 0.3, 0.033]} rotation-x={-0.25}>
+          <planeGeometry args={[0.26, 0.16]} />
+          <meshBasicMaterial color="#cfe6f2" toneMapped={false} />
+        </mesh>
+      </group>
+      {/* Service bell. */}
+      <group position={[0.3, 1.01, 0.25]}>
+        <mesh position={[0, 0.01, 0]}>
+          <cylinderGeometry args={[0.06, 0.06, 0.02, 16]} />
+          <Toon color="#2b2b2e" />
+        </mesh>
+        <mesh position={[0, 0.04, 0]}>
+          <sphereGeometry args={[0.05, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2]} />
+          <Toon color="#d9a441" />
+          <Ink />
+        </mesh>
+        <mesh position={[0, 0.1, 0]}>
+          <cylinderGeometry args={[0.008, 0.008, 0.03, 6]} />
+          <Toon color="#d9a441" />
+        </mesh>
+      </group>
       {/* Receipt hangs from the printer slot; scale.y grows it downward. */}
       <group ref={paper} position={[0, 1.3, 0.42]}>
         <mesh position={[0, -RECEIPT_HEIGHT / 2, 0]}>
@@ -83,9 +146,18 @@ linkedin.com/in/jhezra-tolentino
 
 Come again!`}
       </Label>
-      <mesh position={[0.5, 1.12, 0]}>
+      {/* Tip jar with coins. */}
+      <mesh position={[0.5, 1.135, 0]}>
         <cylinderGeometry args={[0.1, 0.1, 0.25, 16, 1, true]} />
         <Toon color="#f6ead8" transparent opacity={0.35} />
+      </mesh>
+      <mesh position={[0.5, 1.04, 0]}>
+        <cylinderGeometry args={[0.095, 0.095, 0.06, 16]} />
+        <Toon color="#d9a441" />
+      </mesh>
+      <mesh position={[0.5, 1.265, 0]} rotation-x={Math.PI / 2}>
+        <torusGeometry args={[0.1, 0.008, 6, 20]} />
+        <Toon color="#b9bfc5" />
       </mesh>
       <group ref={tips} position={[0.5, 1.42, 0]} visible={false}>
         <Label font="display" fontSize={0.06} color="#2b2b2e">

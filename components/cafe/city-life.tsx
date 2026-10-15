@@ -73,7 +73,7 @@ function Person({ look, rig, seated = false }: { look: Look; rig: LimbRig; seate
         <group key={x} ref={set(x < 0 ? "legL" : "legR")} position={[x, 0.85, 0]} rotation-x={seated ? -Math.PI / 2 : 0}>
           <mesh position={[0, -0.38, 0]}>
             <capsuleGeometry args={[0.07, 0.5, 4, 10]} />
-            <Toon color={look.pants} />
+            <Toon color={look.pants} surface="linen" />
           </mesh>
           <mesh position={[0, -0.8, 0.05]}>
             <boxGeometry args={[0.12, 0.08, 0.22]} />
@@ -83,14 +83,14 @@ function Person({ look, rig, seated = false }: { look: Look; rig: LimbRig; seate
       ))}
       <mesh position={[0, 1.13, 0]}>
         <capsuleGeometry args={[0.19, 0.3, 6, 14]} />
-        <Toon color={look.shirt} />
+        <Toon color={look.shirt} surface="linen" />
         <Ink />
       </mesh>
       {[-1, 1].map((side) => (
         <group key={side} ref={set(side < 0 ? "armL" : "armR")} position={[side * 0.24, 1.32, 0]} rotation-z={side * 0.12}>
           <mesh position={[0, -0.2, 0]}>
             <capsuleGeometry args={[0.055, 0.3, 4, 8]} />
-            <Toon color={look.shirt} />
+            <Toon color={look.shirt} surface="linen" />
           </mesh>
           <mesh position={[0, -0.41, 0]}>
             <sphereGeometry args={[0.055, 10, 8]} />
@@ -136,11 +136,11 @@ function Person({ look, rig, seated = false }: { look: Look; rig: LimbRig; seate
           <group position={[0, 0.1, 0]}>
             <mesh>
               <sphereGeometry args={[0.215, 16, 10, 0, Math.PI * 2, 0, Math.PI * 0.5]} />
-              <Toon color={look.shirt} />
+              <Toon color={look.shirt} surface="linen" />
             </mesh>
             <mesh position={[0, 0, 0.2]} rotation-x={0.15}>
               <boxGeometry args={[0.26, 0.03, 0.16]} />
-              <Toon color={look.shirt} />
+              <Toon color={look.shirt} surface="linen" />
             </mesh>
           </group>
         )}
@@ -521,7 +521,7 @@ function Car({ car, still }: { car: CarSpec; still: boolean }) {
       <group rotation-y={car.dir > 0 ? Math.PI / 2 : -Math.PI / 2}>
         <mesh position={[0, 0.6, 0]}>
           <boxGeometry args={[1.7, 0.6, 3.8]} />
-          <Toon color={car.color} />
+          <Toon color={car.color} surface="metal" />
           <Ink />
         </mesh>
         <mesh position={[0, 1.15, -0.25]}>
@@ -531,7 +531,7 @@ function Car({ car, still }: { car: CarSpec; still: boolean }) {
         </mesh>
         <mesh position={[0, 1.44, -0.25]}>
           <boxGeometry args={[1.56, 0.08, 2.06]} />
-          <Toon color={car.color} />
+          <Toon color={car.color} surface="metal" />
         </mesh>
         {/* Window pillars, so the cabin reads as glass in a body-coloured frame. */}
         {[
@@ -544,7 +544,7 @@ function Car({ car, still }: { car: CarSpec; still: boolean }) {
         ].map(([x, z], i) => (
           <mesh key={`p${i}`} position={[x, 1.15, z]}>
             <boxGeometry args={[0.06, 0.58, 0.1]} />
-            <Toon color={car.color} />
+            <Toon color={car.color} surface="metal" />
           </mesh>
         ))}
         {/* Bumpers. */}

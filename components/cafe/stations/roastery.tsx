@@ -32,13 +32,13 @@ function Conveyor() {
     <group>
       <mesh position={[0, BELT_Y - 0.03, 0]}>
         <boxGeometry args={[BELT_LEN, 0.06, 0.46]} />
-        <Toon color="#2f2f33" />
+        <Toon color="#2f2f33" surface="canvas" />
         <Ink />
       </mesh>
       {[-0.26, 0.26].map((z) => (
         <mesh key={z} position={[0, BELT_Y + 0.02, z]}>
           <boxGeometry args={[BELT_LEN + 0.1, 0.08, 0.04]} />
-          <Toon color={STEEL} />
+          <Toon color={STEEL} surface="metal" />
           <Ink />
         </mesh>
       ))}
@@ -46,14 +46,14 @@ function Conveyor() {
         [-0.24, 0.24].map((z) => (
           <mesh key={`${x}${z}`} position={[x, (BELT_Y - 0.06) / 2, z]}>
             <boxGeometry args={[0.05, BELT_Y - 0.06, 0.05]} />
-            <Toon color={STEEL} />
+            <Toon color={STEEL} surface="metal" />
           </mesh>
         )),
       )}
       {[-BELT_LEN / 2, BELT_LEN / 2].map((x) => (
         <mesh key={x} position={[x, BELT_Y - 0.03, 0]} rotation-x={Math.PI / 2}>
           <cylinderGeometry args={[0.05, 0.05, 0.5, 14]} />
-          <Toon color={STEEL} />
+          <Toon color={STEEL} surface="metal" />
           <Ink />
         </mesh>
       ))}
@@ -67,18 +67,18 @@ function DrumRoaster() {
     <group position={[2.3, 0, -0.5]} scale={0.85}>
       <mesh position={[0, 0.35, 0]}>
         <boxGeometry args={[0.9, 0.7, 0.7]} />
-        <Toon color="#2b2b2e" />
+        <Toon color="#2b2b2e" surface="metal" />
         <Ink />
       </mesh>
       <mesh position={[0, 1.02, 0]} rotation-x={Math.PI / 2}>
         <cylinderGeometry args={[0.34, 0.34, 0.6, 24]} />
-        <Toon color={COPPER} />
+        <Toon color={COPPER} surface="copper" />
         <Ink />
       </mesh>
       {/* Front door with a glass window and a handle. */}
       <mesh position={[0, 1.02, 0.31]} rotation-x={Math.PI / 2}>
         <cylinderGeometry args={[0.3, 0.3, 0.03, 24]} />
-        <Toon color="#2b2b2e" />
+        <Toon color="#2b2b2e" surface="metal" />
       </mesh>
       <mesh position={[0, 1.02, 0.33]} rotation-x={Math.PI / 2}>
         <cylinderGeometry args={[0.14, 0.14, 0.02, 20]} />
@@ -86,12 +86,12 @@ function DrumRoaster() {
       </mesh>
       <mesh position={[0.2, 0.92, 0.36]} rotation-z={Math.PI / 2}>
         <cylinderGeometry args={[0.018, 0.018, 0.16, 8]} />
-        <Toon color={STEEL} />
+        <Toon color={STEEL} surface="metal" />
       </mesh>
       {/* Hopper of green beans on top. */}
       <mesh position={[0, 1.55, 0]}>
         <cylinderGeometry args={[0.24, 0.07, 0.36, 16]} />
-        <Toon color={STEEL} />
+        <Toon color={STEEL} surface="metal" />
         <Ink />
       </mesh>
       <mesh position={[0, 1.71, 0]}>
@@ -101,14 +101,14 @@ function DrumRoaster() {
       {/* Chimney up to the ceiling. */}
       <mesh position={[0.25, 2.6, -0.2]}>
         <cylinderGeometry args={[0.08, 0.08, 2.6, 12]} />
-        <Toon color={STEEL} />
+        <Toon color={STEEL} surface="metal" />
         <Ink />
       </mesh>
       {/* Cooling tray with stirring arms, full of dark beans. */}
       <group position={[0.68, 0.78, 0.15]}>
         <mesh>
           <cylinderGeometry args={[0.4, 0.4, 0.1, 28]} />
-          <Toon color={STEEL} />
+          <Toon color={STEEL} surface="metal" />
           <Ink />
         </mesh>
         <mesh position={[0, 0.051, 0]}>
@@ -118,12 +118,12 @@ function DrumRoaster() {
         {[0, Math.PI / 2].map((r) => (
           <mesh key={r} position={[0, 0.07, 0]} rotation-y={r + 0.4}>
             <boxGeometry args={[0.7, 0.02, 0.03]} />
-            <Toon color={STEEL} />
+            <Toon color={STEEL} surface="metal" />
           </mesh>
         ))}
         <mesh position={[0, -0.4, 0]}>
           <cylinderGeometry args={[0.05, 0.05, 0.7, 10]} />
-          <Toon color="#2b2b2e" />
+          <Toon color="#2b2b2e" surface="metal" />
         </mesh>
       </group>
       {/* Gauges on the cabinet. */}
@@ -157,12 +157,12 @@ function BeanSacks() {
         <group key={i} position={[x, y, z]} scale={s}>
           <mesh position={[0, 0.3, 0]} scale={[0.28, 0.36, 0.24]}>
             <sphereGeometry args={[1, 16, 12]} />
-            <Toon color="#c9a77c" />
+            <Toon color="#c9a77c" surface="burlap" />
             <Ink />
           </mesh>
           <mesh position={[0, 0.62, 0]}>
             <cylinderGeometry args={[0.16, 0.22, 0.08, 14]} />
-            <Toon color="#b8956a" />
+            <Toon color="#b8956a" surface="burlap" />
           </mesh>
           <mesh position={[0, 0.665, 0]} scale={[1, 0.4, 1]}>
             <sphereGeometry args={[0.15, 12, 8]} />
@@ -230,7 +230,7 @@ export default function Roastery() {
       <group position={[0, 2.08, -0.7]}>
         <mesh>
           <boxGeometry args={[2.1, 0.36, 0.05]} />
-          <Toon color="#5a3620" />
+          <Toon color="#5a3620" surface="wood" />
           <Ink />
         </mesh>
         <Label font="display" fontSize={0.2} letterSpacing={0.06} color="#f6efe2" position={[0, 0, 0.03]}>

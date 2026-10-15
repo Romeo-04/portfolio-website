@@ -16,10 +16,10 @@ import { Ink, Toon } from "@/components/cafe/kit";
 import Merged from "@/components/cafe/merged";
 import { CHARCOAL, CREAM, GREEN, GREEN_DARK, PAVEMENT, WHITE } from "@/components/cafe/palette";
 import { Label } from "@/components/cafe/text3d";
+import type { Surface } from "@/components/cafe/textures";
 
 type V3 = [number, number, number];
 
-const ASPHALT = "#5d6169";
 const CURB = "#cfc8bb";
 const ROAD_NEAR = 3.6;
 const ROAD_FAR = 10;
@@ -104,11 +104,25 @@ const DEPTH = 12;
 const WINDOW_GLASS = "#a9d6ec";
 const WINDOW_WARM = "#ffe6a6";
 
-function Box({ position, size, color, ink = false }: { position: V3; size: V3; color: string; ink?: boolean }) {
+function Box({
+  position,
+  size,
+  color,
+  ink = false,
+  surface,
+  surfaceRepeat,
+}: {
+  position: V3;
+  size: V3;
+  color: string;
+  ink?: boolean;
+  surface?: Surface;
+  surfaceRepeat?: [number, number];
+}) {
   return (
     <mesh position={position}>
       <boxGeometry args={size} />
-      <Toon color={color} />
+      <Toon color={color} surface={surface} surfaceRepeat={surfaceRepeat} />
       {ink && <Ink />}
     </mesh>
   );
@@ -131,7 +145,7 @@ function NeighbourBuilding({ b, seed }: { b: Neighbour; seed: number }) {
   return (
     <group>
       {/* The block itself, a cornice and a plinth. */}
-      <Box position={[cx, b.h / 2, -DEPTH / 2]} size={[w, b.h, DEPTH]} color={b.color} ink />
+      <Box position={[cx, b.h / 2, -DEPTH / 2]} size={[w, b.h, DEPTH]} color={b.color} surface="stucco" surfaceRepeat={[2, 3]} ink />
       <Box position={[cx, b.h - 0.15, 0.12]} size={[w + 0.25, 0.3, 0.3]} color={b.trim} />
       <Box position={[cx, 3.45, 0.06]} size={[w, 0.16, 0.14]} color={b.trim} />
       {/* Upper windows: a trim frame, glass (some lit warm) and a sill. */}
@@ -152,7 +166,7 @@ function NeighbourBuilding({ b, seed }: { b: Neighbour; seed: number }) {
           </mesh>
           <mesh position={[0, 2.0, 0]}>
             <coneGeometry args={[0.8, 0.5, 14]} />
-            <Toon color={CHARCOAL} />
+            <Toon color={CHARCOAL} surface="metal" />
           </mesh>
           {[-0.45, 0.45].map((x) => (
             <Box key={x} position={[x, 0.2, 0]} size={[0.08, 0.4, 0.08]} color={CHARCOAL} />
@@ -179,6 +193,7 @@ function NeighbourBuilding({ b, seed }: { b: Neighbour; seed: number }) {
                 position={[-(w - 0.4) / 2 + ((w - 0.4) / stripes) * (i + 0.5), 0, 0]}
                 size={[(w - 0.4) / stripes, 0.06, 1.15]}
                 color={b.shop!.awning[i % 2]}
+                surface="canvas"
               />
             ))}
           </group>
@@ -229,7 +244,7 @@ function Skyline() {
     <group>
       {towers.map((t, i) => (
         <group key={i} position={[t.x, 0, t.z]}>
-          <Box position={[0, t.h / 2, 0]} size={[t.w, t.h, t.d]} color={t.color} />
+          <Box position={[0, t.h / 2, 0]} size={[t.w, t.h, t.d]} color={t.color} surface="stucco" surfaceRepeat={[2, 4]} />
           {/* Bands of windows read as floors from far away. */}
           {Array.from({ length: Math.floor((t.h - 3) / 3) }, (_, f) => (
             <Box key={f} position={[0, 3 + f * 3, t.d / 2 + 0.02]} size={[t.w - 0.8, 0.9, 0.04]} color="#eef6fb" />
@@ -246,13 +261,13 @@ function StreetLamp({ x, z }: { x: number; z: number }) {
     <group position={[x, 0, z]}>
       <mesh position={[0, 2.1, 0]}>
         <cylinderGeometry args={[0.06, 0.09, 4.2, 10]} />
-        <Toon color={CHARCOAL} />
+        <Toon color={CHARCOAL} surface="metal" />
         <Ink />
       </mesh>
-      <Box position={[0, 4.15, -0.3]} size={[0.08, 0.08, 0.7]} color={CHARCOAL} />
+      <Box position={[0, 4.15, -0.3]} size={[0.08, 0.08, 0.7]} color={CHARCOAL} surface="metal" />
       <mesh position={[0, 4.0, -0.6]}>
         <coneGeometry args={[0.28, 0.3, 12]} />
-        <Toon color={CHARCOAL} />
+        <Toon color={CHARCOAL} surface="metal" />
       </mesh>
       <mesh position={[0, 3.86, -0.6]}>
         <sphereGeometry args={[0.12, 10, 8]} />
@@ -271,7 +286,7 @@ function Tree({ x, z, scale = 1 }: { x: number; z: number; scale?: number }) {
       </mesh>
       <mesh position={[0, 1.3, 0]}>
         <cylinderGeometry args={[0.1, 0.15, 2.6, 8]} />
-        <Toon color="#7a5236" />
+        <Toon color="#7a5236" surface="wood" />
         <Ink />
       </mesh>
       {(
@@ -284,7 +299,7 @@ function Tree({ x, z, scale = 1 }: { x: number; z: number; scale?: number }) {
       ).map(([px, py, pz, r, c], i) => (
         <mesh key={i} position={[px, py, pz]}>
           <icosahedronGeometry args={[r, 1]} />
-          <Toon color={c} />
+          <Toon color={c} surface="foliage" />
           <Ink />
         </mesh>
       ))}
@@ -317,20 +332,20 @@ function Ground() {
       {/* Pavement under everything, out to the horizon. */}
       <mesh rotation-x={-Math.PI / 2} position={[0, -0.01, -10]}>
         <planeGeometry args={[160, 120]} />
-        <Toon color="#d8d1c4" />
+        <Toon color="#d8d1c4" surface="concrete" surfaceRepeat={[53, 40]} />
       </mesh>
       {/* Café-side sidewalk, curbs, road and the far sidewalk. */}
       <mesh rotation-x={-Math.PI / 2} position={[0, 0.001, ROAD_NEAR / 2]}>
         <planeGeometry args={[120, ROAD_NEAR]} />
-        <Toon color={PAVEMENT} />
+        <Toon color={PAVEMENT} surface="concrete" surfaceRepeat={[40, 1.2]} />
       </mesh>
       <mesh rotation-x={-Math.PI / 2} position={[0, 0.002, (ROAD_NEAR + ROAD_FAR) / 2]}>
         <planeGeometry args={[120, ROAD_FAR - ROAD_NEAR]} />
-        <Toon color={ASPHALT} />
+        <Toon color="#ffffff" surface="asphalt" surfaceRepeat={[30, 1.6]} />
       </mesh>
       <mesh rotation-x={-Math.PI / 2} position={[0, 0.001, ROAD_FAR + 6]}>
         <planeGeometry args={[120, 12]} />
-        <Toon color={PAVEMENT} />
+        <Toon color={PAVEMENT} surface="concrete" surfaceRepeat={[40, 4]} />
       </mesh>
       <Box position={[0, 0.07, ROAD_NEAR]} size={[120, 0.14, 0.2]} color={CURB} />
       <Box position={[0, 0.07, ROAD_FAR]} size={[120, 0.14, 0.2]} color={CURB} />

@@ -70,7 +70,7 @@ export default function MenuBoard() {
     <group position={BOARD}>
       <mesh>
         <boxGeometry args={[3.4, 2.2, 0.08]} />
-        <Toon color={OAK_DARK} />
+        <Toon color={OAK_DARK} surface="wood" />
         <Ink />
       </mesh>
       <mesh position={[0, 0, 0.05]}>

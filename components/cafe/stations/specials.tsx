@@ -114,19 +114,19 @@ export default function Specials({ items }: { items: SpecialItem[] }) {
       {/* Carcass: back, sides, top and shelf boards. */}
       <mesh position={[0, HEIGHT / 2, -DEPTH + 0.02]}>
         <boxGeometry args={[WIDTH, HEIGHT, 0.04]} />
-        <Toon color={CHARCOAL} />
+        <Toon color={CHARCOAL} surface="wood" />
       </mesh>
       {[-WIDTH / 2, WIDTH / 2].map((x) => (
         <mesh key={x} position={[x, HEIGHT / 2, -DEPTH / 2]}>
           <boxGeometry args={[0.06, HEIGHT, DEPTH]} />
-          <Toon color={CHARCOAL} />
+          <Toon color={CHARCOAL} surface="wood" />
           <Ink />
         </mesh>
       ))}
       {[...BOARDS, HEIGHT].map((y) => (
         <mesh key={y} position={[0, y, -DEPTH / 2]}>
           <boxGeometry args={[WIDTH, 0.04, DEPTH]} />
-          <Toon color={CHARCOAL} />
+          <Toon color={CHARCOAL} surface="wood" />
         </mesh>
       ))}
 
@@ -141,7 +141,7 @@ export default function Specials({ items }: { items: SpecialItem[] }) {
         <group ref={soldOut} position={[0, rowY + 0.2, 0.06]} visible={false}>
           <mesh>
             <planeGeometry args={[1.5, 0.3]} />
-            <Toon color={CHARCOAL} />
+            <Toon color={CHARCOAL} surface="wood" />
           </mesh>
           <Label font="chalk" fontSize={0.1} color="#f6efe2" position={[0, 0, 0.005]}>
             Sold out — check back soon

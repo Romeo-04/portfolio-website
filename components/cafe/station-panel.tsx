@@ -120,7 +120,6 @@ function content(id: StationId, specials: SpecialItem[], reduced: boolean): { ey
                 Résumé ↗
               </a>
             </div>
-            <p className="panel-hint">Scroll to walk through the café.</p>
           </>
         ),
       };

@@ -6,6 +6,7 @@ import SceneBoundary from "@/components/cafe/scene-boundary";
 import Hud from "@/components/cafe/hud";
 import Intro from "@/components/cafe/intro";
 import ProjectSheet from "@/components/cafe/project-sheet";
+import ScrollCue from "@/components/cafe/scroll-cue";
 import StationPanel from "@/components/cafe/station-panel";
 import type { SpecialItem } from "@/components/cafe/stations/specials";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
@@ -189,6 +190,7 @@ export default function CafeShell({ children, specials }: { children: ReactNode;
       </button>
       <Hud reduced={reduced} />
       {!introActive && <StationPanel specials={specials} reduced={reduced} />}
+      {!introActive && <ScrollCue reduced={reduced} />}
       <aside
         ref={asideRef}
         tabIndex={-1}

@@ -77,7 +77,7 @@ export default function Wall() {
           {/* Moulding, cream mat, and an accent band like a print. */}
           <mesh position={[0, -0.3, 0]}>
             <boxGeometry args={[1.05, 0.62, 0.05]} />
-            <Toon color={FRAME_COLORS[a.tier]} />
+            <Toon color={FRAME_COLORS[a.tier]} surface={a.tier === "bronze" ? "wood" : "metal"} />
             <Ink />
           </mesh>
           <mesh position={[0, -0.3, 0.027]}>

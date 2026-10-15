@@ -11,7 +11,7 @@
 // ============================================================
 
 import { Ink, Toon } from "@/components/cafe/kit";
-import { useCafeTexture } from "@/components/cafe/textures";
+import { useCafeTexture, type Surface } from "@/components/cafe/textures";
 import { BRASS, CEDAR_TINT, CHARCOAL, GLASS, OAK, OAK_DARK, TERRACOTTA, WHITE } from "@/components/cafe/palette";
 
 type V3 = [number, number, number];
@@ -20,11 +20,32 @@ const JAR_COLORS = ["#e4572e", "#f3a712", "#8cb369", "#669bbc", "#f0c987", "#bc4
 const CHROME = "#e6e9ec";
 const STEEL = "#b9bfc5";
 
-function Part({ position, size, color, ink = false, rotation }: { position: V3; size: V3; color: string; ink?: boolean; rotation?: V3 }) {
+/** Metals get brushed metal, woods get grain; everything else stays plain. */
+function surfaceFor(color: string): Surface | undefined {
+  if (color === CHROME || color === STEEL || color === BRASS || color === CHARCOAL) return "metal";
+  if (color === OAK || color === OAK_DARK) return "wood";
+  return undefined;
+}
+
+function Part({
+  position,
+  size,
+  color,
+  ink = false,
+  rotation,
+  surface,
+}: {
+  position: V3;
+  size: V3;
+  color: string;
+  ink?: boolean;
+  rotation?: V3;
+  surface?: Surface;
+}) {
   return (
     <mesh position={position} rotation={rotation}>
       <boxGeometry args={size} />
-      <Toon color={color} />
+      <Toon color={color} surface={surface ?? surfaceFor(color)} />
       {ink && <Ink />}
     </mesh>
   );
@@ -38,6 +59,7 @@ function Cyl({
   rTop,
   ink = false,
   rotation,
+  surface,
 }: {
   position: V3;
   r: number;
@@ -46,11 +68,12 @@ function Cyl({
   rTop?: number;
   ink?: boolean;
   rotation?: V3;
+  surface?: Surface;
 }) {
   return (
     <mesh position={position} rotation={rotation}>
       <cylinderGeometry args={[rTop ?? r, r, h, 18]} />
-      <Toon color={color} />
+      <Toon color={color} surface={surface ?? surfaceFor(color)} />
       {ink && <Ink />}
     </mesh>
   );
@@ -242,7 +265,7 @@ export default function BrewBar() {
     <group>
       <mesh position={[5.6, 0.55, -2.8]}>
         <boxGeometry args={[0.8, 1.1, 3.8]} />
-        <Toon color={OAK_DARK} />
+        <Toon color={OAK_DARK} surface="wood" />
         <Ink />
       </mesh>
       {/* Wood slats on the customer side, and a dark kick plate. */}

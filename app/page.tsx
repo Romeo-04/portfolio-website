@@ -9,7 +9,7 @@ export default async function Home() {
   // getGithubRepos already drops githubExclude; here we only hide drinks.
   const specials = selectSpecials(repos, drinkRepoNames(projectsData));
   return (
-    <CafeShell specials={specials.map((r) => ({ id: r.id, name: r.displayName, language: r.language }))}>
+    <CafeShell specials={specials.map((r) => ({ id: r.id, name: r.displayName, language: r.language, url: r.url }))}>
       <QuickOrderMenu specials={specials} />
     </CafeShell>
   );

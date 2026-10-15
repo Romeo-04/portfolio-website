@@ -62,13 +62,20 @@ function Ticket({ project }: { project: Project }) {
       <div className="min-w-0">
         <h3 className="text-lg font-bold">{project.title}</h3>
         <p className="font-receipt text-xs uppercase">{project.role} · {project.category}</p>
-        <p className="mt-1 text-sm">{project.pitch}</p>
-        <ul className="mt-1 list-disc pl-5 text-sm">
-          {project.description.map((line) => (
-            <li key={line}>{line}</li>
-          ))}
-        </ul>
+        <p className="mt-1 text-sm leading-relaxed">{project.pitch}</p>
         <p className="font-receipt mt-1 text-xs">{project.techStack.join(" · ")}</p>
+        {/* Highlights stay in the page for search and no-JS readers, folded away. */}
+        <details className="mt-1 text-sm">
+          <summary className="cursor-pointer text-xs text-[#7a5a44]">Highlights</summary>
+          <ul className="mt-1 list-disc pl-5">
+            {project.description.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+        </details>
+        <button type="button" data-project={project.slug} className="ticket-open">
+          Open project →
+        </button>
         <p className="mt-2 flex gap-3 text-sm underline">
           {project.demoUrl && (
             <a

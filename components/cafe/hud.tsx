@@ -11,6 +11,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { offTheClock } from "@/data/portfolio";
+import { Cup } from "@/components/ui/icons";
 import { addStamp, isComplete, loadStamps, saveStamps, stampFor } from "@/lib/cafe/loyalty";
 import { getProgress, goTo, isGliding, subscribeProgress } from "@/lib/cafe/scroll";
 import { STATIONS, type StationId } from "@/lib/cafe/stations";
@@ -72,7 +73,7 @@ export default function Hud({ reduced }: { reduced: boolean }) {
               key={s.id}
               className={`grid h-6 w-6 place-items-center rounded-full border-2 border-[#2b2b2e] text-[11px] transition-transform ${stamps.includes(s.id) ? "scale-110 bg-[#e4572e] text-[#fff8ec]" : "bg-[#efe3cf]"}`}
             >
-              {stamps.includes(s.id) ? "☕" : ""}
+              {stamps.includes(s.id) && <Cup size={14} />}
             </span>
           ))}
         </span>

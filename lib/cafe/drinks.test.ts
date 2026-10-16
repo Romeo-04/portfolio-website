@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { MAX_LAYERS, drinkFor } from "@/lib/cafe/drinks";
+import { MAX_LAYERS, drinkFor, dustFor } from "@/lib/cafe/drinks";
 
 describe("drinkFor", () => {
   it("maps known technologies to named layers in stack order", () => {
@@ -85,5 +85,17 @@ describe("drinkFor overrides", () => {
     });
     expect(drink.cup).toBe("cup");
     expect(drink.layers.map((l) => l.name)).toEqual(["Espresso", "Steamed milk"]);
+  });
+});
+
+describe("toppings", () => {
+  it("whips glasses and foams mugs", () => {
+    expect(drinkFor({ title: "A", techStack: ["Python", "React", "Vite"] }).topping.kind).toBe("whip");
+    expect(drinkFor({ title: "B", techStack: ["Python"] }).topping.kind).toBe("foam");
+  });
+
+  it("dusts with the first flavour layer, else cocoa", () => {
+    expect(dustFor([{ name: "Espresso", color: "#000" }, { name: "Cinnamon", color: "#111" }])).toBe("#a0522d");
+    expect(dustFor([{ name: "Espresso", color: "#000" }])).toBe("#5a3620");
   });
 });

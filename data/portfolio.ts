@@ -171,17 +171,28 @@ export const skillsData: SkillCategory[] = [
 ];
 
 // --- Experience / Leadership ---
+/** Organisation logos in public/logos; aspect is width / height. */
+export const ORG_LOGOS = {
+  eden: { src: "/logos/eden.webp", alt: "EDEN", aspect: 200 / 66, dark: true },
+  feu: { src: "/logos/feu.webp", alt: "FEU Institute of Technology", aspect: 262 / 320, dark: false },
+  acm: { src: "/logos/acm.webp", alt: "ACM Student Chapter", aspect: 1, dark: false },
+} as const;
+export type OrgLogo = keyof typeof ORG_LOGOS;
+
 export interface Experience {
   title: string;
   organization: string;
   period: string;
   description: string[];
+  /** Logos shown on the roastery plaque and in the panel, left to right. */
+  logos?: OrgLogo[];
 }
 
 export const experienceData: Experience[] = [
   {
     title: "Software Engineering Intern",
     organization: "ED3N Ventures",
+    logos: ["eden"],
     period: "June 2026 – August 2026", // e.g., "June 2026 – August 2026" — placed first, reorder if not most recent
     description: [
       "Contributed to the design and development of full-stack features using Next.js, TypeScript, and PostgreSQL under the guidance of senior engineers",
@@ -193,6 +204,7 @@ export const experienceData: Experience[] = [
   {
     title: "Lead Developer — ACMX Web Dev Team",
     organization: "FEU Tech ACM Student Chapter",
+    logos: ["feu", "acm"],
     period: "August 2025 – Present",
     description: [
       "Lead a team of 7 developers building and maintaining the organization's web platform",
@@ -204,6 +216,7 @@ export const experienceData: Experience[] = [
   {
     title: "Director for Academics",
     organization: "FEU Tech ACM Student Chapter",
+    logos: ["feu", "acm"],
     period: "August 2024 – August 2025",
     description: [
       "Led the academics committee overseeing all academic-related events and initiatives",
@@ -600,3 +613,66 @@ export interface OffTheClock {
 }
 
 export const offTheClock: OffTheClock | null = null;
+
+// --- Testimonials ---
+// People who've worked with Jhezra. Each one stands outside the café with a
+// coffee; clicking them opens their card. Replace the placeholders with real
+// testimonials (and set placeholder: false): name, role, organisation, how
+// you worked together, their words, a photo in public/testimonials, and
+// links to their portfolio or LinkedIn. `look` dresses their 3D figure.
+export interface Testimonial {
+  name: string;
+  role: string;
+  organization: string;
+  /** How they know Jhezra, e.g. "Worked together on the ACMX web team". */
+  relationship: string;
+  quote: string;
+  /** Square photo in public/testimonials, e.g. "/testimonials/jane.webp". */
+  photo?: string;
+  portfolioUrl?: string;
+  linkedinUrl?: string;
+  /** Their usual order, shown on the cup they're holding. */
+  order: string;
+  look: {
+    skin: string;
+    hair: string;
+    shirt: string;
+    pants: string;
+    style: "short" | "bun" | "long" | "cap";
+  };
+  /** True until a real testimonial replaces this entry. */
+  placeholder?: boolean;
+}
+
+export const testimonialsData: Testimonial[] = [
+  {
+    name: "Testimonial coming soon",
+    role: "Teammate",
+    organization: "FEU Tech ACM Student Chapter",
+    relationship: "Reserved for someone from the ACMX web team",
+    quote: "This spot is saved for a teammate's words. The barista is collecting testimonials and this one is still brewing.",
+    order: "Caramel latte",
+    look: { skin: "#c68863", hair: "#2a1d17", shirt: "#669bbc", pants: "#2b2b2e", style: "bun" },
+    placeholder: true,
+  },
+  {
+    name: "Testimonial coming soon",
+    role: "Mentor",
+    organization: "ED3N Ventures",
+    relationship: "Reserved for a mentor from the internship",
+    quote: "This spot is saved for a mentor's words. The barista is collecting testimonials and this one is still brewing.",
+    order: "Flat white",
+    look: { skin: "#f1c7a5", hair: "#5a3a22", shirt: "#8cb369", pants: "#3d405b", style: "short" },
+    placeholder: true,
+  },
+  {
+    name: "Testimonial coming soon",
+    role: "Collaborator",
+    organization: "Hackathon team",
+    relationship: "Reserved for a hackathon teammate",
+    quote: "This spot is saved for a collaborator's words. The barista is collecting testimonials and this one is still brewing.",
+    order: "Iced matcha",
+    look: { skin: "#8d5a3b", hair: "#111111", shirt: "#e4572e", pants: "#29335c", style: "cap" },
+    placeholder: true,
+  },
+];

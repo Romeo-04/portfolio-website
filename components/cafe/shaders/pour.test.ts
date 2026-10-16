@@ -6,6 +6,7 @@ import { MAX_LAYERS, type Drink } from "@/lib/cafe/drinks";
 const drink: Drink = {
   cup: "glass",
   mark: "K",
+  topping: { kind: "whip", dust: "#5a3620" },
   layers: [
     { name: "Espresso", color: "#3b2314" },
     { name: "Steamed milk", color: "#efe1cc" },

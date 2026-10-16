@@ -7,11 +7,14 @@ import Hud from "@/components/cafe/hud";
 import Intro from "@/components/cafe/intro";
 import ProjectSheet from "@/components/cafe/project-sheet";
 import ScrollCue from "@/components/cafe/scroll-cue";
+import TestimonialSheet from "@/components/cafe/testimonial-sheet";
 import StationPanel from "@/components/cafe/station-panel";
 import type { SpecialItem } from "@/components/cafe/stations/specials";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { ArrowRight, Cup } from "@/components/ui/icons";
 import { detectWebGL, isPhoneViewport, resolveMode } from "@/lib/cafe/mode";
 import { openProject, originOf } from "@/lib/cafe/project-sheet";
+import { openTestimonial } from "@/lib/cafe/testimonial-sheet";
 import { goTo, pauseScroll, startScroll } from "@/lib/cafe/scroll";
 import { STATIONS, menuTargetForHash, resolveHash } from "@/lib/cafe/stations";
 
@@ -126,6 +129,12 @@ export default function CafeShell({ children, specials }: { children: ReactNode;
       openProject(opener.dataset.project, originOf(opener));
       return;
     }
+    const regular = (e.target as HTMLElement).closest<HTMLElement>("[data-testimonial]");
+    if (regular?.dataset.testimonial) {
+      e.preventDefault();
+      openTestimonial(Number(regular.dataset.testimonial), originOf(regular));
+      return;
+    }
     const link = (e.target as HTMLElement).closest("a");
     const href = link?.getAttribute("href");
     if (!href?.startsWith("#")) return;
@@ -147,7 +156,7 @@ export default function CafeShell({ children, specials }: { children: ReactNode;
       <main onClick={onLinkClick} aria-label="Quick Order menu" className="mx-auto max-w-2xl px-5 py-10">
         {mode === "closed" && (
           <p role="status" className="font-display mb-6 text-center text-2xl">
-            The café is closed today ☕
+            The café is closed today <Cup size={22} />
           </p>
         )}
         {caps?.phone && caps.webgl && (
@@ -156,11 +165,12 @@ export default function CafeShell({ children, specials }: { children: ReactNode;
             onClick={() => setEntered(true)}
             className="game-button game-button-accent mb-6 w-full px-4 py-3"
           >
-            Step inside the café →
+            Step inside the café <ArrowRight />
           </button>
         )}
         <div className="rounded-lg bg-[#f6ead8] p-6">{children}</div>
         <ProjectSheet reduced={reduced} />
+        <TestimonialSheet reduced={reduced} />
       </main>
     );
   }
@@ -205,6 +215,7 @@ export default function CafeShell({ children, specials }: { children: ReactNode;
       </div>
       <Intro reduced={reduced} ready={sceneReady} onActiveChange={onIntroActive} />
       <ProjectSheet reduced={reduced} />
+      <TestimonialSheet reduced={reduced} />
     </div>
   );
 }

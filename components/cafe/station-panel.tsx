@@ -13,21 +13,26 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import type { SpecialItem } from "@/components/cafe/stations/specials";
+import DrinkIllustration from "@/components/menu/drink-illustration";
+import { TestimonialAvatar } from "@/components/cafe/testimonial-sheet";
 import {
   aboutData,
   achievementsData,
   certificationsData,
   experienceData,
+  testimonialsData,
+  ORG_LOGOS,
   personalInfo,
   projectsData,
   skillsData,
   tierLabels,
   type SkillTier,
 } from "@/data/portfolio";
-import { drinkFor } from "@/lib/cafe/drinks";
 import { openProject, originOf } from "@/lib/cafe/project-sheet";
+import { openTestimonial } from "@/lib/cafe/testimonial-sheet";
 import { getProgress, goTo, subscribeProgress } from "@/lib/cafe/scroll";
 import { setViewInset } from "@/lib/cafe/view-inset";
+import { ArrowRight, Code, Document, External, Mail } from "@/components/ui/icons";
 import { DWELL, STATIONS, stationIndexAt, stationProgress, type StationId } from "@/lib/cafe/stations";
 
 /** The panel's width plus its margin, in CSS px (see .station-panel). */
@@ -63,7 +68,6 @@ function Chips({ items }: { items: string[] }) {
 
 function ProjectCard({ slug }: { slug: string }) {
   const p = projectsData.find((x) => x.slug === slug)!;
-  const drink = drinkFor(p);
   return (
     <button
       type="button"
@@ -72,17 +76,13 @@ function ProjectCard({ slug }: { slug: string }) {
       aria-label={`Open ${p.title}`}
     >
       <span aria-hidden className="panel-swatch">
-        {drink.layers.map((l) => (
-          <span key={l.name} style={{ background: l.color }} />
-        ))}
+        <DrinkIllustration project={p} size={40} />
       </span>
       <span className="min-w-0 flex-1 text-left">
         <span className="block font-semibold text-[#2b1a10]">{p.title}</span>
         <span className="mt-0.5 block text-[13px] leading-snug text-[#6b5444]">{p.pitch}</span>
       </span>
-      <span aria-hidden className="panel-arrow">
-        →
-      </span>
+      <ArrowRight className="panel-arrow" />
     </button>
   );
 }
@@ -114,12 +114,37 @@ function content(id: StationId, specials: SpecialItem[], reduced: boolean): { ey
             </dl>
             <div className="mt-5 flex flex-wrap gap-2">
               <button type="button" className="panel-action panel-action-primary" onClick={() => goTo("brew-bar", { immediate: reduced })}>
-                See my projects
+                See my projects <ArrowRight />
               </button>
               <a href={personalInfo.resumeUrl} target="_blank" rel="noopener noreferrer" className="panel-action">
-                Résumé ↗
+                <Document /> Résumé
               </a>
             </div>
+            {testimonialsData.length > 0 && (
+              <div className="mt-6">
+                <Label>Regulars outside</Label>
+                <div className="panel-regulars mt-2">
+                  {testimonialsData.map((t, i) => (
+                    <button
+                      key={`${t.name}-${i}`}
+                      type="button"
+                      onClick={(e) => openTestimonial(i, originOf(e.currentTarget))}
+                      className="panel-project group"
+                      aria-label={`Read ${t.placeholder ? "the reserved testimonial" : `${t.name}'s testimonial`}`}
+                    >
+                      <TestimonialAvatar t={t} size={38} />
+                      <span className="min-w-0 flex-1 text-left">
+                        <span className="block font-semibold text-[#2b1a10]">{t.name}</span>
+                        <span className="mt-0.5 block text-[13px] leading-snug text-[#6b5444]">
+                          {t.role} · {t.organization}
+                        </span>
+                      </span>
+                      <ArrowRight className="panel-arrow" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </>
         ),
       };
@@ -201,6 +226,21 @@ function content(id: StationId, specials: SpecialItem[], reduced: boolean): { ey
           <ol className="panel-timeline">
             {experienceData.map((e) => (
               <li key={`${e.title}-${e.organization}`}>
+                {e.logos && (
+                  <span className="panel-logos">
+                    {e.logos.map((k) => (
+                      // eslint-disable-next-line @next/next/no-img-element -- tiny static logos
+                      <img
+                        key={k}
+                        src={ORG_LOGOS[k].src}
+                        alt={ORG_LOGOS[k].alt}
+                        height={26}
+                        width={Math.round(26 * ORG_LOGOS[k].aspect)}
+                        className={ORG_LOGOS[k].dark ? "is-dark" : undefined}
+                      />
+                    ))}
+                  </span>
+                )}
                 <p className="font-semibold text-[#2b1a10]">{e.title}</p>
                 <p className="panel-meta">
                   {e.organization} · {e.period}
@@ -237,7 +277,7 @@ function content(id: StationId, specials: SpecialItem[], reduced: boolean): { ey
                   {specials.map((r) => (
                     <li key={r.id}>
                       <a href={r.url} target="_blank" rel="noopener noreferrer" className="font-semibold underline-offset-2 hover:underline">
-                        {r.name} ↗
+                        {r.name} <External size={13} className="opacity-60" />
                       </a>
                       {r.language && <span className="panel-meta">{r.language}</span>}
                     </li>
@@ -257,17 +297,17 @@ function content(id: StationId, specials: SpecialItem[], reduced: boolean): { ey
             <p className="panel-text">Open to {aboutData.currently.aimingFor.toLowerCase()}. The fastest way to reach me is email.</p>
             <div className="mt-4 flex flex-col gap-2">
               <a href={`mailto:${personalInfo.email}`} className="panel-action panel-action-primary">
-                {personalInfo.email}
+                <Mail /> {personalInfo.email}
               </a>
               <div className="flex flex-wrap gap-2">
                 <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="panel-action">
-                  GitHub ↗
+                  <Code /> GitHub
                 </a>
                 <a href={personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="panel-action">
-                  LinkedIn ↗
+                  <External /> LinkedIn
                 </a>
                 <a href={personalInfo.resumeUrl} target="_blank" rel="noopener noreferrer" className="panel-action">
-                  Résumé ↗
+                  <Document /> Résumé
                 </a>
               </div>
             </div>

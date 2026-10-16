@@ -16,10 +16,20 @@ export interface DrinkLayer {
   color: string;
 }
 
+/**
+ * What sits on top: tall glasses get whipped cream with a drizzle, mugs and
+ * cups get milk foam with latte art. The dust is the powder on top.
+ */
+export interface Topping {
+  kind: "whip" | "foam";
+  dust: string;
+}
+
 export interface Drink {
   cup: CupType;
   layers: DrinkLayer[];
   mark: string;
+  topping: Topping;
 }
 
 export const MAX_LAYERS = 4;
@@ -73,9 +83,26 @@ export function drinkFor(
   const override = project.drink?.layers;
   const finalLayers =
     override && override.length > 0 ? capLayers(override) : derived;
+  const cup = project.drink?.cup ?? (finalLayers.length >= 3 ? "glass" : "mug");
   return {
-    cup: project.drink?.cup ?? (finalLayers.length >= 3 ? "glass" : "mug"),
+    cup,
     layers: finalLayers,
     mark: project.title.charAt(0).toUpperCase(),
+    topping: { kind: cup === "glass" ? "whip" : "foam", dust: dustFor(finalLayers) },
   };
+}
+
+const DUSTS: Record<string, string> = {
+  Cinnamon: "#a0522d",
+  Matcha: "#8bab5a",
+  Pistachio: "#a8c08a",
+  Caramel: "#c8873a",
+  Honey: "#e0a93b",
+};
+const COCOA = "#5a3620";
+
+/** Powder on top: the first flavour layer that has one, else cocoa. */
+export function dustFor(layers: DrinkLayer[]): string {
+  for (const l of layers) if (DUSTS[l.name]) return DUSTS[l.name];
+  return COCOA;
 }

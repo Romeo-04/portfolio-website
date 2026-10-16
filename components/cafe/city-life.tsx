@@ -17,7 +17,7 @@ import { useFrame } from "@react-three/fiber";
 import { useCallback, useMemo, useRef, type ReactNode } from "react";
 import { Quaternion, Vector3, type Group } from "three";
 import { Ink, Toon } from "@/components/cafe/kit";
-import { CHARCOAL, TERRACOTTA, WHITE } from "@/components/cafe/palette";
+import { CHARCOAL, WHITE } from "@/components/cafe/palette";
 import { getProgress } from "@/lib/cafe/scroll";
 import { stationIndexAt } from "@/lib/cafe/stations";
 
@@ -34,7 +34,7 @@ function streetInView(): boolean {
   return stationIndexAt(getProgress()) === 0;
 }
 
-function Blob({ radius = 0.3 }: { radius?: number }) {
+export function Blob({ radius = 0.3 }: { radius?: number }) {
   return (
     <mesh rotation-x={-Math.PI / 2} position={[0, 0.012, 0]}>
       <circleGeometry args={[radius, 16]} />
@@ -45,7 +45,7 @@ function Blob({ radius = 0.3 }: { radius?: number }) {
 
 // ---------------------------------------------------------------- people
 
-type Look = {
+export type Look = {
   skin: string;
   hair: string;
   shirt: string;
@@ -54,7 +54,7 @@ type Look = {
   coffee?: boolean;
 };
 
-type Limbs = {
+export type Limbs = {
   legL: Group | null;
   legR: Group | null;
   armL: Group | null;
@@ -63,9 +63,9 @@ type Limbs = {
 };
 
 /** A chibi person facing +z, about 1.75 m tall. Limbs are exposed for posing. */
-type LimbRig = (key: keyof Limbs, g: Group | null) => void;
+export type LimbRig = (key: keyof Limbs, g: Group | null) => void;
 
-function Person({ look, rig, seated = false }: { look: Look; rig: LimbRig; seated?: boolean }) {
+export function Person({ look, rig, seated = false }: { look: Look; rig: LimbRig; seated?: boolean }) {
   const set = (key: keyof Limbs) => (g: Group | null) => rig(key, g);
   return (
     <group ref={set("body")}>
@@ -98,13 +98,22 @@ function Person({ look, rig, seated = false }: { look: Look; rig: LimbRig; seate
           </mesh>
           {look.coffee && side > 0 && (
             <group position={[0, -0.45, 0.06]}>
+              {/* A café cup: white with a kraft sleeve and a dark lid. */}
               <mesh>
-                <cylinderGeometry args={[0.05, 0.04, 0.14, 10]} />
+                <cylinderGeometry args={[0.05, 0.04, 0.14, 12]} />
                 <Toon color={WHITE} />
               </mesh>
               <mesh>
-                <cylinderGeometry args={[0.052, 0.046, 0.06, 10]} />
-                <Toon color={TERRACOTTA} />
+                <cylinderGeometry args={[0.053, 0.047, 0.06, 12]} />
+                <Toon color="#c99a66" surface="canvas" />
+              </mesh>
+              <mesh position={[0, 0.078, 0]}>
+                <cylinderGeometry args={[0.054, 0.052, 0.018, 12]} />
+                <Toon color="#3b2314" />
+              </mesh>
+              <mesh position={[0, 0, 0.049]} rotation-x={-0.07}>
+                <circleGeometry args={[0.017, 12]} />
+                <meshBasicMaterial color="#3b2314" />
               </mesh>
             </group>
           )}

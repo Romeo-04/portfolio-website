@@ -75,7 +75,7 @@ export default function TestimonialSheet({ reduced }: { reduced: boolean }) {
               <h2 id="testimonial-title" className="font-display mt-0.5 text-3xl leading-tight">
                 {t.name}
               </h2>
-              <p className="text-sm text-[#7a5a44]">
+              <p className="text-sm text-[var(--ink-muted)]">
                 {t.role} · {t.organization}
               </p>
             </div>
@@ -118,7 +118,7 @@ export default function TestimonialSheet({ reduced }: { reduced: boolean }) {
             <button type="button" onClick={() => stepTestimonial(-1)} className="sheet-nav" aria-label="Previous testimonial">
               <ArrowLeft className="shrink-0" /> Previous
             </button>
-            <span className="text-xs tabular-nums text-[#7a5a44]">
+            <span className="text-xs tabular-nums text-[var(--ink-muted)]">
               {shown.index + 1} / {n}
             </span>
             <button type="button" onClick={() => stepTestimonial(1)} className="sheet-nav justify-end" aria-label="Next testimonial">

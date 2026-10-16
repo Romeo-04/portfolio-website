@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { cupFill, layerIndexAt } from "@/lib/cafe/pour";
-import { DWELL, STATIONS, stationRange } from "@/lib/cafe/stations";
+import { POUR_SHARE, cupFill, layerIndexAt } from "@/lib/cafe/pour";
+import { DWELL, STATIONS, stationAnchor, stationRange } from "@/lib/cafe/stations";
 
 const brewIndex = STATIONS.findIndex((s) => s.id === "brew-bar");
 const [start, end] = stationRange(brewIndex);
-/** progress at a fraction of the brew bar's dwell zone */
-const atDwell = (f: number) => start + f * DWELL * (end - start);
+/** progress at a fraction of the brew bar's pour */
+const atDwell = (f: number) => start + f * DWELL * POUR_SHARE * (end - start);
 
 describe("cupFill", () => {
   it("is empty before the brew bar and full after its dwell", () => {
@@ -29,6 +29,11 @@ describe("cupFill", () => {
     const again = cupFill(later, 2, 4);
     expect(first).toBe(again);
     expect(back).toBeLessThan(first);
+  });
+
+  it("has every cup full where the camera rests", () => {
+    const anchor = stationAnchor("brew-bar");
+    for (let i = 0; i < 4; i++) expect(cupFill(anchor, i, 4)).toBeCloseTo(1);
   });
 
   it("handles a single cup and no cups", () => {

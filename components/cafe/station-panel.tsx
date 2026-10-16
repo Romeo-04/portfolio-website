@@ -3,12 +3,14 @@
 // ============================================================
 // STATION PANEL
 // ============================================================
-// The café is the backdrop; this is where the details are read. When the
-// camera settles at a station, a calm paper card slides in beside it with
-// that station's content in plain, readable type: the intro, about and
-// skills, projects (each opens its pop-up), the wall, experience, repos
-// and contact. It slides out while the camera glides, and the visitor can
-// fold it away to just enjoy the view.
+// The café is the backdrop; this is where the details are read. A phone
+// is held up beside the café showing the current station as a small app:
+// a status bar, an app bar with the station and a fold button, and a
+// scrolling screen with that station's content (the intro, about and
+// skills, projects that open their pop-ups, the wall, experience, repos
+// and contact). It stays up while the camera travels and can be folded
+// away to a pill to just enjoy the view. On phones it is a plain bottom
+// sheet instead, since the visitor is already holding one.
 // ============================================================
 
 import { useEffect, useState, type ReactNode } from "react";
@@ -32,20 +34,25 @@ import { openProject, originOf } from "@/lib/cafe/project-sheet";
 import { openTestimonial } from "@/lib/cafe/testimonial-sheet";
 import { getProgress, goTo, subscribeProgress } from "@/lib/cafe/scroll";
 import { setViewInset } from "@/lib/cafe/view-inset";
-import { ArrowRight, Code, Document, External, Mail } from "@/components/ui/icons";
+import { ArrowRight, Code, Document, External, Mail, Minus, Phone } from "@/components/ui/icons";
 import { STATIONS, stationIndexAt, type StationId } from "@/lib/cafe/stations";
 
-/** The panel's width plus its margin, in CSS px (see .station-panel). */
-const PANEL_SPACE = 420;
+/** The phone's width plus its left margin and a gap, in CSS px (see .station-panel). */
+const PANEL_SPACE = 388;
 
-
-function Label({ children }: { children: ReactNode }) {
-  return <p className="panel-label">{children}</p>;
+/** A labelled group on the screen. */
+function Section({ label, children }: { label?: string; children: ReactNode }) {
+  return (
+    <div className="panel-section">
+      {label && <p className="panel-label">{label}</p>}
+      {children}
+    </div>
+  );
 }
 
 function Chips({ items }: { items: string[] }) {
   return (
-    <ul className="flex flex-wrap gap-1.5">
+    <ul className="panel-chips">
       {items.map((t) => (
         <li key={t} className="panel-chip">
           {t}
@@ -58,21 +65,39 @@ function Chips({ items }: { items: string[] }) {
 function ProjectCard({ slug }: { slug: string }) {
   const p = projectsData.find((x) => x.slug === slug)!;
   return (
-    <button
-      type="button"
-      onClick={(e) => openProject(p.slug, originOf(e.currentTarget))}
-      className="panel-project group"
-      aria-label={`Open ${p.title}`}
-    >
+    <button type="button" onClick={(e) => openProject(p.slug, originOf(e.currentTarget))} className="panel-project" aria-label={`Open ${p.title}`}>
       <span aria-hidden className="panel-swatch">
-        <DrinkIllustration project={p} size={40} />
+        <DrinkIllustration project={p} size={36} />
       </span>
-      <span className="min-w-0 flex-1 text-left">
-        <span className="block font-semibold text-[#2b1a10]">{p.title}</span>
-        <span className="mt-0.5 block text-[13px] leading-snug text-[#6b5444]">{p.pitch}</span>
+      <span className="min-w-0 flex-1">
+        <span className="panel-project-title">{p.title}</span>
+        <span className="panel-project-text">{p.pitch}</span>
       </span>
       <ArrowRight className="panel-arrow" />
     </button>
+  );
+}
+
+/** Signal, Wi-Fi and battery, drawn small for the status bar. */
+function StatusIcons() {
+  return (
+    <span className="phone-icons" aria-hidden>
+      <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor">
+        <rect x="0" y="7" width="3" height="4" rx="1" />
+        <rect x="4.5" y="5" width="3" height="6" rx="1" />
+        <rect x="9" y="2.5" width="3" height="8.5" rx="1" />
+        <rect x="13.5" y="0" width="3" height="11" rx="1" />
+      </svg>
+      <svg width="15" height="11" viewBox="0 0 15 11" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+        <path d="M1.5 4a9 9 0 0 1 12 0M4 6.6a5.4 5.4 0 0 1 7 0" />
+        <circle cx="7.5" cy="9.3" r="1" fill="currentColor" stroke="none" />
+      </svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none">
+        <rect x="0.75" y="0.75" width="21" height="10.5" rx="3" stroke="currentColor" strokeOpacity="0.45" strokeWidth="1.5" />
+        <rect x="2.5" y="2.5" width="17.5" height="7" rx="1.6" fill="currentColor" />
+        <path d="M23.3 4.2v3.6" stroke="currentColor" strokeOpacity="0.45" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    </span>
   );
 }
 
@@ -101,30 +126,29 @@ function content(id: StationId, specials: SpecialItem[], reduced: boolean): { ey
                 <dd>{aboutData.currently.aimingFor}</dd>
               </div>
             </dl>
-            <div className="mt-5 flex flex-wrap gap-2">
+            <div className="panel-actions">
               <button type="button" className="panel-action panel-action-primary" onClick={() => goTo("brew-bar", { immediate: reduced })}>
-                See my projects <ArrowRight />
+                Projects <ArrowRight />
               </button>
               <a href={personalInfo.resumeUrl} target="_blank" rel="noopener noreferrer" className="panel-action">
                 <Document /> Résumé
               </a>
             </div>
             {testimonialsData.length > 0 && (
-              <div className="mt-6">
-                <Label>Regulars outside</Label>
-                <div className="panel-regulars mt-2">
+              <Section label="Regulars outside">
+                <div className="panel-stack">
                   {testimonialsData.map((t, i) => (
                     <button
                       key={`${t.name}-${i}`}
                       type="button"
                       onClick={(e) => openTestimonial(i, originOf(e.currentTarget))}
-                      className="panel-project group"
+                      className="panel-project"
                       aria-label={`Read ${t.placeholder ? "the reserved testimonial" : `${t.name}'s testimonial`}`}
                     >
-                      <TestimonialAvatar t={t} size={38} />
-                      <span className="min-w-0 flex-1 text-left">
-                        <span className="block font-semibold text-[#2b1a10]">{t.name}</span>
-                        <span className="mt-0.5 block text-[13px] leading-snug text-[#6b5444]">
+                      <TestimonialAvatar t={t} size={36} />
+                      <span className="min-w-0 flex-1">
+                        <span className="panel-project-title">{t.name}</span>
+                        <span className="panel-project-text">
                           {t.role} · {t.organization}
                         </span>
                       </span>
@@ -132,7 +156,7 @@ function content(id: StationId, specials: SpecialItem[], reduced: boolean): { ey
                     </button>
                   ))}
                 </div>
-              </div>
+              </Section>
             )}
           </>
         ),
@@ -145,15 +169,14 @@ function content(id: StationId, specials: SpecialItem[], reduced: boolean): { ey
           <>
             <p className="panel-text">{aboutData.bio[0]}</p>
             {TIERS.map((tier) => (
-              <div key={tier} className="mt-4">
-                <Label>{tierLabels[tier]}</Label>
+              <Section key={tier} label={tierLabels[tier]}>
                 <Chips
                   items={skillsData
                     .flatMap((c) => c.skills)
                     .filter((s) => s.tier === tier)
                     .map((s) => s.name)}
                 />
-              </div>
+              </Section>
             ))}
           </>
         ),
@@ -165,7 +188,7 @@ function content(id: StationId, specials: SpecialItem[], reduced: boolean): { ey
         body: (
           <>
             <p className="panel-text">Each project is a drink, layered from its stack. Open one for the full story.</p>
-            <div className="mt-3 space-y-2">
+            <div className="panel-stack">
               {projectsData
                 .filter((p) => p.featured)
                 .map((p) => (
@@ -190,8 +213,7 @@ function content(id: StationId, specials: SpecialItem[], reduced: boolean): { ey
               ))}
             </ul>
             {certificationsData.length > 0 && (
-              <div className="mt-4">
-                <Label>Certifications</Label>
+              <Section label="Certifications">
                 <ul className="panel-list">
                   {certificationsData.map((c) => (
                     <li key={c.title}>
@@ -202,7 +224,7 @@ function content(id: StationId, specials: SpecialItem[], reduced: boolean): { ey
                     </li>
                   ))}
                 </ul>
-              </div>
+              </Section>
             )}
           </>
         ),
@@ -223,20 +245,20 @@ function content(id: StationId, specials: SpecialItem[], reduced: boolean): { ey
                         key={k}
                         src={ORG_LOGOS[k].src}
                         alt={ORG_LOGOS[k].alt}
-                        height={26}
-                        width={Math.round(26 * ORG_LOGOS[k].aspect)}
+                        height={24}
+                        width={Math.round(24 * ORG_LOGOS[k].aspect)}
                         className={ORG_LOGOS[k].dark ? "is-dark" : undefined}
                       />
                     ))}
                   </span>
                 )}
-                <p className="font-semibold text-[#2b1a10]">{e.title}</p>
+                <p className="panel-project-title">{e.title}</p>
                 <p className="panel-meta">
                   {e.organization} · {e.period}
                 </p>
-                <ul className="mt-1.5 space-y-1">
+                <ul className="mt-2 grid gap-1">
                   {e.description.slice(0, 2).map((line) => (
-                    <li key={line} className="text-[13.5px] leading-snug text-[#5a4536]">
+                    <li key={line} className="panel-text">
                       {line}
                     </li>
                   ))}
@@ -252,7 +274,7 @@ function content(id: StationId, specials: SpecialItem[], reduced: boolean): { ey
         title: "More from the shelf",
         body: (
           <>
-            <div className="space-y-2">
+            <div className="panel-stack">
               {projectsData
                 .filter((p) => !p.featured)
                 .map((p) => (
@@ -260,19 +282,18 @@ function content(id: StationId, specials: SpecialItem[], reduced: boolean): { ey
                 ))}
             </div>
             {specials.length > 0 && (
-              <div className="mt-4">
-                <Label>Fresh on GitHub</Label>
+              <Section label="Fresh on GitHub">
                 <ul className="panel-list">
                   {specials.map((r) => (
                     <li key={r.id}>
-                      <a href={r.url} target="_blank" rel="noopener noreferrer" className="font-semibold underline-offset-2 hover:underline">
-                        {r.name} <External size={13} className="opacity-60" />
+                      <a href={r.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 font-semibold underline-offset-2 hover:underline">
+                        {r.name} <External size={14} className="opacity-60" />
                       </a>
                       {r.language && <span className="panel-meta">{r.language}</span>}
                     </li>
                   ))}
                 </ul>
-              </div>
+              </Section>
             )}
           </>
         ),
@@ -284,18 +305,18 @@ function content(id: StationId, specials: SpecialItem[], reduced: boolean): { ey
         body: (
           <>
             <p className="panel-text">Open to {aboutData.currently.aimingFor.toLowerCase()}. The fastest way to reach me is email.</p>
-            <div className="mt-4 flex flex-col gap-2">
-              <a href={`mailto:${personalInfo.email}`} className="panel-action panel-action-primary">
+            <div className="panel-stack">
+              <a href={`mailto:${personalInfo.email}`} className="panel-action panel-action-primary panel-action-block">
                 <Mail /> {personalInfo.email}
               </a>
-              <div className="flex flex-wrap gap-2">
-                <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="panel-action">
+              <div className="panel-stack">
+                <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="panel-action panel-action-row">
                   <Code /> GitHub
                 </a>
-                <a href={personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="panel-action">
+                <a href={personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="panel-action panel-action-row">
                   <External /> LinkedIn
                 </a>
-                <a href={personalInfo.resumeUrl} target="_blank" rel="noopener noreferrer" className="panel-action">
+                <a href={personalInfo.resumeUrl} target="_blank" rel="noopener noreferrer" className="panel-action panel-action-row">
                   <Document /> Résumé
                 </a>
               </div>
@@ -336,29 +357,37 @@ export default function StationPanel({ specials, reduced }: { specials: SpecialI
   if (folded) {
     return (
       <button type="button" onClick={() => setFolded(false)} className="panel-pill" aria-label={`Show details: ${title}`}>
-        <span className="tabular-nums text-[#a0522d]">{step}</span> {station.label} · Show details
+        <Phone size={18} />
+        <span className="panel-pill-step">{step}</span> {station.label}
       </button>
     );
   }
 
   return (
-    <section
-      aria-label={`${station.label}: ${title}`}
-      className="station-panel is-visible"
-      data-lenis-prevent
-    >
-      {/* Keyed by station so the content re-staggers on arrival. */}
-      <div key={station.id} className="panel-inner">
-        <div className="flex items-center justify-between">
+    <section aria-label={`${station.label}: ${title}`} className="station-panel is-visible">
+      <div className="phone-screen">
+        <div className="phone-status" aria-hidden>
+          <span>9:41</span>
+          <span className="phone-island" />
+          <StatusIcons />
+        </div>
+        <header className="phone-appbar">
           <p className="panel-step">
-            <span className="tabular-nums">{step}</span> · {eyebrow}
+            <span className="tabular-nums">{step}</span> · {station.label}
           </p>
           <button type="button" onClick={() => setFolded(true)} className="panel-fold" aria-label="Hide details">
-            –
+            <Minus size={18} />
           </button>
+        </header>
+        <div className="phone-scroll" data-lenis-prevent>
+          {/* Keyed by station so the content re-staggers on arrival. */}
+          <div key={station.id} className="panel-inner">
+            <p className="panel-eyebrow">{eyebrow}</p>
+            <h2 className="font-display panel-title">{title}</h2>
+            <div className="panel-body">{body}</div>
+          </div>
         </div>
-        <h2 className="font-display panel-title">{title}</h2>
-        <div className="panel-body">{body}</div>
+        <div className="phone-home" aria-hidden />
       </div>
     </section>
   );

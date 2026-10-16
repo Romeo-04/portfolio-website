@@ -125,3 +125,20 @@ export function User(props: IconProps) {
     </Icon>
   );
 }
+
+export function Minus(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M6 12h12" />
+    </Icon>
+  );
+}
+
+export function Phone(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <rect x="6" y="2.5" width="12" height="19" rx="3" />
+      <path d="M10.5 18.5h3" />
+    </Icon>
+  );
+}

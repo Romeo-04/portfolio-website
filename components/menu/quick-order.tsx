@@ -1,4 +1,5 @@
 import DrinkIllustration from "@/components/menu/drink-illustration";
+import { ArrowRight, External } from "@/components/ui/icons";
 import {
   aboutData,
   achievementsData,
@@ -10,6 +11,7 @@ import {
   tierLabels,
   type Project,
   type SkillTier,
+  testimonialsData,
 } from "@/data/portfolio";
 import type { GithubRepo } from "@/lib/github";
 
@@ -46,7 +48,7 @@ function Section({
             aria-label={`See ${title} in the café`}
             className="font-receipt text-xs underline"
           >
-            see it in the café →
+            see it in the café <ArrowRight size={14} />
           </a>
         )}
       </div>
@@ -74,7 +76,7 @@ function Ticket({ project }: { project: Project }) {
           </ul>
         </details>
         <button type="button" data-project={project.slug} className="ticket-open">
-          Open project →
+          Open project <ArrowRight size={14} />
         </button>
         <p className="mt-2 flex gap-3 text-sm underline">
           {project.demoUrl && (
@@ -84,7 +86,7 @@ function Ticket({ project }: { project: Project }) {
               rel="noopener noreferrer"
               aria-label={`Live demo of ${project.title}`}
             >
-              Live demo ↗
+              Live demo <External size={13} />
             </a>
           )}
           {project.repoUrl && (
@@ -94,7 +96,7 @@ function Ticket({ project }: { project: Project }) {
               rel="noopener noreferrer"
               aria-label={`Code for ${project.title}`}
             >
-              Code ↗
+              Code <External size={13} />
             </a>
           )}
         </p>
@@ -194,6 +196,21 @@ export default function QuickOrderMenu({ specials }: { specials: GithubRepo[] })
             ))}
           </ul>
         )}
+      </Section>
+
+      <Section id="menu-regulars" title="Regulars Say" station="storefront">
+        {testimonialsData.map((t, i) => (
+          <article key={`${t.name}-${i}`} className="py-2">
+            <h3 className="font-bold">{t.name}</h3>
+            <p className="font-receipt text-xs">
+              {t.role} · {t.organization}
+            </p>
+            <p className="mt-1 text-sm leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
+            <button type="button" data-testimonial={i} className="ticket-open">
+              Read more <ArrowRight size={14} />
+            </button>
+          </article>
+        ))}
       </Section>
 
       <Section id="menu-find-us" title="Find Us" station="checkout">

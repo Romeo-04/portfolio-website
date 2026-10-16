@@ -174,6 +174,9 @@
   .panel-facts dd { color: #3b2a1f; line-height: 1.45; }
   .panel-timeline { display: grid; gap: 16px; border-left: 2px solid #ead9c2; padding-left: 16px; }
   .panel-timeline > li { position: relative; }
+  .panel-logos { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
+  .panel-logos img { height: 26px; width: auto; object-fit: contain; }
+  .panel-logos img.is-dark { border-radius: 6px; }
   .panel-timeline > li::before {
     content: "";
     position: absolute;
@@ -201,23 +204,14 @@
     border-color: rgb(208 96 63 / 0.35);
     box-shadow: 0 10px 24px rgb(27 18 12 / 0.1);
   }
-  .panel-swatch {
-    display: flex;
-    flex-direction: column-reverse;
-    width: 30px;
-    height: 40px;
-    flex-shrink: 0;
-    overflow: hidden;
-    border-radius: 6px 6px 10px 10px;
-    border: 1px solid rgb(43 26 16 / 0.15);
-  }
-  .panel-swatch > span { flex: 1; }
+  .panel-swatch { flex-shrink: 0; display: grid; place-items: center; width: 44px; }
   .panel-arrow { color: #d0603f; transition: transform 200ms ease; }
   .panel-project:hover .panel-arrow { transform: translateX(3px); }
   .panel-action {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 7px;
     padding: 9px 16px;
     border-radius: 999px;
     font-size: 14px;
@@ -317,6 +311,7 @@
   .sheet-action {
     display: inline-flex;
     align-items: center;
+    gap: 8px;
     padding: 11px 20px;
     border-radius: 999px;
     font-weight: 600;
@@ -356,18 +351,24 @@
     border-radius: 999px;
     background: rgb(255 255 255 / 0.85);
     border: 1px solid rgb(43 26 16 / 0.1);
-    font-size: 15px;
+    display: grid;
+    place-items: center;
   }
   .sheet-close:hover { background: #fff; }
 
   /* Quick Order tickets: tidy cards that open the sheet. */
   .ticket-open {
     margin-top: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
     font-size: 13px;
     font-weight: 600;
     color: #a0522d;
   }
   .ticket-open:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .ticket-open svg { transition: transform 200ms ease; }
+  .ticket-open:hover svg { transform: translateX(3px); }
 
   @media (prefers-reduced-motion: reduce) {
     .sheet-rise,
@@ -493,5 +494,50 @@
     .scroll-cue-mouse > span,
     .scroll-cue-chevrons > span { animation: none; opacity: 1; transform: rotate(45deg); }
     .scroll-cue-mouse > span { transform: none; }
+  }
+}
+
+/* ------------------------------------------------------------------
+   Testimonials: the card that opens from a person outside the café,
+   and the small avatars in the storefront panel.
+   ------------------------------------------------------------------ */
+@layer components {
+  .testimonial-card { width: min(620px, 100%); }
+  .testimonial-body { padding: 34px 36px 28px; }
+  .testimonial-avatar {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border-radius: 999px;
+    object-fit: cover;
+    color: #fffaf3;
+    border: 3px solid #fffaf3;
+    box-shadow: 0 0 0 1px rgb(43 26 16 / 0.15), 0 6px 16px rgb(27 18 12 / 0.15);
+  }
+  .testimonial-quote {
+    position: relative;
+    margin-top: 24px;
+    padding: 22px 24px 22px 60px;
+    border-radius: 18px;
+    background: #f6ead8;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #2b1a10;
+  }
+  .testimonial-mark { position: absolute; left: 18px; top: 20px; color: #d0603f; }
+  .testimonial-facts { display: grid; gap: 12px; margin-top: 20px; grid-template-columns: 1fr 1fr; }
+  .testimonial-facts dt {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #b0482a;
+  }
+  .testimonial-facts dd { margin-top: 3px; font-size: 14.5px; color: #4a3a2e; }
+  .panel-regulars { display: flex; flex-direction: column; gap: 8px; }
+  @media (max-width: 640px) {
+    .testimonial-body { padding: 26px 22px 22px; }
+    .testimonial-quote { font-size: 16px; padding: 18px 18px 18px 50px; }
+    .testimonial-facts { grid-template-columns: 1fr; }
   }
 }

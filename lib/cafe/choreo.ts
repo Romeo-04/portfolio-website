@@ -53,7 +53,8 @@ export function gaugeValue(elapsedMs: number, minMs: number, loadedPct: number |
   return Math.min(time, loaded);
 }
 
-export const ROAST_GREEN = "#7a9a3a";
+/** Raw green coffee: a pale, grey sage rather than leaf green. */
+export const ROAST_GREEN = "#9aa36a";
 export const ROAST_DARK = "#3b2314";
 
 function hexToRgb(hex: string): [number, number, number] {

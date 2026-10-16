@@ -69,6 +69,16 @@ describe("progressFromScroll", () => {
 });
 
 describe("cameraPose", () => {
+  it("leaves the roastery through its doorway, never through the wall", () => {
+    const [start, end] = stationRange(STATIONS.findIndex((st) => st.id === "roastery"));
+    for (let k = 0; k <= 200; k++) {
+      const p = start + (DWELL + ((1 - DWELL) * k) / 200) * (end - start) * 0.999;
+      const [x, , z] = cameraPose(p).position;
+      // The wall at z -9.5 is 0.2 thick; inside it the camera must be in the doorway.
+      if (z > -9.75 && z < -9.25) expect(Math.abs(x)).toBeLessThan(0.45);
+    }
+  });
+
   it("rests on the station during its dwell zone", () => {
     expect(cameraPose(stationAnchor("wall"))).toEqual(STATIONS[3].camera);
   });

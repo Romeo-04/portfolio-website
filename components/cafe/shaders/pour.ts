@@ -2,7 +2,7 @@
 // POUR SHADER
 // ============================================================
 // Colours a cylinder by height: each band is one layer of the drink, bottom
-// to top (same order as the 2D illustration). Everything above uFill is
+// to top (same order as the 2D illustration), blended softly at the seams. Everything above uFill is
 // discarded, so raising uFill "pours" the drink. Shading uses the same
 // three-band idea as the toon material. The layer pick loops instead of
 // indexing uColors[idx], which WebGL1 does not allow. three.Color stores
@@ -31,11 +31,20 @@ const fragmentShader = /* glsl */ `
   varying vec3 vNormal;
   void main() {
     if (uFill <= 0.0 || vH >= uFill) discard;
-    int pick = int(clamp(floor(vH * float(uCount)), 0.0, float(uCount - 1)));
-    vec3 color = uColors[0];
+    // Each layer holds its colour in the middle of its band and melts into
+    // the next one across the seam, like a poured layered drink.
+    float x = vH * float(uCount) - 0.5;
+    float last = float(uCount - 1);
+    float lo = clamp(floor(x), 0.0, last);
+    float hi = min(lo + 1.0, last);
+    float f = x < 0.0 ? 0.0 : smoothstep(0.2, 0.8, x - lo);
+    vec3 cLo = uColors[0];
+    vec3 cHi = uColors[0];
     for (int i = 1; i < ${MAX_LAYERS}; i++) {
-      if (i == pick) color = uColors[i];
+      if (float(i) == lo) cLo = uColors[i];
+      if (float(i) == hi) cHi = uColors[i];
     }
+    vec3 color = mix(cLo, cHi, f);
     vec3 n = normalize(vNormal) * (gl_FrontFacing ? 1.0 : -1.0);
     float light = dot(n, normalize(vec3(0.4, 0.8, 0.6)));
     float band = light > 0.5 ? 1.0 : (light > 0.0 ? 0.8 : 0.6);

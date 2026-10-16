@@ -47,6 +47,10 @@ export const TEXTURES = {
   asphalt: "/textures/surface-asphalt.webp",
   foliage: "/textures/surface-foliage.webp",
   canvas: "/textures/surface-canvas.webp",
+  // Organisation logos for the roastery's experience plaques.
+  "logo-eden": "/logos/eden.webp",
+  "logo-feu": "/logos/feu.webp",
+  "logo-acm": "/logos/acm.webp",
 } as const;
 
 export type Surface =

@@ -8,23 +8,48 @@
 // ============================================================
 
 import { useFrame } from "@react-three/fiber";
-import { useLayoutEffect, useMemo, useRef } from "react";
-import { Color, Object3D, type Group, type InstancedMesh } from "three";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { Color, Object3D, SphereGeometry, type Group, type InstancedMesh } from "three";
 import { Ink, Toon } from "@/components/cafe/kit";
 import { Label } from "@/components/cafe/text3d";
 import { toonGradient } from "@/components/cafe/materials/toon";
-import { experienceData } from "@/data/portfolio";
+import { useCafeTexture } from "@/components/cafe/textures";
+import { ORG_LOGOS, experienceData, type Experience, type OrgLogo } from "@/data/portfolio";
 import { CONVEYOR_END, CONVEYOR_START, ROAST_DARK, ROAST_GREEN, beanX, dwellT, easeOutBack, stagger } from "@/lib/cafe/choreo";
 import { getProgress } from "@/lib/cafe/scroll";
 import { STATIONS } from "@/lib/cafe/stations";
 
 const RZ = STATIONS.find((s) => s.id === "roastery")!.camera.target[2];
-const BEANS = 48;
+const BEANS = 96;
+/** Half-roasted beans pass through cinnamon brown on the way to dark. */
+const ROAST_MID = "#a0662f";
 const BELT_Y = 0.55;
 
 const BELT_LEN = CONVEYOR_END - CONVEYOR_START + 0.4;
 const STEEL = "#b9bfc5";
 const COPPER = "#c8763a";
+
+/**
+ * One coffee bean: an oval with a flat face and the centre crease running
+ * down it in a slight S, the domed back underneath.
+ */
+function beanGeometry() {
+  const g = new SphereGeometry(1, 16, 12);
+  const pos = g.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i);
+    let y = pos.getY(i);
+    const z = pos.getZ(i);
+    if (y > 0) {
+      y *= 0.45;
+      const seam = x - 0.18 * Math.sin(z * 2.2);
+      y -= 0.32 * Math.exp(-(seam * seam) / 0.012);
+    }
+    pos.setXYZ(i, x * 0.045, y * 0.032, z * 0.062);
+  }
+  g.computeVertexNormals();
+  return g;
+}
 
 /** The belt on a steel frame: side rails, legs and a roller at each end. */
 function Conveyor() {
@@ -178,6 +203,94 @@ function BeanSacks() {
   );
 }
 
+const PLAQUE_W = 1.32;
+const PLAQUE_H = 0.62;
+const LOGO_H = 0.27;
+/** Plaque scale and spacing: the row fits beside an open station panel. */
+const PLAQUE_SCALE = 0.82;
+const PLAQUE_GAP = 1.14;
+
+/** One organisation logo, cut out (or on its own dark tile for the EDEN wordmark). */
+function OrgLogoMark({ logo, x }: { logo: OrgLogo; x: number }) {
+  const info = ORG_LOGOS[logo];
+  const map = useCafeTexture(`logo-${logo}`, 1, 1);
+  const w = info.dark ? 0.4 : LOGO_H * info.aspect;
+  const h = info.dark ? w / info.aspect : LOGO_H;
+  return (
+    <group position={[x, 0, 0.004]}>
+      {info.dark && (
+        <mesh position={[0, 0, -0.001]}>
+          <planeGeometry args={[w + 0.04, h + 0.08]} />
+          <meshBasicMaterial color="#000000" />
+        </mesh>
+      )}
+      <mesh>
+        <planeGeometry args={[w, h]} />
+        <meshBasicMaterial map={map} transparent={!info.dark} alphaTest={0.4} toneMapped={false} />
+      </mesh>
+    </group>
+  );
+}
+
+/**
+ * A framed plaque for one role: walnut moulding with a brass inlay, the
+ * organisation's logos on the left, and the role, organisation and dates
+ * set beside them like an engraved nameplate.
+ */
+function ExperiencePlaque({ e }: { e: Experience }) {
+  const logos = e.logos ?? [];
+  const widths = logos.map((k) => (ORG_LOGOS[k].dark ? 0.44 : LOGO_H * ORG_LOGOS[k].aspect));
+  const span = widths.reduce((t, w) => t + w, 0) + Math.max(0, logos.length - 1) * 0.03;
+  const left = -PLAQUE_W / 2 + 0.1;
+  const textX = logos.length ? left + span + 0.1 : -PLAQUE_W / 2 + 0.12;
+  const textW = PLAQUE_W / 2 - 0.08 - textX;
+  const xs = widths.map((w, i) => left + widths.slice(0, i).reduce((t, v) => t + v + 0.03, 0) + w / 2);
+  return (
+    <group>
+      <mesh position={[0, 0, -0.025]}>
+        <boxGeometry args={[PLAQUE_W, PLAQUE_H, 0.05]} />
+        <Toon color="#4a2c1a" surface="wood" />
+        <Ink />
+      </mesh>
+      <mesh position={[0, 0, 0.001]}>
+        <planeGeometry args={[PLAQUE_W - 0.08, PLAQUE_H - 0.08]} />
+        <Toon color="#c9a24a" surface="metal" />
+      </mesh>
+      <mesh position={[0, 0, 0.002]}>
+        <planeGeometry args={[PLAQUE_W - 0.12, PLAQUE_H - 0.12]} />
+        <Toon color="#f8f1e4" />
+      </mesh>
+      {logos.map((k, i) => (
+        <OrgLogoMark key={k} logo={k} x={xs[i]} />
+      ))}
+      {logos.length > 0 && (
+        <mesh position={[textX - 0.05, 0, 0.004]}>
+          <planeGeometry args={[0.006, PLAQUE_H - 0.22]} />
+          <meshBasicMaterial color="#c9a24a" />
+        </mesh>
+      )}
+      <Label
+        font="display"
+        fontSize={0.058}
+        maxWidth={textW}
+        lineHeight={1.08}
+        anchorX="left"
+        anchorY="bottom"
+        color="#2b1a10"
+        position={[textX, 0.03, 0.005]}
+      >
+        {e.title}
+      </Label>
+      <Label font="body" fontSize={0.04} maxWidth={textW} anchorX="left" anchorY="top" color="#5a4536" position={[textX, -0.01, 0.005]}>
+        {e.organization}
+      </Label>
+      <Label font="body" fontSize={0.034} letterSpacing={0.04} anchorX="left" anchorY="bottom" color="#b0482a" position={[textX, -PLAQUE_H / 2 + 0.1, 0.005]}>
+        {e.period.toUpperCase()}
+      </Label>
+    </group>
+  );
+}
+
 export default function Roastery() {
   const beans = useRef<InstancedMesh>(null);
   const labels = useRef<(Group | null)[]>([]);
@@ -185,8 +298,23 @@ export default function Roastery() {
   const color = useMemo(() => new Color(), []);
   const lastT = useRef(-1);
   const green = useMemo(() => new Color(ROAST_GREEN), []);
+  const mid = useMemo(() => new Color(ROAST_MID), []);
   const dark = useMemo(() => new Color(ROAST_DARK), []);
   const offsets = useMemo(() => Array.from({ length: BEANS }, (_, i) => i / BEANS), []);
+  const bean = useMemo(() => beanGeometry(), []);
+  useEffect(() => () => bean.dispose(), [bean]);
+  // Fixed scatter across the belt so the beans lie like a real batch.
+  const scatter = useMemo(
+    () =>
+      Array.from({ length: BEANS }, (_, i) => {
+        const r = (k: number) => {
+          const v = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453;
+          return v - Math.floor(v);
+        };
+        return { z: (r(1) - 0.5) * 0.34, yaw: r(2) * Math.PI * 2, flip: r(3) > 0.7 ? Math.PI : 0, tilt: (r(4) - 0.5) * 0.4 };
+      }),
+    [],
+  );
 
   useLayoutEffect(() => {
     // Instance colours must exist before the first frame sets them.
@@ -201,12 +329,14 @@ export default function Roastery() {
     if (mesh) {
       offsets.forEach((offset, i) => {
         const x = beanX(t, offset);
-        dummy.position.set(x, BELT_Y + 0.06, (i % 3) * 0.12 - 0.12);
-        dummy.rotation.set(0, i, 0);
+        const b = scatter[i];
+        dummy.position.set(x, BELT_Y + 0.03, b.z);
+        dummy.rotation.set(b.flip + b.tilt, b.yaw, 0);
         dummy.updateMatrix();
         mesh.setMatrixAt(i, dummy.matrix);
         const along = (x - CONVEYOR_START) / (CONVEYOR_END - CONVEYOR_START);
-        mesh.setColorAt(i, color.lerpColors(green, dark, Math.min(Math.max(along, 0), 1)));
+        const k = Math.min(Math.max(along, 0), 1);
+        mesh.setColorAt(i, k < 0.5 ? color.lerpColors(green, mid, k * 2) : color.lerpColors(mid, dark, k * 2 - 1));
       });
       mesh.instanceMatrix.needsUpdate = true;
       if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
@@ -237,8 +367,7 @@ export default function Roastery() {
           ROASTED IN-HOUSE
         </Label>
       </group>
-      <instancedMesh ref={beans} args={[undefined, undefined, BEANS]}>
-        <sphereGeometry args={[0.06, 8, 6]} />
+      <instancedMesh ref={beans} args={[bean, undefined, BEANS]}>
         <meshToonMaterial gradientMap={toonGradient()} />
       </instancedMesh>
       {experienceData.map((e, i) => (
@@ -247,25 +376,12 @@ export default function Roastery() {
           ref={(g) => {
             labels.current[i] = g;
           }}
-          position={[CONVEYOR_START + ((i + 0.5) / experienceData.length) * (CONVEYOR_END - CONVEYOR_START), 1.45, 0]}
+          position={[(i - (experienceData.length - 1) / 2) * PLAQUE_GAP, 1.58, 0]}
           visible={false}
         >
-          <mesh position={[0, 0, -0.02]}>
-            <boxGeometry args={[1.32, 0.5, 0.03]} />
-            <Toon color="#a8743f" />
-            <Ink />
-          </mesh>
-          <mesh>
-            <planeGeometry args={[1.24, 0.42]} />
-            <Toon color="#f6efe2" />
-          </mesh>
-          <Label font="display" fontSize={0.068} maxWidth={1.12} textAlign="center" lineHeight={1.05} color="#2b2b2e" position={[0, 0.08, 0.005]}>
-            {e.title}
-          </Label>
-          <Label font="body" fontSize={0.045} maxWidth={1.12} textAlign="center" color="#6b5d4f" position={[0, -0.1, 0.005]}>
-            {`${e.organization}
-${e.period}`}
-          </Label>
+          <group scale={PLAQUE_SCALE}>
+            <ExperiencePlaque e={e} />
+          </group>
         </group>
       ))}
     </group>

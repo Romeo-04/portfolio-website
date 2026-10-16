@@ -20,6 +20,9 @@ import { STATIONS, stationYaw } from "@/lib/cafe/stations";
 
 const [CX, , CZ] = STATIONS.find((s) => s.id === "checkout")!.camera.target;
 const RECEIPT_HEIGHT = 0.9;
+/** The printer sits at the counter's front edge, so the receipt hangs clear of the top. */
+const PRINTER_Z = 0.24;
+const RECEIPT_Z = PRINTER_Z + 0.24;
 
 export default function Checkout() {
   const paper = useRef<Group>(null);
@@ -68,21 +71,21 @@ export default function Checkout() {
         <Ink />
       </mesh>
       {/* Receipt printer with a paper roll and a slot. */}
-      <mesh position={[0, 1.15, 0]}>
+      <mesh position={[0, 1.15, PRINTER_Z]}>
         <boxGeometry args={[0.6, 0.28, 0.4]} />
         <Toon color="#2b2b2e" surface="metal" />
         <Ink />
       </mesh>
-      <mesh position={[0, 1.3, -0.08]} rotation-z={Math.PI / 2}>
+      <mesh position={[0, 1.3, PRINTER_Z - 0.08]} rotation-z={Math.PI / 2}>
         <cylinderGeometry args={[0.09, 0.09, 0.56, 18]} />
         <Toon color="#fbf6ee" />
       </mesh>
-      <mesh position={[0, 1.3, 0.205]}>
+      <mesh position={[0, 1.3, PRINTER_Z + 0.205]}>
         <boxGeometry args={[0.58, 0.015, 0.02]} />
         <Toon color="#111113" />
       </mesh>
       {[-0.22, -0.17].map((x) => (
-        <mesh key={x} position={[x, 1.12, 0.205]}>
+        <mesh key={x} position={[x, 1.12, PRINTER_Z + 0.205]}>
           <boxGeometry args={[0.03, 0.03, 0.01]} />
           <meshBasicMaterial color={x < -0.2 ? "#8cb369" : "#f3a712"} toneMapped={false} />
         </mesh>
@@ -104,7 +107,7 @@ export default function Checkout() {
         </mesh>
       </group>
       {/* Service bell. */}
-      <group position={[0.3, 1.01, 0.25]}>
+      <group position={[0.42, 1.01, 0.32]}>
         <mesh position={[0, 0.01, 0]}>
           <cylinderGeometry args={[0.06, 0.06, 0.02, 16]} />
           <Toon color="#2b2b2e" surface="metal" />
@@ -120,30 +123,31 @@ export default function Checkout() {
         </mesh>
       </group>
       {/* Receipt hangs from the printer slot; scale.y grows it downward. */}
-      <group ref={paper} position={[0, 1.3, 0.42]}>
+      <group ref={paper} position={[0, 1.3, RECEIPT_Z]}>
         <mesh position={[0, -RECEIPT_HEIGHT / 2, 0]}>
-          <planeGeometry args={[0.56, RECEIPT_HEIGHT]} />
+          <planeGeometry args={[0.6, RECEIPT_HEIGHT]} />
           <Toon color="#fbf6ee" />
         </mesh>
       </group>
       <Label
         ref={text}
         font="receipt"
-        fontSize={0.034}
-        lineHeight={1.5}
-        maxWidth={0.5}
+        fontSize={0.036}
+        lineHeight={1.45}
+        maxWidth={0.54}
         textAlign="center"
         anchorY="top"
         color="#1b120c"
-        position={[0, 1.24, 0.44]}
+        position={[0, 1.24, RECEIPT_Z + 0.004]}
         clipRect={[-1, 0, 1, 1]}
       >
         {`THANK YOU
-
+- - - - - - - - - -
 ${personalInfo.email}
 ${personalInfo.github.replace("https://", "")}
-linkedin.com/in/jhezra-tolentino
-
+linkedin.com/in/
+jhezra-tolentino
+- - - - - - - - - -
 Come again!`}
       </Label>
       {/* Tip jar with coins. */}
@@ -159,9 +163,15 @@ Come again!`}
         <torusGeometry args={[0.1, 0.008, 6, 20]} />
         <Toon color="#b9bfc5" />
       </mesh>
-      <group ref={tips} position={[0.5, 1.42, 0]} visible={false}>
-        <Label font="display" fontSize={0.06} color="#2b2b2e">
-          Tips → GitHub · LinkedIn
+      {/* A paper tag tied to the jar. */}
+      <group ref={tips} position={[0.5, 1.16, 0.11]} rotation-z={0.06} visible={false}>
+        <mesh>
+          <boxGeometry args={[0.15, 0.08, 0.004]} />
+          <Toon color="#fbf6ee" />
+          <Ink />
+        </mesh>
+        <Label font="display" fontSize={0.045} color="#b0482a" position={[0, 0, 0.004]}>
+          TIPS
         </Label>
       </group>
     </group>

@@ -33,7 +33,145 @@ const ACCENT_COLORS: Record<Achievement["tier"], string> = {
   special: "#8cb369",
 };
 
+/** The seal's metal: gold, silver, bronze, or a red wax seal for special honours. */
+const SEAL_COLORS: Record<Achievement["tier"], string> = {
+  gold: "#e0b13a",
+  silver: "#d5d9de",
+  bronze: "#c27a3e",
+  special: "#b8322a",
+};
+
 const COLS = 4;
+const FW = 1.1;
+const FH = 0.7;
+/** Frame centre below its nail. */
+const FY = -0.4;
+
+/**
+ * A grand certificate frame: a deep moulding with a raised inner lip and
+ * corner rosettes, a cream mat, a gilt fillet round an ivory certificate,
+ * an embossed seal with ribbon tails, and a brass picture lamp on top.
+ */
+function Certificate({ a }: { a: Achievement }) {
+  const frame = FRAME_COLORS[a.tier];
+  const surface = a.tier === "bronze" ? "wood" : "metal";
+  const seal = SEAL_COLORS[a.tier];
+  return (
+    <group>
+      {/* Nail and hanging wire. */}
+      <mesh>
+        <sphereGeometry args={[0.022, 10, 8]} />
+        <Toon color={CHARCOAL} surface="metal" />
+      </mesh>
+      {[-1, 1].map((side) => (
+        <mesh key={side} position={[side * 0.2, -0.035, 0.01]} rotation-z={side * 1.2}>
+          <boxGeometry args={[0.006, 0.45, 0.004]} />
+          <meshBasicMaterial color="#3a3a3a" />
+        </mesh>
+      ))}
+      <group position={[0, FY, 0]}>
+        {/* Moulding, raised inner lip, corner rosettes. */}
+        <mesh>
+          <boxGeometry args={[FW, FH, 0.06]} />
+          <Toon color={frame} surface={surface} />
+          <Ink />
+        </mesh>
+        <mesh position={[0, 0, 0.012]}>
+          <boxGeometry args={[FW - 0.1, FH - 0.1, 0.06]} />
+          <Toon color={frame} surface={surface} />
+          <Ink />
+        </mesh>
+        {[
+          [-1, -1],
+          [-1, 1],
+          [1, -1],
+          [1, 1],
+        ].map(([sx, sy]) => (
+          <mesh key={`${sx}${sy}`} position={[(sx * (FW - 0.05)) / 2, (sy * (FH - 0.05)) / 2, 0.035]}>
+            <sphereGeometry args={[0.034, 12, 8]} />
+            <Toon color={frame} surface={surface} />
+            <Ink />
+          </mesh>
+        ))}
+        {/* Mat, gilt fillet, certificate paper. */}
+        <mesh position={[0, 0, 0.043]}>
+          <planeGeometry args={[FW - 0.16, FH - 0.16]} />
+          <Toon color={CREAM} />
+        </mesh>
+        <mesh position={[0, 0, 0.044]}>
+          <planeGeometry args={[FW - 0.25, FH - 0.25]} />
+          <Toon color="#c9a24a" />
+        </mesh>
+        <mesh position={[0, 0, 0.045]}>
+          <planeGeometry args={[FW - 0.262, FH - 0.262]} />
+          <Toon color="#fffaf0" />
+        </mesh>
+        <mesh position={[0, 0.125, 0.046]}>
+          <planeGeometry args={[0.5, 0.004]} />
+          <meshBasicMaterial color={ACCENT_COLORS[a.tier]} />
+        </mesh>
+        <Label font="body" fontSize={0.026} letterSpacing={0.18} color="#8a6a3a" position={[0, 0.15, 0.047]}>
+          IN RECOGNITION
+        </Label>
+        <Label
+          font="display"
+          fontSize={0.056}
+          maxWidth={0.66}
+          textAlign="center"
+          lineHeight={1.08}
+          color="#2b1a10"
+          position={[-0.04, 0.025, 0.047]}
+        >
+          {a.title}
+        </Label>
+        <Label font="body" fontSize={0.036} color="#6b5d4f" position={[-0.04, -0.115, 0.047]}>
+          {a.year}
+        </Label>
+        {/* Seal with ribbon tails, lower right. */}
+        <group position={[0.33, -0.12, 0.05]}>
+          {[-1, 1].map((side) => (
+            <mesh key={side} position={[side * 0.022, -0.06, -0.002]} rotation-z={side * 0.3}>
+              <planeGeometry args={[0.035, 0.1]} />
+              <meshBasicMaterial color={ACCENT_COLORS[a.tier]} />
+            </mesh>
+          ))}
+          <mesh rotation-x={Math.PI / 2}>
+            <cylinderGeometry args={[0.058, 0.058, 0.012, 20]} />
+            <Toon color={seal} surface="metal" />
+            <Ink />
+          </mesh>
+          <mesh position={[0, 0, 0.007]}>
+            <ringGeometry args={[0.036, 0.042, 20]} />
+            <meshBasicMaterial color="#000000" transparent opacity={0.25} />
+          </mesh>
+          {/* Embossed star: two offset triangles. */}
+          {[0, Math.PI].map((r) => (
+            <mesh key={r} position={[0, 0, 0.008]} rotation-z={r + Math.PI / 2}>
+              <circleGeometry args={[0.028, 3]} />
+              <meshBasicMaterial color="#000000" transparent opacity={0.22} />
+            </mesh>
+          ))}
+        </group>
+        {/* Brass picture lamp over the frame. */}
+        <group position={[0, FH / 2 + 0.07, 0.1]}>
+          <mesh rotation-z={Math.PI / 2}>
+            <cylinderGeometry args={[0.03, 0.03, 0.36, 12]} />
+            <Toon color={BRASS} surface="metal" />
+            <Ink />
+          </mesh>
+          <mesh position={[0, -0.02, -0.05]} rotation-x={0.6}>
+            <boxGeometry args={[0.012, 0.012, 0.1]} />
+            <Toon color={BRASS} surface="metal" />
+          </mesh>
+          <mesh position={[0, -0.031, 0]}>
+            <boxGeometry args={[0.32, 0.006, 0.03]} />
+            <meshBasicMaterial color="#fff1c8" toneMapped={false} />
+          </mesh>
+        </group>
+      </group>
+    </group>
+  );
+}
 
 const [WALL_X, WALL_Y, WALL_Z] = STATIONS.find((s) => s.id === "wall")!.camera.target;
 
@@ -41,7 +179,7 @@ const [WALL_X, WALL_Y, WALL_Z] = STATIONS.find((s) => s.id === "wall")!.camera.t
 function nail(i: number): [number, number, number] {
   const col = i % COLS;
   const row = Math.floor(i / COLS);
-  return [(col - (COLS - 1) / 2) * 1.25, 1.0 - row * 0.85, 0.05];
+  return [(col - (COLS - 1) / 2) * 1.3, 1.08 - row * 0.92, 0.05];
 }
 
 export default function Wall() {
@@ -74,26 +212,7 @@ export default function Wall() {
             frames.current[i] = g;
           }}
         >
-          {/* Moulding, cream mat, and an accent band like a print. */}
-          <mesh position={[0, -0.3, 0]}>
-            <boxGeometry args={[1.05, 0.62, 0.05]} />
-            <Toon color={FRAME_COLORS[a.tier]} surface={a.tier === "bronze" ? "wood" : "metal"} />
-            <Ink />
-          </mesh>
-          <mesh position={[0, -0.3, 0.027]}>
-            <planeGeometry args={[0.93, 0.5]} />
-            <Toon color={CREAM} />
-          </mesh>
-          <mesh position={[0, -0.12, 0.029]}>
-            <planeGeometry args={[0.81, 0.08]} />
-            <Toon color={ACCENT_COLORS[a.tier]} />
-          </mesh>
-          <Label font="display" fontSize={0.06} maxWidth={0.8} textAlign="center" lineHeight={1.1} color="#2b2b2e" position={[0, -0.3, 0.032]}>
-            {a.title}
-          </Label>
-          <Label font="body" fontSize={0.042} color="#6b5d4f" position={[0, -0.47, 0.032]}>
-            {a.year}
-          </Label>
+          <Certificate a={a} />
         </group>
       ))}
     </group>

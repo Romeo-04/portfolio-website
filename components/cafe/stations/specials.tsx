@@ -34,7 +34,7 @@ const BOARDS = Array.from({ length: ROWS }, (_, k) => 0.1 + k * ROW);
 /** The eye-level row that holds the highlighted repo books. */
 const FEATURED_ROW = 3;
 const FEATURED_W = 0.14;
-const FEATURED_GAP = 0.34;
+const FEATURED_GAP = 0.44;
 
 type Book = { x: number; y: number; w: number; h: number; color: string };
 
@@ -168,18 +168,28 @@ export default function Specials({ items }: { items: SpecialItem[] }) {
                 ref={(g) => {
                   labels.current[i] = g;
                 }}
-                position={[0, 0.52, 0.16]}
+                position={[0, 0.55, 0.16]}
                 visible={false}
               >
                 <mesh>
-                  <planeGeometry args={[0.32, 0.13]} />
+                  <boxGeometry args={[0.42, 0.21, 0.01]} />
                   <Toon color="#fbfaf6" />
+                  <Ink />
                 </mesh>
-                <Label font="display" fontSize={0.034} maxWidth={0.3} textAlign="center" color="#20262a" position={[0, 0.02, 0.004]}>
+                <Label
+                  font="display"
+                  fontSize={0.048}
+                  maxWidth={0.38}
+                  lineHeight={1.05}
+                  textAlign="center"
+                  anchorY="bottom"
+                  color="#20262a"
+                  position={[0, -0.012, 0.007]}
+                >
                   {item.name}
                 </Label>
-                <Label font="body" fontSize={0.026} color="#6b5d4f" position={[0, -0.035, 0.004]}>
-                  {item.language ?? ""}
+                <Label font="body" fontSize={0.036} color="#8a4a2a" anchorY="top" position={[0, -0.035, 0.007]}>
+                  {item.language ?? "Repo"}
                 </Label>
               </group>
             </group>

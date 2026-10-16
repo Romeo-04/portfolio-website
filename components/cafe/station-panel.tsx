@@ -13,37 +13,31 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import type { SpecialItem } from "@/components/cafe/stations/specials";
+import DrinkIllustration from "@/components/menu/drink-illustration";
+import { TestimonialAvatar } from "@/components/cafe/testimonial-sheet";
 import {
   aboutData,
   achievementsData,
   certificationsData,
   experienceData,
+  testimonialsData,
+  ORG_LOGOS,
   personalInfo,
   projectsData,
   skillsData,
   tierLabels,
   type SkillTier,
 } from "@/data/portfolio";
-import { drinkFor } from "@/lib/cafe/drinks";
 import { openProject, originOf } from "@/lib/cafe/project-sheet";
+import { openTestimonial } from "@/lib/cafe/testimonial-sheet";
 import { getProgress, goTo, subscribeProgress } from "@/lib/cafe/scroll";
 import { setViewInset } from "@/lib/cafe/view-inset";
-import { DWELL, STATIONS, stationIndexAt, stationProgress, type StationId } from "@/lib/cafe/stations";
+import { ArrowRight, Code, Document, External, Mail } from "@/components/ui/icons";
+import { STATIONS, stationIndexAt, type StationId } from "@/lib/cafe/stations";
 
 /** The panel's width plus its margin, in CSS px (see .station-panel). */
 const PANEL_SPACE = 420;
 
-/** Visible from arrival until a little after the camera starts to leave. */
-const SHOW_UNTIL = DWELL + 0.12;
-
-type View = { index: number; visible: boolean };
-
-function viewAt(progress: number): View {
-  const index = stationIndexAt(progress);
-  const id = STATIONS[index].id;
-  const last = index === STATIONS.length - 1;
-  return { index, visible: last || stationProgress(progress, id) <= SHOW_UNTIL };
-}
 
 function Label({ children }: { children: ReactNode }) {
   return <p className="panel-label">{children}</p>;
@@ -63,7 +57,6 @@ function Chips({ items }: { items: string[] }) {
 
 function ProjectCard({ slug }: { slug: string }) {
   const p = projectsData.find((x) => x.slug === slug)!;
-  const drink = drinkFor(p);
   return (
     <button
       type="button"
@@ -72,17 +65,13 @@ function ProjectCard({ slug }: { slug: string }) {
       aria-label={`Open ${p.title}`}
     >
       <span aria-hidden className="panel-swatch">
-        {drink.layers.map((l) => (
-          <span key={l.name} style={{ background: l.color }} />
-        ))}
+        <DrinkIllustration project={p} size={40} />
       </span>
       <span className="min-w-0 flex-1 text-left">
         <span className="block font-semibold text-[#2b1a10]">{p.title}</span>
         <span className="mt-0.5 block text-[13px] leading-snug text-[#6b5444]">{p.pitch}</span>
       </span>
-      <span aria-hidden className="panel-arrow">
-        →
-      </span>
+      <ArrowRight className="panel-arrow" />
     </button>
   );
 }
@@ -114,12 +103,37 @@ function content(id: StationId, specials: SpecialItem[], reduced: boolean): { ey
             </dl>
             <div className="mt-5 flex flex-wrap gap-2">
               <button type="button" className="panel-action panel-action-primary" onClick={() => goTo("brew-bar", { immediate: reduced })}>
-                See my projects
+                See my projects <ArrowRight />
               </button>
               <a href={personalInfo.resumeUrl} target="_blank" rel="noopener noreferrer" className="panel-action">
-                Résumé ↗
+                <Document /> Résumé
               </a>
             </div>
+            {testimonialsData.length > 0 && (
+              <div className="mt-6">
+                <Label>Regulars outside</Label>
+                <div className="panel-regulars mt-2">
+                  {testimonialsData.map((t, i) => (
+                    <button
+                      key={`${t.name}-${i}`}
+                      type="button"
+                      onClick={(e) => openTestimonial(i, originOf(e.currentTarget))}
+                      className="panel-project group"
+                      aria-label={`Read ${t.placeholder ? "the reserved testimonial" : `${t.name}'s testimonial`}`}
+                    >
+                      <TestimonialAvatar t={t} size={38} />
+                      <span className="min-w-0 flex-1 text-left">
+                        <span className="block font-semibold text-[#2b1a10]">{t.name}</span>
+                        <span className="mt-0.5 block text-[13px] leading-snug text-[#6b5444]">
+                          {t.role} · {t.organization}
+                        </span>
+                      </span>
+                      <ArrowRight className="panel-arrow" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </>
         ),
       };
@@ -201,6 +215,21 @@ function content(id: StationId, specials: SpecialItem[], reduced: boolean): { ey
           <ol className="panel-timeline">
             {experienceData.map((e) => (
               <li key={`${e.title}-${e.organization}`}>
+                {e.logos && (
+                  <span className="panel-logos">
+                    {e.logos.map((k) => (
+                      // eslint-disable-next-line @next/next/no-img-element -- tiny static logos
+                      <img
+                        key={k}
+                        src={ORG_LOGOS[k].src}
+                        alt={ORG_LOGOS[k].alt}
+                        height={26}
+                        width={Math.round(26 * ORG_LOGOS[k].aspect)}
+                        className={ORG_LOGOS[k].dark ? "is-dark" : undefined}
+                      />
+                    ))}
+                  </span>
+                )}
                 <p className="font-semibold text-[#2b1a10]">{e.title}</p>
                 <p className="panel-meta">
                   {e.organization} · {e.period}
@@ -237,7 +266,7 @@ function content(id: StationId, specials: SpecialItem[], reduced: boolean): { ey
                   {specials.map((r) => (
                     <li key={r.id}>
                       <a href={r.url} target="_blank" rel="noopener noreferrer" className="font-semibold underline-offset-2 hover:underline">
-                        {r.name} ↗
+                        {r.name} <External size={13} className="opacity-60" />
                       </a>
                       {r.language && <span className="panel-meta">{r.language}</span>}
                     </li>
@@ -257,17 +286,17 @@ function content(id: StationId, specials: SpecialItem[], reduced: boolean): { ey
             <p className="panel-text">Open to {aboutData.currently.aimingFor.toLowerCase()}. The fastest way to reach me is email.</p>
             <div className="mt-4 flex flex-col gap-2">
               <a href={`mailto:${personalInfo.email}`} className="panel-action panel-action-primary">
-                {personalInfo.email}
+                <Mail /> {personalInfo.email}
               </a>
               <div className="flex flex-wrap gap-2">
                 <a href={personalInfo.github} target="_blank" rel="noopener noreferrer" className="panel-action">
-                  GitHub ↗
+                  <Code /> GitHub
                 </a>
                 <a href={personalInfo.linkedin} target="_blank" rel="noopener noreferrer" className="panel-action">
-                  LinkedIn ↗
+                  <External /> LinkedIn
                 </a>
                 <a href={personalInfo.resumeUrl} target="_blank" rel="noopener noreferrer" className="panel-action">
-                  Résumé ↗
+                  <Document /> Résumé
                 </a>
               </div>
             </div>
@@ -278,30 +307,31 @@ function content(id: StationId, specials: SpecialItem[], reduced: boolean): { ey
 }
 
 export default function StationPanel({ specials, reduced }: { specials: SpecialItem[]; reduced: boolean }) {
-  const [view, setView] = useState<View>(() => viewAt(getProgress()));
+  // The panel stays up the whole way through; its content follows the
+  // station the camera is at or heading for.
+  const [index, setIndex] = useState(() => stationIndexAt(getProgress()));
   const [folded, setFolded] = useState(false);
 
   useEffect(
     () =>
       subscribeProgress(() => {
-        const next = viewAt(getProgress());
-        setView((v) => (v.index === next.index && v.visible === next.visible ? v : next));
+        setIndex(stationIndexAt(getProgress()));
       }),
     [],
   );
 
   // Make room for the panel: the 3D view centres in the space beside it.
   // Phones get a bottom sheet instead, so the view stays put there.
-  const open = view.visible && !folded;
+  const open = !folded;
   useEffect(() => {
     const wide = window.matchMedia("(min-width: 641px)").matches;
     setViewInset(open && wide ? PANEL_SPACE / 2 : 0);
   }, [open]);
   useEffect(() => () => setViewInset(0), []);
 
-  const station = STATIONS[view.index];
+  const station = STATIONS[index];
   const { eyebrow, title, body } = content(station.id, specials, reduced);
-  const step = `${String(view.index + 1).padStart(2, "0")} / ${String(STATIONS.length).padStart(2, "0")}`;
+  const step = `${String(index + 1).padStart(2, "0")} / ${String(STATIONS.length).padStart(2, "0")}`;
 
   if (folded) {
     return (
@@ -314,8 +344,7 @@ export default function StationPanel({ specials, reduced }: { specials: SpecialI
   return (
     <section
       aria-label={`${station.label}: ${title}`}
-      className={`station-panel ${view.visible ? "is-visible" : ""}`}
-      inert={!view.visible}
+      className="station-panel is-visible"
       data-lenis-prevent
     >
       {/* Keyed by station so the content re-staggers on arrival. */}

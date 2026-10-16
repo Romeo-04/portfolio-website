@@ -10,10 +10,12 @@
 // focus is trapped and Escape works; reduced motion just fades.
 // ============================================================
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
+import { useSheetMotion } from "@/components/cafe/sheet-motion";
 import DrinkIllustration from "@/components/menu/drink-illustration";
 import { projectsData } from "@/data/portfolio";
 import { drinkFor } from "@/lib/cafe/drinks";
+import { ArrowLeft, ArrowRight, Close, Code, External } from "@/components/ui/icons";
 import {
   SHEET_ORDER,
   closeProject,
@@ -21,67 +23,19 @@ import {
   stepProject,
   stepSlug,
   subscribeSheet,
-  type Origin,
 } from "@/lib/cafe/project-sheet";
 
-const EASE_OUT = "cubic-bezier(0.2, 0.9, 0.25, 1)";
-const EASE_IN = "cubic-bezier(0.5, 0, 0.75, 0.2)";
-
-/** The transform that puts the sheet's box over the origin rect. */
-function fromOrigin(sheet: DOMRect, origin: Origin): string {
-  const dx = origin.x + origin.w / 2 - (sheet.left + sheet.width / 2);
-  const dy = origin.y + origin.h / 2 - (sheet.top + sheet.height / 2);
-  const s = Math.max(0.08, Math.min(origin.w / sheet.width, origin.h / sheet.height));
-  return `translate(${dx}px, ${dy}px) scale(${s})`;
-}
+const originOfSheet = () => getSheet()?.origin ?? null;
 
 export default function ProjectSheet({ reduced }: { reduced: boolean }) {
   // The store stays set until the close animation ends, so it drives everything.
   const shown = useSyncExternalStore(subscribeSheet, getSheet, () => null);
-  const dialog = useRef<HTMLDialogElement>(null);
-  const card = useRef<HTMLDivElement>(null);
-  const closing = useRef(false);
-
-  // Grow in from the origin when the sheet first opens.
-  useLayoutEffect(() => {
-    const d = dialog.current;
-    const c = card.current;
-    if (!shown || !d || !c || d.open) return;
-    d.showModal();
-    closing.current = false;
-    const end = { transform: "none", opacity: 1 };
-    const start =
-      reduced || !shown.origin
-        ? { transform: reduced ? "none" : "translateY(24px) scale(0.97)", opacity: 0 }
-        : { transform: fromOrigin(c.getBoundingClientRect(), shown.origin), opacity: 0.2 };
-    c.animate([start, end], { duration: reduced ? 160 : 480, easing: EASE_OUT });
-    d.animate([{ backgroundColor: "rgb(27 18 12 / 0)" }, { backgroundColor: "rgb(27 18 12 / 0.55)" }], {
-      duration: reduced ? 160 : 360,
-      fill: "forwards",
-    });
-  }, [shown, reduced]);
-
-  // Shrink back into the origin, then really close.
-  const dismiss = useCallback(() => {
-    const d = dialog.current;
-    const c = card.current;
-    if (!d || !c || closing.current) return;
-    closing.current = true;
-    const origin = getSheet()?.origin ?? null;
-    const end =
-      reduced || !origin
-        ? { transform: reduced ? "none" : "translateY(16px) scale(0.98)", opacity: 0 }
-        : { transform: fromOrigin(c.getBoundingClientRect(), origin), opacity: 0 };
-    const duration = reduced ? 120 : 300;
-    d.animate([{ backgroundColor: "rgb(27 18 12 / 0.55)" }, { backgroundColor: "rgb(27 18 12 / 0)" }], {
-      duration,
-      fill: "forwards",
-    });
-    c.animate([{ transform: "none", opacity: 1 }, end], { duration, easing: EASE_IN, fill: "forwards" }).onfinish = () => {
-      d.close();
-      closeProject();
-    };
-  }, [reduced]);
+  const { dialog, card, dismiss } = useSheetMotion({
+    open: shown !== null,
+    origin: originOfSheet,
+    reduced,
+    onClosed: closeProject,
+  });
 
   // Arrow keys walk between projects while the sheet is open.
   useEffect(() => {
@@ -178,12 +132,12 @@ export default function ProjectSheet({ reduced }: { reduced: boolean }) {
               <div className="sheet-rise mt-6 flex flex-wrap gap-3" style={{ "--i": 5 } as React.CSSProperties}>
                 {project.demoUrl && (
                   <a href={project.demoUrl} target="_blank" rel="noopener noreferrer" className="sheet-action sheet-action-primary">
-                    Live demo ↗
+                    Live demo <External />
                   </a>
                 )}
                 {project.repoUrl && (
                   <a href={project.repoUrl} target="_blank" rel="noopener noreferrer" className="sheet-action">
-                    View code ↗
+                    <Code /> View code
                   </a>
                 )}
               </div>
@@ -193,18 +147,18 @@ export default function ProjectSheet({ reduced }: { reduced: boolean }) {
 
         <footer className="sheet-footer">
           <button type="button" onClick={() => stepProject(-1)} className="sheet-nav" aria-label={`Previous project: ${prev?.title}`}>
-            ← <span className="truncate">{prev?.title}</span>
+            <ArrowLeft className="shrink-0" /> <span className="truncate">{prev?.title}</span>
           </button>
           <span className="text-xs tabular-nums text-[#7a5a44]">
             {index + 1} / {SHEET_ORDER.length}
           </span>
           <button type="button" onClick={() => stepProject(1)} className="sheet-nav justify-end" aria-label={`Next project: ${next?.title}`}>
-            <span className="truncate">{next?.title}</span> →
+            <span className="truncate">{next?.title}</span> <ArrowRight className="shrink-0" />
           </button>
         </footer>
 
         <button type="button" onClick={dismiss} className="sheet-close" aria-label="Close project">
-          ✕
+          <Close size={18} />
         </button>
       </div>
     </dialog>

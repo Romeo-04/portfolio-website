@@ -29,7 +29,12 @@ export interface Station {
   label: string;
   /** id of the matching section in the Quick Order menu */
   menuSection: string;
-  camera: { position: Vec3; target: Vec3 };
+  /**
+   * `via` bends the camera's path to the next station through this point
+   * (a Bézier control point), so it leaves through a doorway instead of
+   * cutting through a wall.
+   */
+  camera: { position: Vec3; target: Vec3; via?: Vec3 };
 }
 
 export const STATIONS: readonly Station[] = [
@@ -61,7 +66,8 @@ export const STATIONS: readonly Station[] = [
     id: "roastery",
     label: "Roastery",
     menuSection: "menu-roast-log",
-    camera: { position: [0, 1.8, -9.9], target: [0, 1, -13.2] },
+    // Out through the middle of the roastery doorway (x -0.7..0.7, z -9.5).
+    camera: { position: [0, 1.8, -9.9], target: [0, 1, -13.2], via: [0, 1.8, -8.6] },
   },
   {
     id: "specials",
@@ -126,6 +132,12 @@ export function progressFromScroll(
 
 const smoothstep = (t: number) => t * t * (3 - 2 * t);
 
+/** Quadratic Bézier from a to b, pulled toward c. */
+function bezier3(a: Vec3, c: Vec3, b: Vec3, t: number): Vec3 {
+  const u = 1 - t;
+  return [0, 1, 2].map((k) => u * u * a[k] + 2 * u * t * c[k] + t * t * b[k]) as unknown as Vec3;
+}
+
 function lerp3(a: Vec3, b: Vec3, t: number): Vec3 {
   return [
     a[0] + (b[0] - a[0]) * t,
@@ -151,7 +163,7 @@ export function cameraPose(
 
   const s = smoothstep(t);
   return {
-    position: lerp3(here.position, next.position, s),
+    position: here.via ? bezier3(here.position, here.via, next.position, s) : lerp3(here.position, next.position, s),
     target: lerp3(here.target, next.target, s),
   };
 }

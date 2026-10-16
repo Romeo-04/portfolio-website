@@ -30,6 +30,7 @@ import Room from "@/components/cafe/room";
 import Barista from "@/components/cafe/barista";
 import City from "@/components/cafe/city";
 import CityLife from "@/components/cafe/city-life";
+import Regulars from "@/components/cafe/regulars";
 import BrewBar from "@/components/cafe/stations/brew-bar";
 import Checkout from "@/components/cafe/stations/checkout";
 import MenuBoard from "@/components/cafe/stations/menu-board";
@@ -130,21 +131,26 @@ function CameraRig({ cut }: { cut: boolean }) {
   return null;
 }
 
-const CARD_W = 0.54;
-const CARD_H = 0.25;
+const CARD_W = 0.56;
+const CARD_H = 0.34;
 /** The plaque hangs on the counter's front face, just under the cup. */
 const CARD_TOP = -0.27;
 const CARD_Z = 0.225;
+/** Room for text inside the plaque's margins. */
+const CARD_TEXT_W = CARD_W - 0.07;
+
+/** Shrinks long names so they stay on one line inside the plaque. */
+function titleSize(title: string): number {
+  return Math.min(0.06, CARD_TEXT_W / (title.length * 0.54));
+}
 
 /**
  * A plaque on the counter front under each signature cup, like a drink
- * label: the project's initial in a badge, its name and category, and the
- * drink recipe its stack makes. It drops in as the cup starts to fill.
+ * label: the project's name, its category and the drink recipe its stack
+ * makes, set large enough to read from the bar. It drops in as the cup
+ * starts to fill.
  */
-const CupCard = forwardRef<Group, { project: (typeof projectsData)[number]; recipe: string[]; mark: string }>(function CupCard(
-  { project, recipe, mark },
-  ref,
-) {
+const CupCard = forwardRef<Group, { project: (typeof projectsData)[number]; recipe: string[] }>(function CupCard({ project, recipe }, ref) {
   return (
     <group ref={ref} position={[0, CARD_TOP, CARD_Z]} visible={false}>
       <group position={[0, -CARD_H / 2, 0]}>
@@ -153,40 +159,25 @@ const CupCard = forwardRef<Group, { project: (typeof projectsData)[number]; reci
           <Toon color="#fbf3e4" />
           <Ink />
         </mesh>
-        <mesh position={[0, CARD_H / 2 - 0.018, 0.007]}>
-          <planeGeometry args={[CARD_W, 0.036]} />
+        <mesh position={[0, CARD_H / 2 - 0.016, 0.007]}>
+          <planeGeometry args={[CARD_W, 0.032]} />
           <Toon color="#d0603f" />
         </mesh>
-        {/* Badge with the project's initial. */}
-        <mesh position={[-CARD_W / 2 + 0.055, -0.01, 0.007]}>
-          <circleGeometry args={[0.038, 24]} />
-          <Toon color="#3b2314" />
-        </mesh>
-        <Label font="display" fontSize={0.046} color="#fbf3e4" position={[-CARD_W / 2 + 0.055, -0.008, 0.009]}>
-          {mark}
-        </Label>
-        <Label
-          font="display"
-          fontSize={0.044}
-          maxWidth={CARD_W - 0.13}
-          anchorX="left"
-          color="#2b2b2e"
-          position={[-CARD_W / 2 + 0.11, 0.04, 0.009]}
-        >
+        <Label font="display" fontSize={titleSize(project.title)} color="#2b1a10" position={[0, CARD_H / 2 - 0.085, 0.009]}>
           {project.title}
         </Label>
-        <Label font="body" fontSize={0.024} anchorX="left" color="#8a5a3b" position={[-CARD_W / 2 + 0.11, -0.002, 0.009]}>
+        <Label font="body" fontSize={0.034} letterSpacing={0.08} color="#b0482a" position={[0, CARD_H / 2 - 0.14, 0.009]}>
           {project.category.toUpperCase()}
         </Label>
         <Label
           font="body"
-          fontSize={0.024}
-          lineHeight={1.15}
-          maxWidth={CARD_W - 0.13}
-          anchorX="left"
+          fontSize={0.033}
+          lineHeight={1.2}
+          maxWidth={CARD_TEXT_W}
+          textAlign="center"
           anchorY="top"
-          color="#5a4a3e"
-          position={[-CARD_W / 2 + 0.11, -0.025, 0.009]}
+          color="#4a3a2e"
+          position={[0, CARD_H / 2 - 0.175, 0.009]}
         >
           {recipe.join(" · ")}
         </Label>
@@ -194,6 +185,130 @@ const CupCard = forwardRef<Group, { project: (typeof projectsData)[number]; reci
     </group>
   );
 });
+
+/** The café's mark on a cup: a cream bean on a dark badge with a cream ring. */
+function CafeBadge({ r }: { r: number }) {
+  return (
+    <group>
+      <mesh>
+        <circleGeometry args={[r, 28]} />
+        <meshBasicMaterial color="#3b2314" />
+      </mesh>
+      <mesh position={[0, 0, 0.001]}>
+        <ringGeometry args={[r * 0.8, r * 0.92, 28]} />
+        <meshBasicMaterial color="#fbf3e4" />
+      </mesh>
+      <group rotation-z={-0.5} position={[0, 0, 0.002]}>
+        <mesh scale={[r * 0.36, r * 0.52, 1]}>
+          <circleGeometry args={[1, 20]} />
+          <meshBasicMaterial color="#fbf3e4" />
+        </mesh>
+        <mesh position={[0, 0, 0.001]} rotation-z={0.15}>
+          <planeGeometry args={[r * 0.1, r * 0.9]} />
+          <meshBasicMaterial color="#3b2314" />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+/** Glass radius at height y (the glass tapers from 0.14 at the base to 0.18 at the rim). */
+const glassR = (y: number) => 0.14 + 0.04 * (y / CUP_HEIGHT + 0.5);
+
+/** Kraft sleeve round the middle of the cup, carrying the café's badge. */
+function Sleeve() {
+  return (
+    <group>
+      <mesh>
+        <cylinderGeometry args={[glassR(0.065) + 0.006, glassR(-0.065) + 0.006, 0.13, 28, 1, true]} />
+        <Toon color="#c99a66" surface="canvas" />
+        <Ink />
+      </mesh>
+      <group position={[0, 0, glassR(0) + 0.009]} rotation-x={-0.1}>
+        <CafeBadge r={0.05} />
+      </group>
+    </group>
+  );
+}
+
+/**
+ * The finishing touch once the cup is full: a swirl of whipped cream with
+ * a drizzle and a straw on a glass, or milk foam with a latte-art heart and
+ * a dusting on a mug or cup.
+ */
+function Topping({ kind, dust }: { kind: "whip" | "foam"; dust: string }) {
+  const rim = CUP_HEIGHT / 2;
+  if (kind === "whip") {
+    return (
+      <group position={[0, rim, 0]}>
+        <mesh position={[0, 0.02, 0]} scale={[0.19, 0.08, 0.19]}>
+          <sphereGeometry args={[1, 20, 12]} />
+          <Toon color="#fbf3e4" />
+          <Ink />
+        </mesh>
+        <mesh position={[0, 0.085, 0]} scale={[0.12, 0.07, 0.12]}>
+          <sphereGeometry args={[1, 18, 10]} />
+          <Toon color="#fbf3e4" />
+          <Ink />
+        </mesh>
+        <mesh position={[0, 0.16, 0]}>
+          <coneGeometry args={[0.055, 0.09, 14]} />
+          <Toon color="#fbf3e4" />
+          <Ink />
+        </mesh>
+        {/* Drizzle rings. */}
+        {[
+          [0.06, 0.155],
+          [0.12, 0.1],
+        ].map(([y, r]) => (
+          <mesh key={y} position={[0, y, 0]} rotation-x={Math.PI / 2 - 0.12}>
+            <torusGeometry args={[r, 0.008, 6, 28]} />
+            <Toon color={dust} />
+          </mesh>
+        ))}
+        {/* Striped straw. */}
+        <mesh position={[0.07, 0.12, -0.02]} rotation-z={-0.35}>
+          <cylinderGeometry args={[0.014, 0.014, 0.42, 10]} />
+          <Toon color="#e4572e" />
+          <Ink />
+        </mesh>
+      </group>
+    );
+  }
+  return (
+    <group position={[0, rim - 0.012, 0]}>
+      <mesh rotation-x={-Math.PI / 2}>
+        <circleGeometry args={[0.172, 28]} />
+        <Toon color="#f1e2c8" />
+      </mesh>
+      {/* Latte-art heart: two lobes and a point. */}
+      <group position={[0, 0.002, 0.02]} rotation-x={-Math.PI / 2}>
+        {[-0.03, 0.03].map((x) => (
+          <mesh key={x} position={[x, 0.02, 0]}>
+            <circleGeometry args={[0.038, 18]} />
+            <meshBasicMaterial color="#c08a5c" />
+          </mesh>
+        ))}
+        <mesh position={[0, -0.015, 0]} rotation-z={Math.PI}>
+          <circleGeometry args={[0.062, 3]} />
+          <meshBasicMaterial color="#c08a5c" />
+        </mesh>
+      </group>
+      {[
+        [-0.1, -0.05],
+        [0.11, -0.03],
+        [-0.06, 0.1],
+        [0.08, 0.09],
+        [0.0, -0.11],
+      ].map(([x, z]) => (
+        <mesh key={`${x}${z}`} position={[x, 0.003, z]} rotation-x={-Math.PI / 2}>
+          <circleGeometry args={[0.009, 8]} />
+          <meshBasicMaterial color={dust} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
 
 function PouringCup({
   project,
@@ -215,9 +330,16 @@ function PouringCup({
   const surfaceRef = useRef<Mesh>(null);
   const surfaceMat = useRef<MeshBasicMaterial>(null);
   const card = useRef<Group>(null);
+  const topping = useRef<Group>(null);
   useFrame(() => {
     const fill = cupFill(getProgress(), index, count);
     setFill(liquid, fill);
+    // The topping lands as the last of the pour settles.
+    if (topping.current) {
+      const s = easeOutBack(Math.min(1, Math.max(0, (fill - 0.92) / 0.08)));
+      topping.current.scale.setScalar(Math.max(0.001, s));
+      topping.current.visible = fill > 0.92;
+    }
     // The name card pops up as its cup starts to fill.
     if (card.current) {
       const s = easeOutBack(Math.min(1, fill * 3));
@@ -287,7 +409,11 @@ function PouringCup({
           <Ink />
         </mesh>
       )}
-      <CupCard ref={card} project={project} recipe={drink.layers.map((l) => l.name)} mark={drink.mark} />
+      <Sleeve />
+      <group ref={topping} visible={false}>
+        <Topping kind={drink.topping.kind} dust={drink.topping.dust} />
+      </group>
+      <CupCard ref={card} project={project} recipe={drink.layers.map((l) => l.name)} />
     </group>
   );
 }
@@ -461,6 +587,7 @@ function Shop({
       <SkyDome />
       <City />
       <CityLife still={still} busy={lampLights} />
+      <Regulars still={still} />
       <Model name="room" fallback={<Room lampLights={lampLights} />} />
       <Model name="brew-bar" fallback={<BrewBar />} />
       <Barista />

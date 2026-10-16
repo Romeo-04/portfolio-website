@@ -33,22 +33,11 @@ import { openTestimonial } from "@/lib/cafe/testimonial-sheet";
 import { getProgress, goTo, subscribeProgress } from "@/lib/cafe/scroll";
 import { setViewInset } from "@/lib/cafe/view-inset";
 import { ArrowRight, Code, Document, External, Mail } from "@/components/ui/icons";
-import { DWELL, STATIONS, stationIndexAt, stationProgress, type StationId } from "@/lib/cafe/stations";
+import { STATIONS, stationIndexAt, type StationId } from "@/lib/cafe/stations";
 
 /** The panel's width plus its margin, in CSS px (see .station-panel). */
 const PANEL_SPACE = 420;
 
-/** Visible from arrival until a little after the camera starts to leave. */
-const SHOW_UNTIL = DWELL + 0.12;
-
-type View = { index: number; visible: boolean };
-
-function viewAt(progress: number): View {
-  const index = stationIndexAt(progress);
-  const id = STATIONS[index].id;
-  const last = index === STATIONS.length - 1;
-  return { index, visible: last || stationProgress(progress, id) <= SHOW_UNTIL };
-}
 
 function Label({ children }: { children: ReactNode }) {
   return <p className="panel-label">{children}</p>;
@@ -318,30 +307,31 @@ function content(id: StationId, specials: SpecialItem[], reduced: boolean): { ey
 }
 
 export default function StationPanel({ specials, reduced }: { specials: SpecialItem[]; reduced: boolean }) {
-  const [view, setView] = useState<View>(() => viewAt(getProgress()));
+  // The panel stays up the whole way through; its content follows the
+  // station the camera is at or heading for.
+  const [index, setIndex] = useState(() => stationIndexAt(getProgress()));
   const [folded, setFolded] = useState(false);
 
   useEffect(
     () =>
       subscribeProgress(() => {
-        const next = viewAt(getProgress());
-        setView((v) => (v.index === next.index && v.visible === next.visible ? v : next));
+        setIndex(stationIndexAt(getProgress()));
       }),
     [],
   );
 
   // Make room for the panel: the 3D view centres in the space beside it.
   // Phones get a bottom sheet instead, so the view stays put there.
-  const open = view.visible && !folded;
+  const open = !folded;
   useEffect(() => {
     const wide = window.matchMedia("(min-width: 641px)").matches;
     setViewInset(open && wide ? PANEL_SPACE / 2 : 0);
   }, [open]);
   useEffect(() => () => setViewInset(0), []);
 
-  const station = STATIONS[view.index];
+  const station = STATIONS[index];
   const { eyebrow, title, body } = content(station.id, specials, reduced);
-  const step = `${String(view.index + 1).padStart(2, "0")} / ${String(STATIONS.length).padStart(2, "0")}`;
+  const step = `${String(index + 1).padStart(2, "0")} / ${String(STATIONS.length).padStart(2, "0")}`;
 
   if (folded) {
     return (
@@ -354,8 +344,7 @@ export default function StationPanel({ specials, reduced }: { specials: SpecialI
   return (
     <section
       aria-label={`${station.label}: ${title}`}
-      className={`station-panel ${view.visible ? "is-visible" : ""}`}
-      inert={!view.visible}
+      className="station-panel is-visible"
       data-lenis-prevent
     >
       {/* Keyed by station so the content re-staggers on arrival. */}

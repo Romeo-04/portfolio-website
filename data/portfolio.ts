@@ -29,7 +29,7 @@ export const personalInfo = {
   resumeUrl: "/resume.pdf", // Place your resume PDF in /public/resume.pdf
   email: "jhezraang@gmail.com", // e.g., "jhezra@example.com"
   github: "https://github.com/Romeo-04", // e.g., "https://github.com/jhezra"
-  linkedin: "https://www.linkedin.com/in/jhezra-tolentino-513780287/", // e.g., "https://linkedin.com/in/jhezra"
+  linkedin: "https://www.linkedin.com/in/jhezra-tolentino/", // e.g., "https://linkedin.com/in/jhezra"
 };
 
 // --- GitHub exclusions ---

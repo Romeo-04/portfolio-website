@@ -98,7 +98,7 @@ export default function ProjectSheet({ reduced }: { reduced: boolean }) {
             <h2 id="sheet-title" className="font-display sheet-rise mt-1 text-4xl leading-tight" style={{ "--i": 1 } as React.CSSProperties}>
               {project.title}
             </h2>
-            <p className="sheet-rise mt-1 text-sm text-[#7a5a44]" style={{ "--i": 1 } as React.CSSProperties}>
+            <p className="sheet-rise mt-1 text-sm text-[var(--ink-muted)]" style={{ "--i": 1 } as React.CSSProperties}>
               {project.role}
             </p>
             <p className="sheet-rise mt-4 text-lg leading-relaxed" style={{ "--i": 2 } as React.CSSProperties}>
@@ -110,7 +110,7 @@ export default function ProjectSheet({ reduced }: { reduced: boolean }) {
               <ul className="mt-2 space-y-2">
                 {project.description.map((line) => (
                   <li key={line} className="flex gap-2.5 text-[15px] leading-relaxed">
-                    <span aria-hidden className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#d0603f]" />
+                    <span aria-hidden className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" />
                     {line}
                   </li>
                 ))}
@@ -149,7 +149,7 @@ export default function ProjectSheet({ reduced }: { reduced: boolean }) {
           <button type="button" onClick={() => stepProject(-1)} className="sheet-nav" aria-label={`Previous project: ${prev?.title}`}>
             <ArrowLeft className="shrink-0" /> <span className="truncate">{prev?.title}</span>
           </button>
-          <span className="text-xs tabular-nums text-[#7a5a44]">
+          <span className="text-xs tabular-nums text-[var(--ink-muted)]">
             {index + 1} / {SHEET_ORDER.length}
           </span>
           <button type="button" onClick={() => stepProject(1)} className="sheet-nav justify-end" aria-label={`Next project: ${next?.title}`}>

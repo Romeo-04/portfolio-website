@@ -132,7 +132,7 @@ export default function Intro({
         ref={skipRef}
         type="button"
         onClick={skip}
-        className="game-button mt-6 px-5 py-2 text-sm"
+        className="intro-skip"
       >
         Skip intro
       </button>

@@ -11,7 +11,7 @@ import TestimonialSheet from "@/components/cafe/testimonial-sheet";
 import StationPanel from "@/components/cafe/station-panel";
 import type { SpecialItem } from "@/components/cafe/stations/specials";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
-import { ArrowRight, Cup } from "@/components/ui/icons";
+import { ArrowRight, Close, Cup, MenuIcon } from "@/components/ui/icons";
 import { detectWebGL, isPhoneViewport, resolveMode } from "@/lib/cafe/mode";
 import { openProject, originOf } from "@/lib/cafe/project-sheet";
 import { openTestimonial } from "@/lib/cafe/testimonial-sheet";
@@ -153,22 +153,18 @@ export default function CafeShell({ children, specials }: { children: ReactNode;
 
   if (!inCafe) {
     return (
-      <main onClick={onLinkClick} aria-label="Quick Order menu" className="mx-auto max-w-2xl px-5 py-10">
+      <main onClick={onLinkClick} aria-label="Quick Order menu" className="menu-page">
         {mode === "closed" && (
-          <p role="status" className="font-display mb-6 text-center text-2xl">
-            The café is closed today <Cup size={22} />
+          <p role="status" className="menu-closed">
+            <Cup size={20} /> The café is closed today, so here is the menu.
           </p>
         )}
         {caps?.phone && caps.webgl && (
-          <button
-            type="button"
-            onClick={() => setEntered(true)}
-            className="game-button game-button-accent mb-6 w-full px-4 py-3"
-          >
+          <button type="button" onClick={() => setEntered(true)} className="menu-enter">
             Step inside the café <ArrowRight />
           </button>
         )}
-        <div className="rounded-lg bg-[#f6ead8] p-6">{children}</div>
+        <div className="menu-paper">{children}</div>
         <ProjectSheet reduced={reduced} />
         <TestimonialSheet reduced={reduced} />
       </main>
@@ -189,12 +185,18 @@ export default function CafeShell({ children, specials }: { children: ReactNode;
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         aria-controls="quick-order"
-        className="game-button fixed top-4 right-4 z-20 px-5 py-2 text-sm"
+        aria-keyshortcuts="M"
+        className="hud-button"
       >
-        {open ? "Close menu" : (
+        {open ? (
           <>
-            <span className="sm:hidden">Menu</span>
-            <span className="hidden sm:inline">Quick Order (M)</span>
+            <Close size={18} /> Close
+          </>
+        ) : (
+          <>
+            <MenuIcon size={18} /> <span className="sm:hidden">Menu</span>
+            <span className="hidden sm:inline">Quick order</span>
+            <kbd className="hud-kbd">M</kbd>
           </>
         )}
       </button>
@@ -206,11 +208,12 @@ export default function CafeShell({ children, specials }: { children: ReactNode;
         tabIndex={-1}
         aria-label="Quick Order menu"
         id="quick-order"
-        data-lenis-prevent
         inert={!open}
-        className={`fixed top-0 right-0 z-10 h-full w-full max-w-md overflow-y-auto bg-[#f6ead8] p-6 pt-16 shadow-2xl transition-transform duration-300 ${open ? "translate-x-0" : "translate-x-full"}`}
+        className={`menu-drawer ${open ? "is-open" : ""}`}
       >
-        {children}
+        <div className="menu-drawer-scroll" data-lenis-prevent>
+          {children}
+        </div>
       </aside>
       </div>
       <Intro reduced={reduced} ready={sceneReady} onActiveChange={onIntroActive} />

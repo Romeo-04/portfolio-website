@@ -19,7 +19,7 @@ import { getProgress } from "@/lib/cafe/scroll";
 import { STATIONS, stationYaw } from "@/lib/cafe/stations";
 
 const [CX, , CZ] = STATIONS.find((s) => s.id === "checkout")!.camera.target;
-const RECEIPT_HEIGHT = 0.9;
+const RECEIPT_HEIGHT = 0.56;
 /** The printer sits at the counter's front edge, so the receipt hangs clear of the top. */
 const PRINTER_Z = 0.24;
 const RECEIPT_Z = PRINTER_Z + 0.24;

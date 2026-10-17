@@ -27,6 +27,8 @@ export type Vec3 = readonly [number, number, number];
 export interface Station {
   id: StationId;
   label: string;
+  /** a one-word name for the station nav */
+  short: string;
   /** id of the matching section in the Quick Order menu */
   menuSection: string;
   /**
@@ -41,30 +43,35 @@ export const STATIONS: readonly Station[] = [
   {
     id: "storefront",
     label: "Storefront",
+    short: "Front",
     menuSection: "menu-top",
     camera: { position: [0, 2.1, 15.5], target: [0, 2.7, 0] },
   },
   {
     id: "menu-board",
     label: "Menu Board",
+    short: "Menu",
     menuSection: "menu-about",
     camera: { position: [-0.6, 1.8, -5.3], target: [-2.5, 1.9, -9.4] },
   },
   {
     id: "brew-bar",
     label: "Brew Bar",
+    short: "Bar",
     menuSection: "menu-drinks",
     camera: { position: [2.4, 1.9, -2.9], target: [6, 1, -3] },
   },
   {
     id: "wall",
     label: "Wall of Fame",
+    short: "Wall",
     menuSection: "menu-wall",
     camera: { position: [-2.4, 1.8, -3], target: [-6.3, 1.8, -3] },
   },
   {
     id: "roastery",
     label: "Roastery",
+    short: "Roastery",
     menuSection: "menu-roast-log",
     // Out through the middle of the roastery doorway (x -0.7..0.7, z -9.5).
     camera: { position: [0, 1.8, -9.9], target: [0, 1, -13.2], via: [0, 1.8, -8.6] },
@@ -72,12 +79,14 @@ export const STATIONS: readonly Station[] = [
   {
     id: "specials",
     label: "Today's Specials",
+    short: "Specials",
     menuSection: "menu-specials",
     camera: { position: [3.4, 1.9, -7.4], target: [6.6, 2, -7.4] },
   },
   {
     id: "checkout",
     label: "Checkout",
+    short: "Checkout",
     menuSection: "menu-find-us",
     camera: { position: [0.8, 1.6, -1.9], target: [-0.9, 0.9, -4.9] },
   },

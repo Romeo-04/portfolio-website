@@ -18,11 +18,10 @@
 
 import { PerformanceMonitor, useProgress } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Suspense, forwardRef, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, forwardRef, lazy, useEffect, useMemo, useRef, useState } from "react";
 import { BackSide, Color, Mesh as ThreeMesh, Object3D, ShaderMaterial } from "three";
 import type { Group, Mesh, MeshBasicMaterial, PerspectiveCamera } from "three";
 import { INK, OUTLINE_THICKNESS } from "@/components/cafe/materials/toon";
-import Effects from "@/components/cafe/effects";
 import { Ink, Toon } from "@/components/cafe/kit";
 import { Label } from "@/components/cafe/text3d";
 import Model from "@/components/cafe/model";
@@ -44,6 +43,9 @@ import { projectsData } from "@/data/portfolio";
 import { drinkFor } from "@/lib/cafe/drinks";
 import { cupFill, layerIndexAt } from "@/lib/cafe/pour";
 import { qualityFor } from "@/lib/cafe/quality";
+
+// Post-processing is its own chunk: phones and slow devices never fetch it.
+const Effects = lazy(() => import("@/components/cafe/effects"));
 import { setLoading } from "@/lib/cafe/loading";
 import { CAMERA_LAMBDA, dampVec3, distance3, shouldSnap } from "@/lib/cafe/damp";
 import { getProgress, subscribeProgress } from "@/lib/cafe/scroll";
@@ -133,9 +135,13 @@ function CameraRig({ cut }: { cut: boolean }) {
 
 const CARD_W = 0.56;
 const CARD_H = 0.34;
-/** The plaque hangs on the counter's front face, just under the cup. */
+/**
+ * The plaque hangs on the counter's front face, just under the cup. The
+ * cups face the camera, which sits a little off the counter's axis, so the
+ * end plaques stand a few centimetres proud to clear the slats.
+ */
 const CARD_TOP = -0.27;
-const CARD_Z = 0.225;
+const CARD_Z = 0.27;
 /** Room for text inside the plaque's margins. */
 const CARD_TEXT_W = CARD_W - 0.07;
 
@@ -467,7 +473,13 @@ function Sun({ shadows }: { shadows: boolean }) {
 function ShadowFlags({ enabled }: { enabled: boolean }) {
   const scene = useThree((s) => s.scene);
   const seen = useRef(-1);
+  const checked = useRef(0);
   useFrame(() => {
+    // New pieces (models, late text) only arrive now and then, so the
+    // scene is recounted twice a second rather than walked every frame.
+    const now = performance.now();
+    if (seen.current !== -1 && now - checked.current < 500) return;
+    checked.current = now;
     let count = 0;
     scene.traverse(() => count++);
     if (count === seen.current) return;
@@ -634,7 +646,11 @@ export default function CafeScene({
         <Suspense fallback={null}>
           <Shop specials={specials} lampLights={quality.effects} still={cut} />
         </Suspense>
-        {quality.effects && <Effects />}
+        {quality.effects && (
+          <Suspense fallback={null}>
+            <Effects />
+          </Suspense>
+        )}
       </Canvas>
     </div>
   );

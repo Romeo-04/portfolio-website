@@ -6,13 +6,13 @@
 // Renders a registered Blender model with the toon look and ink outlines,
 // or the procedural fallback while there is no file, while it loads, or if
 // it fails to load. Meshopt compression only: no external Draco decoder.
+// The loader is its own chunk, fetched only once a model is registered.
 // ============================================================
 
-import { useGLTF } from "@react-three/drei";
-import { Component, Suspense, useEffect, useMemo, type ReactNode } from "react";
-import { Ink } from "@/components/cafe/kit";
-import { collectMeshes } from "@/components/cafe/materials/toonify";
+import { Component, Suspense, lazy, type ReactNode } from "react";
 import { modelSrc, type ModelName } from "@/lib/cafe/models";
+
+const Loaded = lazy(() => import("@/components/cafe/model-loaded"));
 
 class ModelBoundary extends Component<{ fallback: ReactNode; children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
@@ -25,22 +25,6 @@ class ModelBoundary extends Component<{ fallback: ReactNode; children: ReactNode
   render() {
     return this.state.failed ? this.props.fallback : this.props.children;
   }
-}
-
-function Loaded({ src }: { src: string }) {
-  const { scene } = useGLTF(src, false, true);
-  const meshes = useMemo(() => collectMeshes(scene), [scene]);
-  // Dispose the toon materials we created; their textures belong to the glTF cache.
-  useEffect(() => () => meshes.forEach((m) => m.material.dispose()), [meshes]);
-  return (
-    <group>
-      {meshes.map((m, i) => (
-        <mesh key={i} geometry={m.geometry} material={m.material} matrix={m.matrix} matrixAutoUpdate={false}>
-          <Ink />
-        </mesh>
-      ))}
-    </group>
-  );
 }
 
 export default function Model({ name, fallback }: { name: ModelName; fallback: ReactNode }) {

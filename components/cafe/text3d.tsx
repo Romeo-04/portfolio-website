@@ -5,9 +5,10 @@
 // ============================================================
 // Every word in the café scene is real 3D text (troika SDF via drei Text):
 // sharp at any distance, hidden correctly behind walls, and far cheaper than
-// HTML overlays, which re-layout every frame. Fonts are subsetted TTFs in
-// public/fonts. The canvas draws on demand, so each label asks for a frame
-// once its glyphs are ready.
+// HTML overlays, which re-layout every frame. Fonts are subsetted WOFFs in
+// public/fonts with the hinting stripped (SDF text never uses it). The
+// canvas draws on demand, so each label asks for a frame once its glyphs
+// are ready.
 // ============================================================
 
 import { Text } from "@react-three/drei";
@@ -16,13 +17,13 @@ import { forwardRef, type ComponentProps } from "react";
 
 export const FONTS = {
   /** Bold, playful display face for signs and titles. */
-  display: "/fonts/LilitaOne-Regular.ttf",
+  display: "/fonts/LilitaOne-Regular.woff",
   /** Clean rounded face for labels. */
-  body: "/fonts/VarelaRound-Regular.ttf",
+  body: "/fonts/VarelaRound-Regular.woff",
   /** Hand-lettered chalk for the menu board. */
-  chalk: "/fonts/Kalam-Bold.ttf",
+  chalk: "/fonts/Kalam-Bold.woff",
   /** Typewriter face for the receipt. */
-  receipt: "/fonts/CourierPrime-Bold.ttf",
+  receipt: "/fonts/CourierPrime-Bold.woff",
 } as const;
 
 export type FontName = keyof typeof FONTS;

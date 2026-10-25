@@ -4,7 +4,7 @@
 // THE BARISTA (Jhezra)
 // ============================================================
 // A stylised, game-like chibi of the site owner standing behind the brew
-// bar, modelled on the owner's photo: full wavy black hair with a fringe,
+// bar, modelled on the owner's photo: full wavy black hair with a middle part,
 // fair skin, almond eyes and an open smile, a white collared shirt and a
 // terracotta apron with a name tag. Built from primitives in the
 // shared toon style so it matches the café, and animated in code:
@@ -40,15 +40,17 @@ const HAIR_TUFTS: [number, number, number, number][] = [
   [-0.15, 0.13, -0.1, 0.1],
   [0.15, 0.13, -0.1, 0.1],
 ];
-/** [x, tilt, length] for each lock of the fringe, swept a little to one side. */
-const FRINGE: [number, number, number][] = [
-  [-0.14, -0.4, 0.85],
-  [-0.085, -0.2, 1.0],
-  [-0.03, 0.08, 0.9],
-  [0.025, 0.3, 1.05],
-  [0.08, 0.42, 0.95],
-  [0.135, 0.55, 0.8],
+/** [x, tilt, length] for the locks on one side of a middle part; the other
+ *  side mirrors them, so the fringe opens like curtains from the centre. */
+const FRINGE_SIDE: [number, number, number][] = [
+  [0.06, 0.7, 1.3],
+  [0.11, 0.5, 1.15],
+  [0.15, 0.32, 1.0],
+  [0.18, 0.18, 0.85],
 ];
+const FRINGE = [-1, 1].flatMap((side) =>
+  FRINGE_SIDE.map(([x, tilt, length]) => [side * x, side * tilt, length] as const),
+);
 
 /** Behind the counter in the gap between two cups, facing the customers (-x). */
 const POSITION: [number, number, number] = [6.35, 0, -2.5];
@@ -193,8 +195,8 @@ export default function Barista() {
               <Toon color={SKIN} />
             </mesh>
           ))}
-          {/* Hair cap, tilted back so the face stays clear. */}
-          <mesh position={[0, 0.04, -0.02]} rotation={[-0.38, 0, 0]} scale={[1.1, 1.08, 1.1]}>
+          {/* Hair cap, tilted back so the hairline sits high and the part shows. */}
+          <mesh position={[0, 0.04, -0.02]} rotation={[-0.6, 0, 0]} scale={[1.1, 1.08, 1.1]}>
             <sphereGeometry args={[0.225, 28, 16, 0, Math.PI * 2, 0, Math.PI * 0.56]} />
             <Toon color={HAIR} />
             <Ink />
@@ -206,9 +208,9 @@ export default function Barista() {
               <Toon color={HAIR} />
             </mesh>
           ))}
-          {/* Fringe: separate wavy locks falling to the brows. */}
+          {/* Fringe: wavy locks parted in the middle, falling to the brows. */}
           {FRINGE.map(([x, tilt, length], i) => (
-            <mesh key={i} position={[x, 0.12, 0.2 - Math.abs(x) * 0.4]} rotation={[-0.4, x * 1.6, tilt]} scale={[0.4, length, 0.3]}>
+            <mesh key={i} position={[x, 0.11, 0.205 - Math.abs(x) * 0.4]} rotation={[-0.4, x * 1.6, tilt]} scale={[0.4, length, 0.3]}>
               <sphereGeometry args={[0.075, 12, 10]} />
               <Toon color={HAIR} />
             </mesh>

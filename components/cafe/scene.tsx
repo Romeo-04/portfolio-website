@@ -12,14 +12,15 @@
 // Smoothness: the camera eases toward its scroll pose (lib/cafe/damp.ts),
 // and after a short warm-up the canvas only draws when something changes —
 // scroll, a camera still settling, or rain on screen — instead of every
-// frame. The warm-up keeps continuous frames while PerformanceMonitor takes
-// its samples, so idle gaps never read as a slow device.
+// frame. Frame times are measured during the warm-up only, while frames are
+// continuous, so idle gaps never read as a slow device. A slow device steps
+// down one quality rung (lib/cafe/quality.ts) and is measured again.
 // ============================================================
 
-import { PerformanceMonitor, useProgress } from "@react-three/drei";
+import { useProgress } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Suspense, forwardRef, lazy, useEffect, useMemo, useRef, useState } from "react";
-import { BackSide, Color, Mesh as ThreeMesh, Object3D, ShaderMaterial } from "three";
+import { BackSide, Color, Mesh as ThreeMesh, NeutralToneMapping, Object3D, ShaderMaterial } from "three";
 import type { Group, Mesh, MeshBasicMaterial, PerspectiveCamera } from "three";
 import { INK, OUTLINE_THICKNESS } from "@/components/cafe/materials/toon";
 import { Ink, Toon } from "@/components/cafe/kit";
@@ -42,7 +43,7 @@ import { preloadCafeTextures } from "@/components/cafe/textures";
 import { projectsData } from "@/data/portfolio";
 import { drinkFor } from "@/lib/cafe/drinks";
 import { cupFill, layerIndexAt } from "@/lib/cafe/pour";
-import { qualityFor } from "@/lib/cafe/quality";
+import { isSlow, qualityFor } from "@/lib/cafe/quality";
 
 // Post-processing is its own chunk: phones and slow devices never fetch it.
 const Effects = lazy(() => import("@/components/cafe/effects"));
@@ -70,18 +71,41 @@ function LoadingReporter() {
 
 /** Continuous frames for this long, then draw only on demand. */
 const WARMUP_MS = 3500;
+/** The first part of a warm-up is shader compiles and uploads: not measured. */
+const SETTLE_MS = 1000;
 
-function FrameDriver() {
+/**
+ * Sets the canvas's pace. Each warm-up renders continuously and times its
+ * frames; when it ends the canvas draws on demand (scroll asks for frames).
+ * A slow warm-up reports onSlow, the scene steps down a rung, and the new
+ * rung gets a warm-up of its own. Mounted with the shop, so loading time is
+ * never measured.
+ */
+function Pacing({ rung, measure, onSlow }: { rung: number; measure: boolean; onSlow: () => void }) {
   const setFrameloop = useThree((s) => s.setFrameloop);
   const invalidate = useThree((s) => s.invalidate);
+  const run = useRef({ start: 0, last: 0, times: [] as number[], done: false });
+  useEffect(() => subscribeProgress(() => invalidate()), [invalidate]);
   useEffect(() => {
-    const timer = setTimeout(() => setFrameloop("demand"), WARMUP_MS);
-    const unsubscribe = subscribeProgress(() => invalidate());
-    return () => {
-      clearTimeout(timer);
-      unsubscribe();
-    };
-  }, [setFrameloop, invalidate]);
+    run.current = { start: 0, last: 0, times: [], done: false };
+    setFrameloop("always");
+  }, [rung, setFrameloop]);
+  useFrame(() => {
+    const r = run.current;
+    if (r.done) return;
+    const now = performance.now();
+    // A hidden tab barely draws; start over once it is back.
+    if (document.hidden || r.start === 0) {
+      run.current = { start: document.hidden ? 0 : now, last: now, times: [], done: false };
+      return;
+    }
+    if (now - r.start > SETTLE_MS) r.times.push(now - r.last);
+    r.last = now;
+    if (now - r.start < WARMUP_MS) return;
+    r.done = true;
+    setFrameloop("demand");
+    if (measure && isSlow(r.times)) onSlow();
+  });
   return null;
 }
 
@@ -438,19 +462,21 @@ function SignatureCups() {
   );
 }
 
-/** The sun: a warm key light that casts soft shadows on desktop. */
-function Sun({ shadows }: { shadows: boolean }) {
+/** The sun: a warm key light that casts soft shadows where the device can afford them. */
+function Sun({ shadows, mapSize }: { shadows: boolean; mapSize: number }) {
   const target = useMemo(() => new Object3D(), []);
   return (
     <>
       <primitive object={target} position={[0, 0, -4]} />
       <directionalLight
+        // A new map size needs a new shadow map, so the light remounts.
+        key={mapSize}
         position={[7, 13, 12]}
-        intensity={2.6}
-        color="#fff1d6"
+        intensity={2.15}
+        color="#fff0d2"
         target={target}
         castShadow={shadows}
-        shadow-mapSize={[2048, 2048]}
+        shadow-mapSize={[mapSize, mapSize]}
         shadow-camera-left={-11}
         shadow-camera-right={11}
         shadow-camera-top={11}
@@ -459,7 +485,10 @@ function Sun({ shadows }: { shadows: boolean }) {
         shadow-camera-far={45}
         shadow-bias={-0.0004}
         shadow-normalBias={0.03}
-        shadow-radius={4}
+        shadow-radius={5}
+        // Shade keeps half the sun: indoors stays bright and airy, and
+        // shadows read as soft tinted pools rather than dark patches.
+        shadow-intensity={0.5}
       />
     </>
   );
@@ -522,6 +551,7 @@ function ShadowRefresh() {
   const get = useThree((s) => s.get);
   const last = useRef<number | null>(null);
   const start = useRef(0);
+  const warmed = useRef(0);
   useEffect(() => {
     const { shadowMap } = get().gl;
     shadowMap.autoUpdate = false;
@@ -533,7 +563,12 @@ function ShadowRefresh() {
   }, [get]);
   useFrame(({ gl }) => {
     const p = getProgress();
-    const warming = performance.now() - start.current < WARMUP_MS;
+    // Late arrivals (text, textures) are caught a few times a second during
+    // the warm-up; redrawing the map every frame would make the warm-up
+    // slower than real use and read as a slow device.
+    const now = performance.now();
+    const warming = now - start.current < WARMUP_MS && now - warmed.current > 250;
+    if (warming) warmed.current = now;
     if (takeShadowUpdate() || warming || p !== last.current) gl.shadowMap.needsUpdate = true;
     last.current = p;
   });
@@ -548,8 +583,8 @@ function SkyDome() {
         side: BackSide,
         depthWrite: false,
         uniforms: {
-          top: { value: new Color("#7fc4f0") },
-          horizon: { value: new Color("#fdf1d8") },
+          top: { value: new Color("#86c8f4") },
+          horizon: { value: new Color("#fff4de") },
         },
         vertexShader: /* glsl */ `
           varying float vY;
@@ -563,8 +598,9 @@ function SkyDome() {
           uniform vec3 horizon;
           varying float vY;
           void main() {
-            float t = smoothstep(-0.05, 0.6, vY);
-            gl_FragColor = vec4(mix(horizon, top, t), 1.0);
+            // A long, even fade: cream haze low down, clear blue overhead.
+            float t = smoothstep(-0.05, 0.75, vY);
+            gl_FragColor = vec4(mix(horizon, top, t * t * (3.0 - 2.0 * t)), 1.0);
             #include <tonemapping_fragment>
             #include <colorspace_fragment>
           }
@@ -625,26 +661,34 @@ export default function CafeScene({
   light: boolean;
   onReady?: () => void;
 }) {
-  const [declined, setDeclined] = useState(false);
-  const quality = qualityFor({ light, declined });
+  const [declines, setDeclines] = useState(0);
+  const quality = qualityFor({ light, declines });
   return (
-    <div aria-hidden className="fixed inset-0">
-      <Canvas shadows="percentage" camera={{ fov: 50, position: [...STATIONS[0].camera.position] }} dpr={quality.dpr} onCreated={() => onReady?.()}>
-        {!declined && <PerformanceMonitor onDecline={() => setDeclined(true)} />}
+    <div aria-hidden className="fixed inset-0" data-quality-rung={declines}>
+      <Canvas
+        shadows="percentage"
+        // Neutral tone mapping keeps the palette's colours as painted; the
+        // filmic curve greyed the pastels.
+        gl={{ toneMapping: NeutralToneMapping }}
+        camera={{ fov: 50, position: [...STATIONS[0].camera.position] }}
+        dpr={quality.dpr}
+        onCreated={() => onReady?.()}
+      >
         <color attach="background" args={["#bfe3f7"]} />
-        {/* Daylight: blue sky above, warm bounce below, and a warm sun. */}
-        <hemisphereLight args={["#d6ecff", "#f3dcb8", 1.05]} />
-        <Sun shadows={quality.shadows} />
-        <ambientLight intensity={0.15} />
+        {/* Daylight: a strong, soft fill (cool sky above, peach bounce
+            below) under a warm sun, so shade stays bright and tinted
+            instead of going grey. */}
+        <hemisphereLight args={["#e3eaff", "#ffdfc0", 1.9]} />
+        <Sun shadows={quality.shadows} mapSize={quality.shadowMap} />
         <ShadowFlags enabled={quality.shadows} />
         <ShadowRefresh />
         <LoadingReporter />
-        <FrameDriver />
         <CameraRig cut={cut} />
         <ViewShift cut={cut} />
         {/* Fonts for the 3D text load first; the intro covers the wait. */}
         <Suspense fallback={null}>
           <Shop specials={specials} lampLights={quality.effects} still={cut} />
+          <Pacing rung={declines} measure={quality.canDecline} onSlow={() => setDeclines((n) => n + 1)} />
         </Suspense>
         {quality.effects && (
           <Suspense fallback={null}>

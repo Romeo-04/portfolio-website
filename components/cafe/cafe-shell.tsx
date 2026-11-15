@@ -85,6 +85,13 @@ export default function CafeShell({ children, specials }: { children: ReactNode;
     };
   }, [inCafe, reduced]);
 
+  // The café hides the page scrollbar (see globals.css); the menu page keeps it.
+  useEffect(() => {
+    if (!inCafe) return;
+    document.documentElement.classList.add("in-cafe");
+    return () => document.documentElement.classList.remove("in-cafe");
+  }, [inCafe]);
+
   // Freeze scrolling while the intro covers the café.
   useEffect(() => {
     if (!inCafe || !introActive) return;

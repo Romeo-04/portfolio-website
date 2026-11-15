@@ -6,7 +6,9 @@
 // The espresso machine warms up: its pressure gauge follows real asset
 // loading (reported by the scene via lib/cafe/loading), never finishing before a minimum time so the
 // moment registers. Plays once per session, never on deep links, and can
-// be skipped. Mounted only in café mode, so it never renders on the server.
+// be skipped. When it ends it fades away over the café rather than cutting
+// to it; the café is live from the moment the fade starts. Mounted only in
+// café mode, so it never renders on the server.
 // ============================================================
 
 import { useEffect, useRef, useState } from "react";
@@ -14,6 +16,9 @@ import { personalInfo } from "@/data/portfolio";
 import { gaugeValue } from "@/lib/cafe/choreo";
 import { getLoading } from "@/lib/cafe/loading";
 import { markIntroSeen, shouldPlayIntro } from "@/lib/cafe/intro";
+
+/** How long the overlay stays mounted to fade out (the CSS transition, plus a margin). */
+const LEAVE_MS = 750;
 
 function storage(): Storage | null {
   try {
@@ -33,6 +38,8 @@ export default function Intro({
   onActiveChange?: (active: boolean) => void;
 }) {
   const [show, setShow] = useState(() => shouldPlayIntro(window.location.hash, storage()));
+  // The overlay stays mounted, fading, for a moment after it stops being active.
+  const [leaving, setLeaving] = useState(false);
   const [value, setValue] = useState(0);
   const readyRef = useRef(ready);
   const skipRef = useRef<HTMLButtonElement>(null);
@@ -50,10 +57,17 @@ export default function Intro({
   }, [show]);
 
   useEffect(() => {
+    if (!leaving) return;
+    const timer = setTimeout(() => setLeaving(false), LEAVE_MS);
+    return () => clearTimeout(timer);
+  }, [leaving]);
+
+  useEffect(() => {
     if (!show) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         markIntroSeen(storage());
+        setLeaving(true);
         setShow(false);
       }
     };
@@ -76,6 +90,7 @@ export default function Intro({
       setValue(latched);
       if (latched >= 1) {
         markIntroSeen(storage());
+        setLeaving(true);
         setShow(false);
         return;
       }
@@ -85,20 +100,24 @@ export default function Intro({
     return () => cancelAnimationFrame(frame);
   }, [show, reduced]);
 
-  if (!show) return null;
+  if (!show && !leaving) return null;
 
   const needle = -90 + 180 * value;
   const skip = () => {
     markIntroSeen(storage());
+    setLeaving(true);
     setShow(false);
   };
 
   return (
     <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="Café loading"
-      className="fixed inset-0 z-30 flex flex-col items-center justify-center bg-[#1b120c] text-[#f5e9da]"
+      // While it fades it is decoration: no dialog, no focus, no clicks.
+      role={show ? "dialog" : undefined}
+      aria-modal={show ? "true" : undefined}
+      aria-label={show ? "Café loading" : undefined}
+      aria-hidden={show ? undefined : true}
+      inert={!show}
+      className={`intro fixed inset-0 z-30 flex flex-col items-center justify-center text-[#f5e9da] ${show ? "" : "is-leaving"}`}
     >
       <div aria-hidden className="relative h-24 w-40">
         {[0, 1, 2].map((i) => (

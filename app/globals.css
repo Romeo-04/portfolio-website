@@ -40,6 +40,11 @@
   }
 }
 
+/* In the café the page scrolls a camera, not a document: the station nav
+   shows where you are, so the page scrollbar is hidden over the scene. */
+html.in-cafe { scrollbar-width: none; }
+html.in-cafe::-webkit-scrollbar { display: none; }
+
 /* Café intro: steam rising from the cup. Used with motion-safe: only. */
 @keyframes cafe-steam {
   0% { transform: translateY(0) scaleX(1); opacity: 0; }
@@ -65,8 +70,16 @@
   --night: #1b120c;
   --line: rgb(43 26 16 / 0.1);
   --line-strong: rgb(43 26 16 / 0.16);
-  --glass: rgb(255 250 243 / 0.94);
-  --shadow-float: 0 1px 2px rgb(27 18 12 / 0.08), 0 12px 32px rgb(27 18 12 / 0.2);
+  --glass: rgb(255 251 245 / 0.9);
+  /* Floating surfaces: a lit top edge, a tight contact shadow and a wide,
+     warm ambient one, so they sit over the scene like game UI. */
+  --shadow-float:
+    inset 0 1px 0 rgb(255 255 255 / 0.85),
+    0 1px 2px rgb(74 40 20 / 0.1),
+    0 6px 14px rgb(74 40 20 / 0.1),
+    0 18px 40px rgb(74 40 20 / 0.14);
+  --shadow-card: 0 1px 2px rgb(74 40 20 / 0.06), 0 8px 20px rgb(74 40 20 / 0.1);
+  --shadow-sheet: 0 2px 6px rgb(74 40 20 / 0.12), 0 32px 80px rgb(40 22 12 / 0.34);
   --ease-out: cubic-bezier(0.2, 0.9, 0.25, 1);
   --s1: 4px;
   --s2: 8px;
@@ -88,8 +101,8 @@
     z-index: 20;
     top: var(--s4);
     background: var(--glass);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--line);
+    backdrop-filter: blur(14px) saturate(1.4);
+    border: 1px solid rgb(255 255 255 / 0.6);
     box-shadow: var(--shadow-float);
     color: var(--ink);
   }
@@ -104,9 +117,11 @@
     padding: 0 var(--s4);
     border-radius: 16px;
     cursor: default;
+    transition: background 160ms ease, transform 200ms var(--ease-out);
   }
   .hud-card.is-complete { cursor: pointer; }
-  .hud-card.is-complete:hover { background: var(--screen); }
+  .hud-card.is-complete:hover { background: var(--screen); transform: translateY(-1px); }
+  .hud-card.is-complete:active { transform: scale(0.98); }
   .hud-card-label {
     display: flex;
     align-items: baseline;
@@ -128,9 +143,15 @@
     border-radius: 999px;
     border: 1.5px dashed rgb(43 26 16 / 0.28);
     color: var(--screen);
-    transition: background 200ms ease, border-color 200ms ease, transform 300ms var(--ease-out);
+    transition: background 200ms ease, border-color 200ms ease;
   }
-  .hud-stamp.is-stamped { background: var(--accent); border: 1.5px solid var(--accent); transform: rotate(-8deg); }
+  .hud-stamp.is-stamped {
+    background: var(--accent);
+    border: 1.5px solid var(--accent);
+    transform: rotate(-8deg);
+    box-shadow: 0 2px 5px rgb(196 85 47 / 0.35);
+    animation: stamp-land 420ms var(--ease-out) both;
+  }
 
   .hud-nav {
     left: calc(50% + var(--hud-shift, 0px));
@@ -155,11 +176,16 @@
     font-weight: 600;
     letter-spacing: 0.04em;
     color: var(--ink-muted);
-    transition: background 160ms ease, color 160ms ease;
+    transition: background 200ms ease, color 200ms ease, transform 160ms var(--ease-out);
   }
   .hud-nav-item.is-visited { color: var(--ink); }
   .hud-nav-item:hover { background: var(--tint); color: var(--ink); }
-  .hud-nav-item[aria-current] { background: var(--ink); color: var(--screen); }
+  .hud-nav-item:active { transform: scale(0.95); }
+  .hud-nav-item[aria-current] {
+    background: var(--ink);
+    color: var(--screen);
+    box-shadow: 0 2px 6px rgb(43 26 16 / 0.3);
+  }
 
   .hud-button {
     right: var(--s5);
@@ -171,9 +197,10 @@
     border-radius: 999px;
     font-size: 14px;
     font-weight: 600;
-    transition: background 160ms ease;
+    transition: background 160ms ease, transform 200ms var(--ease-out);
   }
-  .hud-button:hover { background: var(--screen); }
+  .hud-button:hover { background: var(--screen); transform: translateY(-1px); }
+  .hud-button:active { transform: scale(0.97); }
   .hud-kbd {
     display: grid;
     place-items: center;
@@ -215,9 +242,19 @@
     border-radius: 24px;
     background: var(--screen);
     color: var(--ink);
-    box-shadow: 0 30px 80px rgb(27 18 12 / 0.35);
+    box-shadow: var(--shadow-sheet);
   }
-  .secret-dialog::backdrop { background: rgb(27 18 12 / 0.55); }
+  .secret-dialog::backdrop { background: rgb(27 18 12 / 0.5); backdrop-filter: blur(4px); }
+  .secret-dialog[open] { animation: dialog-pop 360ms var(--ease-out) both; }
+  .secret-dialog[open]::backdrop { animation: fade-in 240ms ease both; }
+
+  /* Intro: a warm, dim room before the lights come up. It fades away over
+     the café instead of cutting to it. */
+  .intro {
+    background: radial-gradient(120% 90% at 50% 42%, #3b2617 0%, #1b120c 68%);
+    transition: opacity 560ms ease, transform 700ms var(--ease-out);
+  }
+  .intro.is-leaving { opacity: 0; transform: scale(1.04); pointer-events: none; }
 
   /* Intro: the only control on the dark loading screen. */
   .intro-skip {
@@ -229,9 +266,10 @@
     font-size: 14px;
     font-weight: 600;
     color: #f5e9da;
-    transition: background 160ms ease, border-color 160ms ease;
+    transition: background 160ms ease, border-color 160ms ease, transform 160ms var(--ease-out);
   }
   .intro-skip:hover { background: rgb(245 233 218 / 0.08); border-color: rgb(245 233 218 / 0.5); }
+  .intro-skip:active { transform: scale(0.97); }
   .intro-skip:focus-visible { outline: 2px solid #ffb36b; outline-offset: 3px; }
 }
 
@@ -244,6 +282,18 @@
 @keyframes panel-rise {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: none; }
+}
+@keyframes stamp-land {
+  from { opacity: 0; transform: rotate(-8deg) scale(1.7); }
+  to { opacity: 1; transform: rotate(-8deg) scale(1); }
+}
+@keyframes dialog-pop {
+  from { opacity: 0; transform: translateY(12px) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @layer components {
@@ -263,8 +313,9 @@
     box-shadow:
       inset 0 0 0 1.5px rgb(255 255 255 / 0.12),
       inset 0 0 0 4px #120c08,
-      0 2px 4px rgb(27 18 12 / 0.2),
-      0 24px 60px rgb(27 18 12 / 0.35);
+      0 2px 4px rgb(40 22 12 / 0.2),
+      0 14px 28px rgb(40 22 12 / 0.16),
+      0 36px 72px rgb(40 22 12 / 0.28);
     color: var(--ink);
     opacity: 0;
     transform: translateX(-28px);
@@ -344,9 +395,10 @@
     height: 32px;
     border-radius: 999px;
     color: var(--ink-muted);
-    transition: background 160ms ease, color 160ms ease;
+    transition: background 160ms ease, color 160ms ease, transform 160ms var(--ease-out);
   }
   .panel-fold:hover { background: var(--tint); color: var(--ink); }
+  .panel-fold:active { transform: scale(0.92); }
   .phone-scroll {
     flex: 1;
     min-height: 0;
@@ -427,14 +479,14 @@
     background: var(--card);
     border: 1px solid var(--line);
     text-align: left;
-    transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+    transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms var(--ease-out);
   }
   .panel-project:hover {
     border-color: rgb(196 85 47 / 0.4);
-    box-shadow: 0 6px 16px rgb(27 18 12 / 0.08);
-    transform: translateY(-1px);
+    box-shadow: var(--shadow-card);
+    transform: translateY(-2px);
   }
-  .panel-project:active { transform: none; }
+  .panel-project:active { transform: scale(0.985); box-shadow: none; }
   .panel-project-title { display: block; font-size: 14px; font-weight: 600; color: var(--ink); }
   .panel-project-text {
     display: -webkit-box;
@@ -461,12 +513,17 @@
     font-weight: 600;
     color: var(--ink);
     background: var(--card);
-    border: 1px solid rgb(43 26 16 / 0.16);
-    transition: background 160ms ease, border-color 160ms ease;
+    border: 1px solid var(--line-strong);
+    transition: background 160ms ease, border-color 160ms ease, box-shadow 200ms ease, transform 160ms var(--ease-out);
   }
   .panel-action:hover { background: var(--tint); }
-  .panel-action:active { transform: translateY(1px); }
-  .panel-action-primary { background: var(--accent); color: var(--screen); border-color: var(--accent); }
+  .panel-action:active { transform: scale(0.97); }
+  .panel-action-primary {
+    background: var(--accent);
+    color: var(--screen);
+    border-color: var(--accent);
+    box-shadow: 0 4px 12px rgb(196 85 47 / 0.28);
+  }
   .panel-action-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
   .panel-action-block { width: 100%; }
   /* Contact links as full-width list rows, icon leading. */
@@ -491,10 +548,11 @@
     font-weight: 600;
     color: var(--screen);
     background: var(--night);
-    box-shadow: 0 8px 24px rgb(27 18 12 / 0.25);
-    transition: background 160ms ease;
+    box-shadow: 0 2px 4px rgb(40 22 12 / 0.2), 0 10px 26px rgb(40 22 12 / 0.26);
+    transition: background 160ms ease, transform 200ms var(--ease-out);
   }
-  .panel-pill:hover { background: #2f2018; }
+  .panel-pill:hover { background: #2f2018; transform: translateY(-1px); }
+  .panel-pill:active { transform: scale(0.97); }
   .panel-pill-step { color: #f0a77f; font-variant-numeric: tabular-nums; }
 
   /* Phones: the visitor already holds a phone, so the panel is a plain
@@ -511,7 +569,7 @@
       padding: 0;
       border-radius: 24px;
       background: none;
-      box-shadow: 0 18px 48px rgb(27 18 12 / 0.3);
+      box-shadow: 0 2px 6px rgb(40 22 12 / 0.14), 0 18px 48px rgb(40 22 12 / 0.28);
       transform: translateY(24px);
     }
     .station-panel::before,
@@ -546,7 +604,7 @@
     overscroll-behavior: contain;
     border-radius: 24px;
     background: var(--screen);
-    box-shadow: 0 30px 80px rgb(27 18 12 / 0.35);
+    box-shadow: var(--shadow-sheet);
     transform-origin: center;
   }
   .sheet-grid { display: grid; grid-template-columns: 1fr; }
@@ -589,10 +647,16 @@
     font-weight: 600;
     border: 1px solid var(--line-strong);
     background: var(--card);
-    transition: background 160ms ease, transform 160ms ease;
+    transition: background 160ms ease, box-shadow 200ms ease, transform 200ms var(--ease-out);
   }
   .sheet-action:hover { background: var(--tint); transform: translateY(-1px); }
-  .sheet-action-primary { background: var(--accent); border-color: var(--accent); color: var(--screen); }
+  .sheet-action:active { transform: scale(0.97); }
+  .sheet-action-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--screen);
+    box-shadow: 0 4px 12px rgb(196 85 47 / 0.28);
+  }
   .sheet-action-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
   .sheet-footer {
     display: grid;
@@ -613,8 +677,10 @@
     color: var(--ink-soft);
     padding: 0 var(--s2);
     border-radius: 12px;
+    transition: background 160ms ease, color 160ms ease, transform 160ms var(--ease-out);
   }
   .sheet-nav:hover { background: var(--tint); color: var(--ink); }
+  .sheet-nav:active { transform: scale(0.97); }
   .sheet-close {
     position: absolute;
     top: var(--s4);
@@ -627,9 +693,10 @@
     color: var(--ink);
     display: grid;
     place-items: center;
-    transition: background 160ms ease;
+    transition: background 160ms ease, transform 200ms var(--ease-out);
   }
-  .sheet-close:hover { background: var(--card); }
+  .sheet-close:hover { background: var(--card); transform: rotate(90deg); }
+  .sheet-close:active { transform: rotate(90deg) scale(0.92); }
   :is(.sheet-action, .sheet-nav, .sheet-close, .ticket-open, .menu-jump, .menu-link, .menu-enter, .menu-contact a):focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
@@ -690,9 +757,10 @@
     font-weight: 600;
     white-space: nowrap;
     color: var(--ink-soft);
-    transition: background 160ms ease;
+    transition: background 160ms ease, color 160ms ease, transform 160ms var(--ease-out);
   }
   .menu-jump:hover { background: var(--tint); color: var(--ink); }
+  .menu-jump:active { transform: scale(0.96); }
   .menu-ticket { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: var(--s4); }
   .menu-ticket-cup {
     display: grid;
@@ -755,9 +823,10 @@
     font-weight: 600;
     color: var(--ink);
     overflow-wrap: anywhere;
-    transition: background 160ms ease, border-color 160ms ease;
+    transition: background 160ms ease, border-color 160ms ease, transform 160ms var(--ease-out);
   }
   .menu-contact a:hover { background: var(--tint); }
+  .menu-contact a:active { transform: scale(0.985); }
   .menu-contact li:first-child a { background: var(--accent); border-color: var(--accent); color: var(--screen); }
   .menu-contact li:first-child a:hover { background: var(--accent-hover); }
 
@@ -774,11 +843,11 @@
     flex-direction: column;
     padding-top: 80px;
     background: var(--screen);
-    box-shadow: -24px 0 60px rgb(27 18 12 / 0.25);
+    box-shadow: none;
     transform: translateX(100%);
-    transition: transform 320ms var(--ease-out);
+    transition: transform 420ms var(--ease-out), box-shadow 420ms ease;
   }
-  .menu-drawer.is-open { transform: none; }
+  .menu-drawer.is-open { transform: none; box-shadow: -2px 0 8px rgb(40 22 12 / 0.1), -28px 0 64px rgb(40 22 12 / 0.24); }
   .menu-drawer-scroll {
     flex: 1;
     min-height: 0;
@@ -811,9 +880,10 @@
     font-weight: 600;
     color: var(--screen);
     box-shadow: 0 8px 24px rgb(196 85 47 / 0.35);
-    transition: background 160ms ease;
+    transition: background 160ms ease, transform 160ms var(--ease-out);
   }
   .menu-enter:hover { background: var(--accent-hover); }
+  .menu-enter:active { transform: scale(0.98); }
   .menu-closed {
     display: flex;
     align-items: center;
@@ -830,6 +900,13 @@
     .station-panel { transition: opacity 200ms ease; transform: none; }
     .panel-project, .panel-project:hover { transform: none; }
     .menu-drawer, .hud-nav, .hud-stamp { transition: none; }
+    .hud-stamp.is-stamped, .secret-dialog[open], .secret-dialog[open]::backdrop { animation: none; }
+    .intro { transition: opacity 200ms ease; }
+    .intro.is-leaving { transform: none; }
+    /* Press and hover feedback stays as colour only. */
+    :is(.hud-card, .hud-button, .hud-nav-item, .panel-fold, .panel-project, .panel-action, .panel-pill, .sheet-action, .sheet-nav, .sheet-close, .menu-jump, .menu-enter, .intro-skip, .menu-contact a):is(:hover, :active) {
+      transform: none !important;
+    }
   }
 }
 
@@ -891,10 +968,10 @@
     gap: 10px;
     padding: 9px 18px 9px 14px;
     border-radius: 999px;
-    background: rgb(255 250 243 / 0.94);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgb(43 26 16 / 0.1);
-    box-shadow: 0 1px 2px rgb(27 18 12 / 0.08), 0 12px 32px rgb(27 18 12 / 0.2);
+    background: var(--glass);
+    backdrop-filter: blur(14px) saturate(1.4);
+    border: 1px solid rgb(255 255 255 / 0.6);
+    box-shadow: var(--shadow-float);
     font-family: var(--font-display);
     font-size: 16px;
     letter-spacing: 0.06em;

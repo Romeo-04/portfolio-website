@@ -24,7 +24,7 @@ import {
   type Object3D,
   type Texture,
 } from "three";
-import { toonGradient } from "@/components/cafe/materials/toon";
+import { applySoftToon, toonGradient } from "@/components/cafe/materials/toon";
 
 type Colored = Material & {
   color?: Color;
@@ -57,7 +57,7 @@ export function toonify(source: Material | Material[]): Material {
     emissiveIntensity: src?.emissiveIntensity ?? 1,
   });
   toon.name = src?.name ?? "";
-  return toon;
+  return applySoftToon(toon);
 }
 
 export type BakedMesh = { geometry: BufferGeometry; material: Material; matrix: Matrix4 };

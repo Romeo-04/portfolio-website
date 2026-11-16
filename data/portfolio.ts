@@ -8,9 +8,9 @@
 // --- Site Configuration ---
 export const siteConfig = {
   name: "Jhezra A. Tolentino",
-  title: "Software Engineer",
+  title: "Software & AI Engineer",
   description:
-    "Jhezra A. Tolentino — Software Engineer specializing in Web Development, Machine Learning, and Full-Stack Projects.",
+    "Jhezra A. Tolentino — Software and AI engineer building full-stack web platforms, on-device machine learning and agent-driven development workflows.",
   url: "https://jhez-cafe.vercel.app",
 };
 
@@ -18,9 +18,11 @@ export const siteConfig = {
 export const personalInfo = {
   name: "Jhezra A. Tolentino",
   firstName: "Jhezra",
-  role: "Software Engineer",
+  role: "Software & AI Engineer",
+  /** The résumé's headline; the chalkboard's subtitle. */
+  headline: "Software Engineering · AI Engineering",
   tagline:
-    "Building thoughtful systems across web development, machine learning, and interactive experiences.",
+    "Building thoughtful systems across full-stack web, on-device machine learning, and agent-driven development.",
   subtitle:
     "Championing systems that blend logic, creativity, and impact.",
   school: "FEU Tech",
@@ -50,14 +52,14 @@ export const githubExclude: string[] = [
 // --- About Section ---
 export const aboutData = {
   bio: [
-    "I'm a dedicated software engineer and Computer Science student at FEU Tech with a strong focus on machine learning and web development. I'm committed to continuous growth and building impactful technology solutions that solve real problems.",
-    "Beyond code, I lead with purpose — serving as Lead Developer for the FEU Tech ACM Student Chapter's web development team and formerly as Director for Academics. I believe the best engineers are those who can build systems and build people.",
-    "I'm driven by the intersection of intelligent systems and elegant user experiences. Whether it's training models, crafting full-stack applications, or mentoring fellow developers, I bring precision, creativity, and relentless ambition to everything I build.",
+    "I'm a software engineer and Computer Science student at FEU Institute of Technology, specializing in Software Engineering and graduating in 2027. I'm a DOST-SEI and University Elite Scholar with a 3.8 GPA, and my work sits where full-stack web development meets AI engineering.",
+    "I'm a Software Engineering Intern at Ed3N Ventures, where I work AI-first: I direct coding agents across two production projects and put my own effort into harness design, agent workflows, guardrails and code review, so the output stays accountable.",
+    "Before that I led the FEU Tech ACM Student Chapter's web development team and served as its Director for Academics. My thesis, KitaKo, is an image search that runs entirely on an Android phone and treats Taglish queries as fairly as English ones.",
   ],
   currently: {
     studying: "Computer Science at FEU Tech",
-    building: "Full-stack web applications & ML pipelines",
-    exploring: "Deep learning architectures & cloud deployment",
+    building: "A fintech platform and an agent platform at Ed3N Ventures",
+    exploring: "On-device multimodal retrieval & agent harness engineering",
     aimingFor: "Software engineering internships & research opportunities",
   },
 };
@@ -100,6 +102,7 @@ export interface SkillCategory {
   skills: Skill[];
 }
 
+// Categories and names follow the résumé's Technical Skills section.
 export const skillsData: SkillCategory[] = [
   {
     title: "Languages",
@@ -109,63 +112,44 @@ export const skillsData: SkillCategory[] = [
       { name: "Python", tier: "house" },
       { name: "TypeScript", tier: "house" },
       { name: "JavaScript", tier: "house" },
-      { name: "C++", tier: "seasonal" },
-      { name: "Java", tier: "seasonal" },
       { name: "SQL", tier: "house" },
+      { name: "C++", tier: "seasonal" },
+      { name: "Dart", tier: "seasonal" },
     ],
   },
   {
-    title: "Frontend",
+    title: "Frameworks & Libraries",
     color: "blue",
     icon: "layout",
     skills: [
-      { name: "React.js", tier: "house" },
       { name: "Next.js", tier: "house" },
+      { name: "React", tier: "house" },
       { name: "Tailwind CSS", tier: "house" },
-      { name: "HTML / CSS", tier: "house" },
+      { name: "Flutter", tier: "seasonal" },
+      { name: "FastAPI", tier: "seasonal" },
     ],
   },
   {
-    title: "Backend & API",
-    color: "rose",
-    icon: "server",
+    title: "AI / ML",
+    color: "violet",
+    icon: "brain",
     skills: [
-      { name: "Node.js", tier: "seasonal" },
-      { name: "Prisma ORM", tier: "seasonal" },
+      { name: "PyTorch", tier: "seasonal" },
+      { name: "ONNX", tier: "seasonal" },
+      { name: "Agentic development", tier: "experimental" },
+      { name: "Prompt & harness engineering", tier: "experimental" },
+      { name: "LoRA fine-tuning", tier: "experimental" },
+      { name: "SigLIP-2", tier: "experimental" },
+      { name: "ANN indexing", tier: "experimental" },
     ],
   },
   {
-    title: "Databases",
+    title: "Databases & Tools",
     color: "orange",
     icon: "database",
     skills: [
       { name: "PostgreSQL", tier: "house" },
-      { name: "MySQL", tier: "seasonal" },
-      { name: "SQLite", tier: "seasonal" },
-      { name: "Supabase", tier: "seasonal" },
-    ],
-  },
-  {
-    title: "Machine Learning",
-    color: "violet",
-    icon: "brain",
-    skills: [
-      { name: "PyTorch", tier: "experimental" },
-      { name: "Scikit-learn", tier: "experimental" },
-      { name: "NumPy", tier: "seasonal" },
-      { name: "Pandas", tier: "seasonal" },
-      { name: "Matplotlib", tier: "experimental" },
-    ],
-  },
-  {
-    title: "Tools & Platforms",
-    color: "slate",
-    icon: "wrench",
-    skills: [
-      { name: "Git / GitHub", tier: "house" },
-      { name: "Vercel", tier: "house" },
-      { name: "Jupyter Notebook", tier: "seasonal" },
-      { name: "MATLAB", tier: "experimental" },
+      { name: "Git", tier: "house" },
     ],
   },
 ];
@@ -191,26 +175,25 @@ export interface Experience {
 export const experienceData: Experience[] = [
   {
     title: "Software Engineering Intern",
-    organization: "ED3N Ventures",
+    organization: "Ed3N Ventures",
     logos: ["eden"],
-    period: "June 2026 – August 2026", // e.g., "June 2026 – August 2026" — placed first, reorder if not most recent
+    period: "July 2026 – Present",
     description: [
-      "Contributed to the design and development of full-stack features using Next.js, TypeScript, and PostgreSQL under the guidance of senior engineers",
-      "Collaborated with product and design stakeholders to scope, build, and ship new functionality in an agile sprint cycle",
-      "Wrote automated tests and technical documentation to support code quality and long-term maintainability",
-      "Participated in code reviews and deployment workflows, gaining hands-on exposure to production engineering practices",
+      "Drive AI-first development across two production projects by directing coding agents rather than writing code manually",
+      "Focus engineering effort on harness design, agent workflows, guardrails and code review to keep the work accountable and high quality",
+      "Lead delivery of a production fintech backend in Next.js 15, TypeScript and PostgreSQL for a creator revenue-financing platform",
+      "Designed and shipped a channel-agnostic FastAPI backend that pairs Telegram and WhatsApp bots for an agent provisioning platform",
     ],
   },
   {
-    title: "Lead Developer — ACMX Web Dev Team",
+    title: "Lead Web Developer",
     organization: "FEU Tech ACM Student Chapter",
     logos: ["feu", "acm"],
-    period: "August 2025 – Present",
+    period: "August 2025 – August 2026",
     description: [
-      "Lead a team of 7 developers building and maintaining the organization's web platform",
-      "Architect and implement features serving 400+ organization members",
-      "Mentor team members on modern web development practices and collaborative workflows",
-      "Drive technical decisions on stack selection, code quality, and deployment strategy",
+      "Led a web development team of beginner and junior developers, guiding system architecture design and skill-building for the chapter website",
+      "Developed a full-featured Next.js 14 (App Router) and TypeScript e-commerce platform for official ACM merchandise, serving 400+ members",
+      "Optimized the shop for mobile and desktop with a Tailwind CSS interface",
     ],
   },
   {
@@ -219,10 +202,8 @@ export const experienceData: Experience[] = [
     logos: ["feu", "acm"],
     period: "August 2024 – August 2025",
     description: [
-      "Led the academics committee overseeing all academic-related events and initiatives",
-      "Developed review sessions and facilitated peer tutorials to support student learning",
-      "Designed and implemented technical competitions within the institute",
-      "Addressed student concerns in courses and fostered engagement and academic performance",
+      "Led the academics committee, organizing review sessions and peer tutorials that addressed course-related challenges across cohorts",
+      "Designed and implemented institute competitions while coordinating across multiple committees",
     ],
   },
 ];
@@ -249,6 +230,44 @@ export interface Project {
 
 export const projectsData: Project[] = [
   {
+    id: 12,
+    title: "Homestead",
+    slug: "homestead",
+    pitch:
+      "Co-op space-mission game for the NASA Space Apps Challenge 2026: four astronauts scavenge parts, build a spacecraft, fly it and land on the Moon or Mars.",
+    description: [
+      "A ten-minute run in three phases: explore and build a spacecraft from scavenged parts, fly it with each player on their own station, then work Mission Control's list on the surface",
+      "Owned the Pilot and Comms seat on a six-person team, covering two of the four flight stations and the flight events",
+      "Plays solo or with up to four people online over WebRTC, host-authoritative, with seeded runs and no server of its own",
+      "Part stats, hazards and the closing mission report are drawn from NASA sources, and each run ends by naming the real mission that made the same trade-off",
+    ],
+    techStack: ["TypeScript", "HTML5 Canvas", "Vite", "PeerJS", "Web Audio API"],
+    category: "Game",
+    role: "Pilot & Comms seat · team of 6",
+    featured: true,
+    demoUrl: "",
+    repoUrl: "https://github.com/TadeyRuk/Homestead",
+  },
+  {
+    id: 13,
+    title: "CS Expo 2026 Website",
+    slug: "cs-expo-2026",
+    pitch:
+      "Website and event platform for CS Expo 2026, the annual capstone showcase of the FEU Tech Computer Science Department.",
+    description: [
+      "Own the backend with the backend team: Supabase as the system of record, with Postgres row level security, Supabase Auth and a public media bucket",
+      "Every CMS change is a Server Action with Zod validation and a server-side role check, and database triggers append it to an insert-only audit log",
+      "Built guest accounts, registration with resume upload, a profile pass and venue check-in with attendance by day",
+      "One of two maintainers who cut the staging-to-main release; a release gate keeps unreleased sections out of production",
+    ],
+    techStack: ["Next.js", "TypeScript", "Supabase", "PostgreSQL", "Tailwind CSS", "Zod"],
+    category: "Event Platform",
+    role: "Backend Developer · release maintainer",
+    featured: true,
+    demoUrl: "https://fit-cs-expo.vercel.app",
+    repoUrl: "",
+  },
+  {
     id: 1,
     title: "CitySense Live Geo",
     slug: "citysense-live-geo",
@@ -270,7 +289,7 @@ export const projectsData: Project[] = [
     ],
     category: "Web App",
     role: "Full-Stack Developer",
-    featured: true,
+    featured: false,
     demoUrl: "",
     repoUrl: "https://github.com/Romeo-04/citysense-live-geo",
   },
@@ -297,7 +316,7 @@ export const projectsData: Project[] = [
       "GSAP",
     ],
     category: "E-Commerce",
-    role: "Lead Full-Stack Developer",
+    role: "Lead Web Developer",
     featured: false,
     demoUrl: "",
     repoUrl: "",
@@ -351,7 +370,7 @@ export const projectsData: Project[] = [
     ],
     category: "Developer Tool",
     role: "Lead Developer · Cognee hackathon team of 4",
-    featured: true,
+    featured: false,
     demoUrl: "https://kishiagaytano.github.io/archeon/",
     repoUrl: "https://github.com/kishiagaytano/archeon",
   },
@@ -417,15 +436,16 @@ export const projectsData: Project[] = [
     title: "KitaKo",
     slug: "kitako",
     pitch:
-      "Undergraduate thesis research on the linguistic and cultural gaps in artificial intelligence, presented through a public showcase site.",
+      "Undergraduate thesis: an image search that runs entirely on an Android phone and answers Taglish queries as fairly as English ones.",
     description: [
-      "Thesis research on linguistic and cultural gaps in AI systems, carried out with an undergraduate research team",
-      "Contributed to the research behind the study, which the team presents to a public audience",
-      "The showcase website was built by a teammate with React 19, Vite, Express, and a shadcn-style component system",
+      "Fine-tuned SigLIP-2 via LoRA (0.32% trainable parameters) on a 109K-image Taglish dataset, improving Filipino-query fairness (DPR 0.43 to 0.86) and cutting cross-language bias by 60% (TVD)",
+      "Built a fully on-device multimodal image retrieval system for Android: dataset construction, ONNX INT8 quantization, HNSW / IVF-PQ ANN indexing, and Flutter with C++ FFI inference, with no cloud dependency",
+      "Designed a Taglish (Tagalog–English code-switching) retrieval pipeline with near-complete language parity between Taglish and English queries (mAP: p = .920, d = −0.01) on a structured IR benchmark",
+      "Product Manager for Team Stochastic 4, since December 2025",
     ],
-    techStack: ["React", "Vite", "Express", "Tailwind CSS"],
+    techStack: ["PyTorch", "Flutter", "ONNX", "C++", "SigLIP-2", "LoRA"],
     category: "Research",
-    role: "Researcher",
+    role: "Product Manager · Team Stochastic 4",
     featured: true,
     demoUrl: "https://kitako-eight.vercel.app",
     repoUrl: "https://github.com/Emyol/Stochastic4-Website",
@@ -487,119 +507,212 @@ export const projectsData: Project[] = [
     demoUrl: "https://romeo-04.github.io/kislap/",
     repoUrl: "https://github.com/Romeo-04/kislap",
   },
+  {
+    id: 14,
+    title: "Creator Revenue-Financing Platform",
+    slug: "creator-revenue-financing",
+    pitch:
+      "Production fintech backend for a creator revenue-financing platform at Ed3N Ventures, delivered by directing AI coding agents.",
+    description: [
+      "Led delivery of a production fintech backend in Next.js 15, TypeScript and PostgreSQL by directing AI coding agents, owning the architecture, reviewing every change and carrying technical decisions end to end",
+      "Engineered the agent operating environment by mapping six domain-specific instruction sets to the code they govern, so conventions applied automatically instead of being restated each session",
+      "Hardened project non-negotiables into durable guardrails for credential handling, version-control policy and regulated-language rules, keeping output consistent across long-running work",
+    ],
+    techStack: ["Next.js", "TypeScript", "PostgreSQL"],
+    category: "FinTech",
+    role: "Full-Stack Developer · Ed3N Ventures",
+    featured: false,
+    demoUrl: "",
+    repoUrl: "",
+  },
+  {
+    id: 15,
+    title: "Agent Provisioning Platform",
+    slug: "agent-provisioning",
+    pitch:
+      "Channel-agnostic backend at Ed3N Ventures that pairs Telegram and WhatsApp bots through real QR onboarding.",
+    description: [
+      "Reverse-engineered an undocumented third-party agent API, including its session-token auth scheme and multi-stage pairing lifecycle, enabling real Telegram and WhatsApp QR onboarding with zero frontend changes",
+      "Designed and shipped a channel-agnostic FastAPI backend integrating Telegram and WhatsApp bot pairing, replacing a mocked onboarding flow with a production API",
+      "Grew backend test coverage from 23 to 40 tests",
+    ],
+    techStack: ["Python", "FastAPI"],
+    category: "Developer Platform",
+    role: "Backend Engineer · Ed3N Ventures",
+    featured: false,
+    demoUrl: "",
+    repoUrl: "",
+  },
 ];
 
 // --- Achievements ---
 export interface Achievement {
+  /** The headline on the certificate: a placement or an honour. */
   title: string;
+  /** The competition or body behind a placement. */
+  event?: string;
   year: string;
   description: string;
   tier: "gold" | "silver" | "bronze" | "special";
 }
 
+/** An achievement on one line, for lists: "Champion — CyberXploit". */
+export function achievementName(a: Achievement): string {
+  return a.event ? `${a.title} — ${a.event}` : a.title;
+}
+
+/** How many achievements hang on the café wall: the first ones listed. */
+export const WALL_FRAMES = 12;
+
+// Awards and honours from the résumé, strongest first. The wall has room for
+// the first WALL_FRAMES; the panel and the Quick Order menu list them all.
 export const achievementsData: Achievement[] = [
+  {
+    title: "Champion",
+    event: "National IT Skills Olympics",
+    year: "2026",
+    description: "Won the Quiz Bee at the National IT Skills Olympics",
+    tier: "gold",
+  },
+  {
+    title: "Champion",
+    event: "CyberXploit",
+    year: "2026",
+    description: "Won FEU Tech's CyberXploit Capture-the-Flag competition",
+    tier: "gold",
+  },
+  {
+    title: "1st Runner-Up",
+    event: "GDG PUP SEEN",
+    year: "2026",
+    description: "Placed second in the GDG PUP SEEN Capture-the-Flag",
+    tier: "silver",
+  },
+  {
+    title: "3rd Place",
+    event: "P&G Next AIdeathon",
+    year: "2026",
+    description: "Placed third in the P&G Next AIdeathon Business Case Challenge",
+    tier: "bronze",
+  },
+  {
+    title: "3rd Place",
+    event: "OpenAI Campus Hackathon",
+    year: "2026",
+    description: "Placed third in the FEU Tech OpenAI Campus Hackathon",
+    tier: "bronze",
+  },
   {
     title: "Rank 2 Top Performing Student",
     year: "A.Y. 2023–2024",
-    description: "Ranked 2nd among all students in the academic year",
+    description: "Ranked 2nd among top performing students for the academic year",
     tier: "gold",
   },
   {
-    title: "Algolympics 2025 Finalist",
-    year: "2025",
-    description:
-      "Qualified as a finalist in the national competitive programming competition",
-    tier: "gold",
-  },
-  {
-    title: "DOST Scholar",
+    title: "DOST-SEI Scholar",
     year: "Ongoing",
-    description:
-      "Recipient of the Department of Science and Technology scholarship for academic excellence",
+    description: "Scholar of the Department of Science and Technology's Science Education Institute",
     tier: "special",
+  },
+  {
+    title: "University Elite Scholar",
+    year: "Ongoing",
+    description: "University Elite Scholar at FEU Institute of Technology",
+    tier: "special",
+  },
+  {
+    title: "Top 10 Finalist",
+    event: "Philippine Junior Data Science Challenge",
+    year: "2026",
+    description: "Top 10 finalist in the Philippine Junior Data Science Challenge (PJDSC)",
+    tier: "silver",
+  },
+  {
+    title: "Top 10 Finalist",
+    event: "CSSprint Hackathon",
+    year: "2026",
+    description: "Top 10 finalist in the CSSprint Hackathon at the University of Santo Tomas",
+    tier: "silver",
+  },
+  {
+    title: "Finalist",
+    event: "Start-A-Ton Datathon",
+    year: "2026",
+    description: "Finalist in Start-A-Ton, the START-DOST Datathon",
+    tier: "silver",
+  },
+  {
+    title: "Finalist",
+    event: "Algolympics",
+    year: "2025",
+    description: "Finalist in Algolympics, the national competitive programming contest",
+    tier: "silver",
+  },
+  {
+    title: "Consistent Gold Dean's Lister",
+    year: "Ongoing",
+    description: "Gold Dean's List standing every term, with a 3.8 / 4.00 GPA",
+    tier: "gold",
+  },
+  {
+    title: "Rank 3 Top Performing Student",
+    year: "A.Y. 2025–2026",
+    description: "Ranked 3rd among top performing students for the academic year",
+    tier: "gold",
   },
   {
     title: "Rank 8 Top Performing Student",
     year: "A.Y. 2024–2025",
-    description: "Ranked 8th among all students in the academic year",
+    description: "Ranked 8th among top performing students for the academic year",
     tier: "gold",
   },
   {
-    title: "DataCamp Scholar",
-    year: "2024",
-    description:
-      "Selected as a DataCamp Scholar for demonstrating data science aptitude",
-    tier: "special",
-  },
-  {
-    title: "Consistent Dean's Lister",
-    year: "Ongoing",
-    description:
-      "Maintained Dean's List standing across multiple academic terms",
-    tier: "gold",
-  },
-  {
-    title: "TOPCIT 2025 — Level 3",
+    title: "TOPCIT Level 3 (Competent)",
     year: "2025",
-    description:
-      "Achieved Level 3 in the 13th Test of Practical Competency in Information Technology",
+    description: "Level 3 in the 13th national Test of Practical Competency in IT",
     tier: "silver",
   },
   {
-    title: "3rd Placer — Kode Kombat Subservience",
-    year: "2023",
-    description:
-      "Secured 3rd place in the Kode Kombat Subservience programming competition",
-    tier: "bronze",
-  },
-  {
-    title: "3rd Runner-up — First Gen Code Green",
+    title: "3rd Runner-Up",
+    event: "First Gen Code Green",
     year: "2024",
-    description:
-      "Achieved 3rd runner-up position in First Gen Code Green hackathon",
+    description: "Third runner-up in First Gen Code Green, a national pitching competition",
     tier: "bronze",
   },
+  // Not on the current résumé; kept from the earlier list.
   {
-    title: "3rd Place — OpenAI Campus Hackathon 2026",
-    year: "2026",
-    description:
-      "Secured 3rd place in the Campus Hackathon, a collaboration between FEU Tech and OpenAI",
-    tier: "bronze",
+    title: "DataCamp Scholar",
+    year: "2024",
+    description: "Selected as a DataCamp Scholar for demonstrating data science aptitude",
+    tier: "special",
   },
   {
-    title: "Champion — Cyber Xploit 2026",
-    year: "2026",
-    description:
-      "Won 1st place in the Cyber Xploit Capture the Flag (CTF) competition",
-    tier: "gold",
+    title: "3rd Placer",
+    event: "Kode Kombat Subservience",
+    year: "2023",
+    description: "Placed third in the Kode Kombat Subservience programming competition",
+    tier: "bronze",
   },
 ];
 
-// --- Certifications (from LinkedIn) ---
-// LinkedIn cannot be scraped programmatically (login wall + anti-bot 999
-// responses + ToS), so paste your certifications here manually. Copy each
-// one from LinkedIn → "Licenses & certifications". credentialUrl is optional
-// (the "Show credential" link). Once you add entries, the Certifications
-// section renders automatically; while this is empty it stays hidden.
+// --- Certifications ---
+// From the résumé. `issued` is the month and year when known, or a status
+// such as "In progress"; credentialUrl is the "Show credential" link.
 export interface Certification {
   title: string;
   issuer: string;
-  issued: string; // e.g. "Mar 2025"
+  issued?: string; // e.g. "Mar 2025"
   credentialId?: string;
   credentialUrl?: string;
   skills?: string[];
 }
 
 export const certificationsData: Certification[] = [
-  // Example (delete and replace with your real LinkedIn certifications):
-  // {
-  //   title: "Machine Learning Specialization",
-  //   issuer: "DeepLearning.AI",
-  //   issued: "Aug 2024",
-  //   credentialId: "ABCD-1234",
-  //   credentialUrl: "https://coursera.org/verify/...",
-  //   skills: ["Supervised Learning", "TensorFlow"],
-  // },
+  { title: "AI Engineer for Data Scientists", issuer: "DataCamp" },
+  { title: "Associate Data Analyst", issuer: "DataCamp" },
+  { title: "IT Specialist – Python", issuer: "Certiport" },
+  { title: "Project Management Ready", issuer: "PMI" },
+  { title: "Certified Cybersecurity Practitioner", issuer: "Palo Alto Networks", issued: "In progress" },
 ];
 
 // --- Off the Clock (the café's secret drink) ---

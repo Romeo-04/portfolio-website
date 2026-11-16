@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { githubExclude, projectsData, skillsData } from "@/data/portfolio";
+import { achievementName, achievementsData, githubExclude, projectsData, skillsData } from "@/data/portfolio";
 
 describe("portfolio data", () => {
   it("has exactly the four signature drinks", () => {
@@ -8,8 +8,8 @@ describe("portfolio data", () => {
       .map((p) => p.slug)
       .sort();
     expect(signature).toEqual([
-      "archeon",
-      "citysense-live-geo",
+      "cs-expo-2026",
+      "homestead",
       "kislap",
       "kitako",
     ]);
@@ -40,6 +40,17 @@ describe("portfolio data", () => {
     expect(kislap?.role).toBe("Lead Developer · team of 4");
     expect(kislap?.demoUrl).toBe("https://romeo-04.github.io/kislap/");
     expect(kislap?.repoUrl).toBe("https://github.com/Romeo-04/kislap");
+  });
+
+  it("puts Homestead and CS Expo first on the bar", () => {
+    const bar = projectsData.filter((p) => p.featured).map((p) => p.slug);
+    expect(bar.slice(0, 2)).toEqual(["homestead", "cs-expo-2026"]);
+  });
+
+  it("names each achievement once", () => {
+    const names = achievementsData.map(achievementName);
+    expect(new Set(names).size).toBe(names.length);
+    expect(achievementName({ title: "Champion", event: "CyberXploit", year: "2026", description: "", tier: "gold" })).toBe("Champion — CyberXploit");
   });
 
   it("keeps the exclusion list lower-case", () => {

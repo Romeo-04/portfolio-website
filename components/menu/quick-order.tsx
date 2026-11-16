@@ -2,6 +2,7 @@ import DrinkIllustration from "@/components/menu/drink-illustration";
 import { ArrowRight, Code, Document, External, Mail } from "@/components/ui/icons";
 import {
   aboutData,
+  achievementName,
   achievementsData,
   certificationsData,
   experienceData,
@@ -170,8 +171,8 @@ export default function QuickOrderMenu({ specials }: { specials: GithubRepo[] })
       <Section id="menu-wall" title="On the Wall" station="wall">
         <ul className="menu-list">
           {achievementsData.map((a) => (
-            <li key={a.title}>
-              <span className="menu-list-title">{a.title}</span>
+            <li key={achievementName(a)}>
+              <span className="menu-list-title">{achievementName(a)}</span>
               <span className="menu-meta normal-case tracking-normal">
                 {a.year} · {a.description}
               </span>
@@ -181,7 +182,7 @@ export default function QuickOrderMenu({ specials }: { specials: GithubRepo[] })
             <li key={c.title}>
               <span className="menu-list-title">{c.title}</span>
               <span className="menu-meta normal-case tracking-normal">
-                {c.issuer} · {c.issued}
+                {c.issued ? `${c.issuer} · ${c.issued}` : c.issuer}
               </span>
             </li>
           ))}

@@ -3,8 +3,10 @@
 // ============================================================
 // STATION 4: WALL OF FAME
 // ============================================================
-// Every achievement hangs in a frame on the wall. While the camera holds
-// here, the frames swing in one after another and settle on their nails.
+// The strongest achievements hang in frames on the wall, three rows of
+// four. While the camera holds here, the frames swing in one after another
+// and settle on their nails. The panel and the Quick Order menu list the
+// rest.
 // ============================================================
 
 import { useFrame } from "@react-three/fiber";
@@ -14,7 +16,7 @@ import { Ink, Toon } from "@/components/cafe/kit";
 import { Label } from "@/components/cafe/text3d";
 import { BRASS, BRICK_TINT, CHARCOAL, CREAM, OAK_DARK } from "@/components/cafe/palette";
 import { useCafeTexture } from "@/components/cafe/textures";
-import { achievementsData, type Achievement } from "@/data/portfolio";
+import { achievementName, achievementsData, WALL_FRAMES, type Achievement } from "@/data/portfolio";
 import { dwellT, frameAngle } from "@/lib/cafe/choreo";
 import { getProgress } from "@/lib/cafe/scroll";
 import { STATIONS, stationYaw } from "@/lib/cafe/stations";
@@ -110,9 +112,11 @@ function Certificate({ a }: { a: Achievement }) {
           <planeGeometry args={[0.5, 0.004]} />
           <meshBasicMaterial color={ACCENT_COLORS[a.tier]} />
         </mesh>
-        <Label font="body" fontSize={0.026} letterSpacing={0.18} color="#8a6a3a" position={[0, 0.15, 0.047]}>
+        <Label heavy font="body" fontSize={0.026} letterSpacing={0.18} color="#7a5a2c" position={[0, 0.15, 0.047]}>
           IN RECOGNITION
         </Label>
+        {/* A placing reads large with its event beneath; an honour with no
+            event takes the whole space. */}
         <Label
           font="display"
           fontSize={0.056}
@@ -120,11 +124,26 @@ function Certificate({ a }: { a: Achievement }) {
           textAlign="center"
           lineHeight={1.08}
           color="#2b1a10"
-          position={[-0.04, 0.025, 0.047]}
+          position={[-0.04, a.event ? 0.062 : 0.025, 0.047]}
         >
           {a.title}
         </Label>
-        <Label font="body" fontSize={0.036} color="#6b5d4f" position={[-0.04, -0.115, 0.047]}>
+        {a.event && (
+          <Label
+            heavy
+            font="body"
+            fontSize={0.036}
+            maxWidth={0.58}
+            textAlign="center"
+            lineHeight={1.15}
+            anchorY="top"
+            color="#33241a"
+            position={[-0.04, 0.022, 0.047]}
+          >
+            {a.event}
+          </Label>
+        )}
+        <Label heavy font="body" fontSize={0.032} color="#5a4536" position={[-0.04, -0.128, 0.047]}>
           {a.year}
         </Label>
         {/* Seal with ribbon tails, lower right. */}
@@ -182,10 +201,12 @@ function nail(i: number): [number, number, number] {
   return [(col - (COLS - 1) / 2) * 1.3, 1.08 - row * 0.92, 0.05];
 }
 
+const HUNG = achievementsData.slice(0, WALL_FRAMES);
+
 export default function Wall() {
   const frames = useRef<(Group | null)[]>([]);
   const brick = useCafeTexture("brick", 6, 3.2);
-  const count = achievementsData.length;
+  const count = HUNG.length;
 
   useFrame(() => {
     const t = dwellT(getProgress(), "wall");
@@ -204,9 +225,9 @@ export default function Wall() {
         <planeGeometry args={[6, 3.2]} />
         <Toon color={BRICK_TINT} map={brick} />
       </mesh>
-      {achievementsData.map((a, i) => (
+      {HUNG.map((a, i) => (
         <group
-          key={a.title}
+          key={achievementName(a)}
           position={nail(i)}
           ref={(g) => {
             frames.current[i] = g;

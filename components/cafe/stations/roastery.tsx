@@ -232,6 +232,13 @@ function OrgLogoMark({ logo, x }: { logo: OrgLogo; x: number }) {
   );
 }
 
+/** Dates as engraved on a plaque: months cut to three letters so a full
+ *  range fits beside two logos. */
+const MONTHS = /January|February|March|April|June|July|August|September|October|November|December/g;
+function plaqueDates(period: string): string {
+  return period.replace(MONTHS, (m) => m.slice(0, 3)).toUpperCase();
+}
+
 /**
  * A framed plaque for one role: walnut moulding with a brass inlay, the
  * organisation's logos on the left, and the role, organisation and dates
@@ -281,11 +288,11 @@ function ExperiencePlaque({ e }: { e: Experience }) {
       >
         {e.title}
       </Label>
-      <Label font="body" fontSize={0.04} maxWidth={textW} anchorX="left" anchorY="top" color="#5a4536" position={[textX, -0.01, 0.005]}>
+      <Label heavy font="body" fontSize={0.04} maxWidth={textW} anchorX="left" anchorY="top" color="#3f2f24" position={[textX, -0.01, 0.005]}>
         {e.organization}
       </Label>
-      <Label font="body" fontSize={0.034} letterSpacing={0.04} anchorX="left" anchorY="bottom" color="#b0482a" position={[textX, -PLAQUE_H / 2 + 0.1, 0.005]}>
-        {e.period.toUpperCase()}
+      <Label heavy font="body" fontSize={0.034} letterSpacing={0.04} anchorX="left" anchorY="bottom" color="#a13a1c" position={[textX, -PLAQUE_H / 2 + 0.1, 0.005]}>
+        {plaqueDates(e.period)}
       </Label>
     </group>
   );

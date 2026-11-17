@@ -43,6 +43,7 @@ import { preloadCafeTextures } from "@/components/cafe/textures";
 import { projectsData } from "@/data/portfolio";
 import { drinkFor } from "@/lib/cafe/drinks";
 import { cupFill, layerIndexAt } from "@/lib/cafe/pour";
+import { packLines } from "@/lib/cafe/lines";
 import { isSlow, qualityFor } from "@/lib/cafe/quality";
 
 // Post-processing is its own chunk: phones and slow devices never fetch it.
@@ -168,6 +169,8 @@ const CARD_TOP = -0.27;
 const CARD_Z = 0.27;
 /** Room for text inside the plaque's margins. */
 const CARD_TEXT_W = CARD_W - 0.07;
+/** The most characters of recipe a card holds on one line. */
+const CARD_LINE_CHARS = 28;
 
 /** Shrinks long names so they stay on one line inside the plaque. */
 function titleSize(title: string): number {
@@ -196,20 +199,21 @@ const CupCard = forwardRef<Group, { project: (typeof projectsData)[number]; reci
         <Label font="display" fontSize={titleSize(project.title)} color="#2b1a10" position={[0, CARD_H / 2 - 0.085, 0.009]}>
           {project.title}
         </Label>
-        <Label font="body" fontSize={0.034} letterSpacing={0.08} color="#b0482a" position={[0, CARD_H / 2 - 0.14, 0.009]}>
+        <Label heavy font="body" fontSize={0.034} letterSpacing={0.08} color="#a13a1c" position={[0, CARD_H / 2 - 0.14, 0.009]}>
           {project.category.toUpperCase()}
         </Label>
         <Label
+          heavy
           font="body"
-          fontSize={0.033}
+          fontSize={0.034}
           lineHeight={1.2}
           maxWidth={CARD_TEXT_W}
           textAlign="center"
           anchorY="top"
-          color="#4a3a2e"
+          color="#33241a"
           position={[0, CARD_H / 2 - 0.175, 0.009]}
         >
-          {recipe.join(" · ")}
+          {packLines(recipe, CARD_LINE_CHARS).join("\n")}
         </Label>
       </group>
     </group>

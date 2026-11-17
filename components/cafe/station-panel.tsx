@@ -19,6 +19,7 @@ import DrinkIllustration from "@/components/menu/drink-illustration";
 import { TestimonialAvatar } from "@/components/cafe/testimonial-sheet";
 import {
   aboutData,
+  achievementName,
   achievementsData,
   certificationsData,
   experienceData,
@@ -206,8 +207,8 @@ function content(id: StationId, specials: SpecialItem[], reduced: boolean): { ey
           <>
             <ul className="panel-list">
               {achievementsData.map((a) => (
-                <li key={a.title}>
-                  <span className="font-semibold">{a.title}</span>
+                <li key={achievementName(a)}>
+                  <span className="font-semibold">{achievementName(a)}</span>
                   <span className="panel-meta">{a.year}</span>
                 </li>
               ))}
@@ -219,7 +220,7 @@ function content(id: StationId, specials: SpecialItem[], reduced: boolean): { ey
                     <li key={c.title}>
                       <span className="font-semibold">{c.title}</span>
                       <span className="panel-meta">
-                        {c.issuer} · {c.issued}
+                        {c.issued ? `${c.issuer} · ${c.issued}` : c.issuer}
                       </span>
                     </li>
                   ))}

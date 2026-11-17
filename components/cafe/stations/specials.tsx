@@ -31,10 +31,16 @@ const ROW = 0.47;
 const ROWS = 12;
 /** Shelf board heights (bottom of each row). */
 const BOARDS = Array.from({ length: ROWS }, (_, k) => 0.1 + k * ROW);
+/** The warm glow over the featured row: enough to lift the books, not so
+ *  much that it burns out the white tags above them. */
+const GLOW = 0.9;
 /** The eye-level row that holds the highlighted repo books. */
 const FEATURED_ROW = 3;
 const FEATURED_W = 0.14;
 const FEATURED_GAP = 0.44;
+/** The name tag above each featured book; just narrower than the gap. */
+const TAG_W = 0.4;
+const TAG_H = 0.24;
 
 type Book = { x: number; y: number; w: number; h: number; color: string };
 
@@ -95,7 +101,7 @@ export default function Specials({ items }: { items: SpecialItem[] }) {
     const t = dwellT(getProgress(), "specials");
     if (t === lastT.current) return;
     lastT.current = t;
-    if (light.current) light.current.intensity = 2.5 * t;
+    if (light.current) light.current.intensity = GLOW * t;
     if (soldOut.current) soldOut.current.visible = t > 0.05;
     featured.current.forEach((g, i) => {
       if (!g) return;
@@ -135,7 +141,7 @@ export default function Specials({ items }: { items: SpecialItem[] }) {
         <Toon color="#ffffff" />
       </instancedMesh>
 
-      <pointLight ref={light} position={[0, rowY + 0.8, 0.9]} intensity={0} color="#ffe2b0" distance={4} />
+      <pointLight ref={light} position={[0, rowY - 0.1, 1.5]} intensity={0} color="#ffe2b0" distance={4} />
 
       {items.length === 0 ? (
         <group ref={soldOut} position={[0, rowY + 0.2, 0.06]} visible={false}>
@@ -168,27 +174,29 @@ export default function Specials({ items }: { items: SpecialItem[] }) {
                 ref={(g) => {
                   labels.current[i] = g;
                 }}
-                position={[0, 0.55, 0.16]}
+                position={[0, 0.56, 0.16]}
                 visible={false}
               >
+                {/* Unlit paper: the tag keeps one flat tone whatever the
+                    lamps do, so the name always has the same contrast. */}
                 <mesh>
-                  <boxGeometry args={[0.42, 0.21, 0.01]} />
-                  <Toon color="#fbfaf6" />
+                  <boxGeometry args={[TAG_W, TAG_H, 0.01]} />
+                  <meshBasicMaterial color="#efe6d4" />
                   <Ink />
                 </mesh>
                 <Label
                   font="display"
-                  fontSize={0.048}
-                  maxWidth={0.38}
+                  fontSize={0.05}
+                  maxWidth={TAG_W - 0.03}
                   lineHeight={1.05}
                   textAlign="center"
                   anchorY="bottom"
-                  color="#20262a"
-                  position={[0, -0.012, 0.007]}
+                  color="#1c1410"
+                  position={[0, -0.022, 0.007]}
                 >
                   {item.name}
                 </Label>
-                <Label font="body" fontSize={0.036} color="#8a4a2a" anchorY="top" position={[0, -0.035, 0.007]}>
+                <Label heavy font="body" fontSize={0.038} color="#7a3418" anchorY="top" position={[0, -0.04, 0.007]}>
                   {item.language ?? "Repo"}
                 </Label>
               </group>

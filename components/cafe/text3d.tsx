@@ -28,11 +28,19 @@ export const FONTS = {
 
 export type FontName = keyof typeof FONTS;
 
-type LabelProps = Omit<ComponentProps<typeof Text>, "font"> & { font?: FontName };
+type LabelProps = Omit<ComponentProps<typeof Text>, "font"> & {
+  font?: FontName;
+  /**
+   * Thickens the strokes with an outline in the text's own colour. The body
+   * face is a light weight, and at caption size on a pale card it thins out
+   * to nothing; this keeps small print legible.
+   */
+  heavy?: boolean;
+};
 
 // troika's mesh type isn't exported by drei; refs are typed loosely here.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const Label = forwardRef<any, LabelProps>(function Label({ font = "body", onSync, ...props }, ref) {
+export const Label = forwardRef<any, LabelProps>(function Label({ font = "body", heavy = false, onSync, ...props }, ref) {
   const invalidate = useThree((s) => s.invalidate);
   return (
     <Text
@@ -40,6 +48,7 @@ export const Label = forwardRef<any, LabelProps>(function Label({ font = "body",
       font={FONTS[font]}
       anchorX="center"
       anchorY="middle"
+      {...(heavy ? { outlineWidth: "4%", outlineColor: props.color } : null)}
       onSync={(mesh) => {
         invalidate();
         onSync?.(mesh);

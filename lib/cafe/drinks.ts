@@ -49,6 +49,14 @@ const TECH_LAYERS: Record<string, DrinkLayer> = {
   leaflet: { name: "Matcha", color: "#8bab5a" },
   "vue 3": { name: "Pistachio", color: "#a8c08a" },
   "transformers.js": { name: "Vanilla", color: "#f3e3b5" },
+  "html5 canvas": { name: "Brown sugar", color: "#b5763c" },
+  peerjs: { name: "Hazelnut", color: "#a9764a" },
+  supabase: { name: "Pandan", color: "#9cc08a" },
+  postgresql: { name: "Muscovado", color: "#7a4a2a" },
+  pytorch: { name: "Ristretto", color: "#2f1a0f" },
+  flutter: { name: "Ube", color: "#8f6fb0" },
+  onnx: { name: "Condensed milk", color: "#f1e2c0" },
+  "c++": { name: "Dark chocolate", color: "#3a2218" },
 };
 
 const FALLBACK_COLORS = ["#7a4a2a", "#b07a4f", "#d9b48a", "#9c6644"];

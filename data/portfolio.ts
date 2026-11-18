@@ -209,6 +209,18 @@ export const experienceData: Experience[] = [
 ];
 
 // --- Projects ---
+export interface Screenshot {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+}
+
+/** Screenshots stored as public/projects/<slug>/1.webp, 2.webp, ... in order. */
+function shots(slug: string, size: [number, number], alts: string[]): Screenshot[] {
+  return alts.map((alt, i) => ({ src: `/projects/${slug}/${i + 1}.webp`, alt, width: size[0], height: size[1] }));
+}
+
 export interface Project {
   id: number;
   title: string;
@@ -221,6 +233,8 @@ export interface Project {
   featured: boolean;
   demoUrl: string; // Replace ADD_DEMO_URL_HERE
   repoUrl: string; // Replace ADD_REPO_URL_HERE
+  /** Screenshots of the running site or game, shown in the project's pop-up. */
+  screenshots?: Screenshot[];
   /** Optional hand-picked drink. Otherwise derived from techStack. */
   drink?: {
     cup?: "glass" | "mug" | "cup";
@@ -245,8 +259,13 @@ export const projectsData: Project[] = [
     category: "Game",
     role: "Pilot & Comms seat · team of 6",
     featured: true,
-    demoUrl: "",
+    demoUrl: "https://seedlign.itch.io/homestead",
     repoUrl: "https://github.com/TadeyRuk/Homestead",
+    screenshots: shots("homestead", [1280, 720], [
+      "Title screen on Mars, with the mission setup panel",
+      "Mission Control brief for a Mars survey",
+      "Build phase: scavenging parts for the rocket's four slots",
+    ]),
   },
   {
     id: 13,
@@ -266,6 +285,11 @@ export const projectsData: Project[] = [
     featured: true,
     demoUrl: "https://fit-cs-expo.vercel.app",
     repoUrl: "",
+    screenshots: shots("cs-expo-2026", [1280, 800], [
+      "CS Expo 2026 landing page",
+      "The expo at a glance: projects, days, sessions and panelists",
+      "Thesis showcase section",
+    ]),
   },
   {
     id: 1,
@@ -348,6 +372,11 @@ export const projectsData: Project[] = [
     featured: false,
     demoUrl: "https://smart-habit-tracker-fawn.vercel.app",
     repoUrl: "https://github.com/Romeo-04/smart-habit-tracker",
+    screenshots: shots("trackhab", [1280, 800], [
+      "TrackHab landing page",
+      "Feature overview",
+      "How it works in three steps",
+    ]),
   },
   {
     id: 4,
@@ -373,6 +402,11 @@ export const projectsData: Project[] = [
     featured: false,
     demoUrl: "https://kishiagaytano.github.io/archeon/",
     repoUrl: "https://github.com/kishiagaytano/archeon",
+    screenshots: shots("archeon", [1280, 800], [
+      "Archeon landing page",
+      "What Archeon captures from a codebase",
+      "Confidence-scored answers",
+    ]),
   },
   {
     id: 5,
@@ -430,6 +464,10 @@ export const projectsData: Project[] = [
     featured: false,
     demoUrl: "https://romeo-04.github.io/Cha-Tsing/",
     repoUrl: "https://github.com/Romeo-04/Cha-Tsing",
+    screenshots: shots("cha-tsing", [1280, 800], [
+      "Chico, the money-saving monkey, says hello",
+      "Insights: savings rate and suggested next steps",
+    ]),
   },
   {
     id: 8,
@@ -447,8 +485,13 @@ export const projectsData: Project[] = [
     category: "Research",
     role: "Product Manager · Team Stochastic 4",
     featured: true,
-    demoUrl: "https://kitako-eight.vercel.app",
+    demoUrl: "https://kitako-stochastic4.vercel.app",
     repoUrl: "https://github.com/Emyol/Stochastic4-Website",
+    screenshots: shots("kitako", [1280, 800], [
+      "KitaKo landing page: search your photos the way you talk",
+      "A Taglish search returning photos on the phone",
+      "How KitaKo maps photos by meaning",
+    ]),
   },
   {
     id: 9,
@@ -506,6 +549,10 @@ export const projectsData: Project[] = [
     featured: true,
     demoUrl: "https://romeo-04.github.io/kislap/",
     repoUrl: "https://github.com/Romeo-04/kislap",
+    screenshots: shots("kislap", [1280, 800], [
+      "Kislap title screen",
+      "Story map with easy, medium and hard stories",
+    ]),
   },
   {
     id: 14,

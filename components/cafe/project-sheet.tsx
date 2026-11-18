@@ -5,12 +5,13 @@
 // ============================================================
 // The pop-up for one project. It grows out of whatever was clicked (a
 // panel card, a menu entry or a cup in the café) and shrinks back into it
-// on close. Inside: the drink, the pitch, what was built, the stack and
-// the links, with prev/next to walk every project. A native <dialog>, so
+// on close. Inside: the drink, the pitch, screenshots, what was built, the
+// stack and the links, with prev/next to walk every project. A native <dialog>, so
 // focus is trapped and Escape works; reduced motion just fades.
 // ============================================================
 
 import { useEffect, useSyncExternalStore } from "react";
+import SheetGallery from "@/components/cafe/sheet-gallery";
 import { useSheetMotion } from "@/components/cafe/sheet-motion";
 import DrinkIllustration from "@/components/menu/drink-illustration";
 import { projectsData } from "@/data/portfolio";
@@ -105,7 +106,13 @@ export default function ProjectSheet({ reduced }: { reduced: boolean }) {
               {project.pitch}
             </p>
 
-            <div className="sheet-rise mt-5" style={{ "--i": 3 } as React.CSSProperties}>
+            {project.screenshots && project.screenshots.length > 0 && (
+              <div className="sheet-rise" style={{ "--i": 3 } as React.CSSProperties}>
+                <SheetGallery shots={project.screenshots} title={project.title} />
+              </div>
+            )}
+
+            <div className="sheet-rise mt-5" style={{ "--i": 4 } as React.CSSProperties}>
               <p className="sheet-label">What I built</p>
               <ul className="mt-2 space-y-2">
                 {project.description.map((line) => (
@@ -117,7 +124,7 @@ export default function ProjectSheet({ reduced }: { reduced: boolean }) {
               </ul>
             </div>
 
-            <div className="sheet-rise mt-5" style={{ "--i": 4 } as React.CSSProperties}>
+            <div className="sheet-rise mt-5" style={{ "--i": 5 } as React.CSSProperties}>
               <p className="sheet-label">Stack</p>
               <ul className="mt-2 flex flex-wrap gap-1.5">
                 {project.techStack.map((t) => (
@@ -129,7 +136,7 @@ export default function ProjectSheet({ reduced }: { reduced: boolean }) {
             </div>
 
             {(project.demoUrl || project.repoUrl) && (
-              <div className="sheet-rise mt-6 flex flex-wrap gap-3" style={{ "--i": 5 } as React.CSSProperties}>
+              <div className="sheet-rise mt-6 flex flex-wrap gap-3" style={{ "--i": 6 } as React.CSSProperties}>
                 {project.demoUrl && (
                   <a href={project.demoUrl} target="_blank" rel="noopener noreferrer" className="sheet-action sheet-action-primary">
                     Live demo <External />

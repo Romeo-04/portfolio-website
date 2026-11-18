@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { achievementName, achievementsData, githubExclude, projectsData, skillsData } from "@/data/portfolio";
 
@@ -51,6 +53,15 @@ describe("portfolio data", () => {
     const names = achievementsData.map(achievementName);
     expect(new Set(names).size).toBe(names.length);
     expect(achievementName({ title: "Champion", event: "CyberXploit", year: "2026", description: "", tier: "gold" })).toBe("Champion — CyberXploit");
+  });
+
+  it("has a file in public/ for every screenshot", () => {
+    for (const p of projectsData) {
+      for (const shot of p.screenshots ?? []) {
+        expect(existsSync(join(process.cwd(), "public", shot.src)), shot.src).toBe(true);
+        expect(shot.alt.trim(), `${shot.src} alt text`).not.toBe("");
+      }
+    }
   });
 
   it("keeps the exclusion list lower-case", () => {

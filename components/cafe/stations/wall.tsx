@@ -108,23 +108,23 @@ function Certificate({ a }: { a: Achievement }) {
           <planeGeometry args={[FW - 0.262, FH - 0.262]} />
           <Toon color="#fffaf0" />
         </mesh>
-        <mesh position={[0, 0.125, 0.046]}>
-          <planeGeometry args={[0.5, 0.004]} />
+        {/* Accent rule across the top of the paper. */}
+        <mesh position={[0, 0.18, 0.046]}>
+          <planeGeometry args={[0.5, 0.006]} />
           <meshBasicMaterial color={ACCENT_COLORS[a.tier]} />
         </mesh>
-        <Label heavy font="body" fontSize={0.026} letterSpacing={0.18} color="#7a5a2c" position={[0, 0.15, 0.047]}>
-          IN RECOGNITION
-        </Label>
-        {/* A placing reads large with its event beneath; an honour with no
-            event takes the whole space. */}
+        {/* Sized to read from the station's camera: a placing sits above
+            its event, which may wrap to two lines across the paper; an
+            honour with no event is centred in the space. */}
         <Label
           font="display"
-          fontSize={0.056}
-          maxWidth={0.66}
+          fontSize={a.event ? 0.09 : 0.084}
+          maxWidth={0.74}
           textAlign="center"
-          lineHeight={1.08}
+          lineHeight={1.05}
+          anchorY={a.event ? "bottom" : "middle"}
           color="#2b1a10"
-          position={[-0.04, a.event ? 0.062 : 0.025, 0.047]}
+          position={[0, a.event ? 0.05 : 0.03, 0.047]}
         >
           {a.title}
         </Label>
@@ -132,22 +132,22 @@ function Certificate({ a }: { a: Achievement }) {
           <Label
             heavy
             font="body"
-            fontSize={0.036}
-            maxWidth={0.58}
+            fontSize={0.062}
+            maxWidth={0.74}
             textAlign="center"
-            lineHeight={1.15}
+            lineHeight={1.18}
             anchorY="top"
             color="#33241a"
-            position={[-0.04, 0.022, 0.047]}
+            position={[0, 0.03, 0.047]}
           >
             {a.event}
           </Label>
         )}
-        <Label heavy font="body" fontSize={0.032} color="#5a4536" position={[-0.04, -0.128, 0.047]}>
+        <Label heavy font="body" fontSize={0.048} color="#5a4536" position={[0, -0.17, 0.047]}>
           {a.year}
         </Label>
-        {/* Seal with ribbon tails, lower right. */}
-        <group position={[0.33, -0.12, 0.05]}>
+        {/* Seal with ribbon tails, in the lower right corner. */}
+        <group position={[0.35, -0.155, 0.05]} scale={0.8}>
           {[-1, 1].map((side) => (
             <mesh key={side} position={[side * 0.022, -0.06, -0.002]} rotation-z={side * 0.3}>
               <planeGeometry args={[0.035, 0.1]} />

@@ -4,13 +4,14 @@ import { describe, expect, it } from "vitest";
 import { achievementName, achievementsData, githubExclude, projectsData, skillsData } from "@/data/portfolio";
 
 describe("portfolio data", () => {
-  it("has exactly the four signature drinks", () => {
+  it("has exactly the five signature drinks", () => {
     const signature = projectsData
       .filter((p) => p.featured)
       .map((p) => p.slug)
       .sort();
     expect(signature).toEqual([
       "cs-expo-2026",
+      "epilag",
       "homestead",
       "kislap",
       "kitako",
@@ -44,9 +45,14 @@ describe("portfolio data", () => {
     expect(kislap?.repoUrl).toBe("https://github.com/Romeo-04/kislap");
   });
 
-  it("puts Homestead and CS Expo first on the bar", () => {
+  it("puts EpiLag-PH first on the bar, then Homestead and CS Expo", () => {
     const bar = projectsData.filter((p) => p.featured).map((p) => p.slug);
-    expect(bar.slice(0, 2)).toEqual(["homestead", "cs-expo-2026"]);
+    expect(bar.slice(0, 3)).toEqual(["epilag", "homestead", "cs-expo-2026"]);
+  });
+
+  it("hangs the PJDSC 2026 championship first on the wall", () => {
+    expect(achievementName(achievementsData[0])).toBe("Champion — Philippine Junior Data Science Challenge");
+    expect(achievementsData.filter((a) => a.event === "Philippine Junior Data Science Challenge")).toHaveLength(1);
   });
 
   it("names each achievement once", () => {

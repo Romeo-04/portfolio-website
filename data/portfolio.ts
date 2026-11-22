@@ -52,7 +52,7 @@ export const githubExclude: string[] = [
 // --- About Section ---
 export const aboutData = {
   bio: [
-    "I'm a software engineer and Computer Science student at FEU Institute of Technology, specializing in Software Engineering and graduating in 2027. I'm a DOST-SEI and University Elite Scholar with a 3.8 GPA, and my work sits where full-stack web development meets AI engineering.",
+    "I'm a software engineer and Computer Science student at FEU Institute of Technology, specializing in Software Engineering and graduating in 2027. I'm a DOST-SEI and University Elite Scholar with a 3.8 GPA, and my work sits where full-stack web development meets AI engineering. With Team DiagNodes I won the Philippine Junior Data Science Challenge 2026 with EpiLag-PH, which forecasts dengue outbreaks weeks before the wards fill up.",
     "I'm a Software Engineering Intern at Ed3N Ventures, where I work AI-first: I direct coding agents across two production projects and put my own effort into harness design, agent workflows, guardrails and code review, so the output stays accountable.",
     "Before that I led the FEU Tech ACM Student Chapter's web development team and served as its Director for Academics. My thesis, KitaKo, is an image search that runs entirely on an Android phone and treats Taglish queries as fairly as English ones.",
   ],
@@ -243,6 +243,30 @@ export interface Project {
 }
 
 export const projectsData: Project[] = [
+  {
+    id: 16,
+    title: "EpiLag-PH",
+    slug: "epilag",
+    pitch:
+      "Champion of the Philippine Junior Data Science Challenge 2026: forecasts dengue cases 2–8 weeks ahead for Philippine regions, provinces and Quezon City, and tells health offices what to do and where a limited budget prevents the most cases.",
+    description: [
+      "LightGBM quantile forecasts with a calibrated likely range, each area compared with its own usual level for the season to give an alert, a week-by-week checklist and a budget plan",
+      "Tested out of sample: in a replay of 2019 it flagged 30 of the 32 provinces that later crossed the epidemic line, 4 weeks ahead, and it flagged Quezon City's 2024–25 outbreak 5 weeks before it crossed the line",
+      "Runs entirely in the browser with no account and works offline, with a residents' outlook in Filipino and English, an SMS version, and open forecast data with RSS and calendar alert feeds",
+      "Dengue Drill, a 3D pixel-art game, puts you in charge of a real outbreak response twice, once reacting to case reports and once with the forecasts, scored on the real cases",
+    ],
+    techStack: ["Python", "LightGBM", "SHAP", "JavaScript", "Three.js", "Vite"],
+    category: "Public Health",
+    role: "Team DiagNodes · PJDSC 2026 Champion",
+    featured: true,
+    demoUrl: "https://epilag.vercel.app",
+    repoUrl: "https://github.com/Romeo-04/epilag",
+    screenshots: shots("epilag", [1280, 800], [
+      "EpiLag-PH landing page: forecast dengue early",
+      "Overview in the June 2019 replay: 25 areas on watch or warning, 30 of 32 outbreaks flagged",
+      "Dengue Drill: choose a mission, starting with Quezon City's 2024–25 season",
+    ]),
+  },
   {
     id: 12,
     title: "Homestead",
@@ -616,6 +640,14 @@ export const WALL_FRAMES = 12;
 export const achievementsData: Achievement[] = [
   {
     title: "Champion",
+    event: "Philippine Junior Data Science Challenge",
+    year: "2026",
+    description:
+      "Won the Philippine Junior Data Science Challenge (PJDSC) 2026 with Team DiagNodes and EpiLag-PH, a dengue outbreak forecaster",
+    tier: "gold",
+  },
+  {
+    title: "Champion",
     event: "National IT Skills Olympics",
     year: "2026",
     description: "Won the Quiz Bee at the National IT Skills Olympics",
@@ -666,13 +698,6 @@ export const achievementsData: Achievement[] = [
     year: "Ongoing",
     description: "University Elite Scholar at FEU Institute of Technology",
     tier: "special",
-  },
-  {
-    title: "Top 10 Finalist",
-    event: "Philippine Junior Data Science Challenge",
-    year: "2026",
-    description: "Top 10 finalist in the Philippine Junior Data Science Challenge (PJDSC)",
-    tier: "silver",
   },
   {
     title: "Top 10 Finalist",

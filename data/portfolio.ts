@@ -52,7 +52,7 @@ export const githubExclude: string[] = [
 // --- About Section ---
 export const aboutData = {
   bio: [
-    "I'm a software engineer and Computer Science student at FEU Institute of Technology, specializing in Software Engineering and graduating in 2027. I'm a DOST-SEI and University Elite Scholar with a 3.8 GPA, and my work sits where full-stack web development meets AI engineering. With Team DiagNodes I won the Philippine Junior Data Science Challenge 2026 with EpiLag-PH, which forecasts dengue outbreaks weeks before the wards fill up.",
+    "I'm a software engineer and Computer Science student at FEU Institute of Technology, specializing in Software Engineering and graduating in 2027. I'm a DOST-SEI and University Elite Scholar with a 3.8 GPA, and my work sits where full-stack web development meets AI engineering. I led Team DiagNodes to win the Philippine Junior Data Science Challenge 2026 with EpiLag-PH, and built the machine learning model that forecasts dengue outbreaks weeks before the wards fill up.",
     "I'm a Software Engineering Intern at Ed3N Ventures, where I work AI-first: I direct coding agents across two production projects and put my own effort into harness design, agent workflows, guardrails and code review, so the output stays accountable.",
     "Before that I led the FEU Tech ACM Student Chapter's web development team and served as its Director for Academics. My thesis, KitaKo, is an image search that runs entirely on an Android phone and treats Taglish queries as fairly as English ones.",
   ],
@@ -250,14 +250,14 @@ export const projectsData: Project[] = [
     pitch:
       "Champion of the Philippine Junior Data Science Challenge 2026: forecasts dengue cases 2–8 weeks ahead for Philippine regions, provinces and Quezon City, and tells health offices what to do and where a limited budget prevents the most cases.",
     description: [
-      "LightGBM quantile forecasts with a calibrated likely range, each area compared with its own usual level for the season to give an alert, a week-by-week checklist and a budget plan",
+      "Led Team DiagNodes to the championship, and built the forecasting model that runs in the website",
+      "Trained LightGBM quantile models, one per forecast horizon, on weekly cases, rain, heat and humidity, with conformal calibration for the likely range and SHAP to explain each forecast",
       "Tested out of sample: in a replay of 2019 it flagged 30 of the 32 provinces that later crossed the epidemic line, 4 weeks ahead, and it flagged Quezon City's 2024–25 outbreak 5 weeks before it crossed the line",
-      "Runs entirely in the browser with no account and works offline, with a residents' outlook in Filipino and English, an SMS version, and open forecast data with RSS and calendar alert feeds",
-      "Dengue Drill, a 3D pixel-art game, puts you in charge of a real outbreak response twice, once reacting to case reports and once with the forecasts, scored on the real cases",
+      "Each forecast is compared with the area's usual level for the season to give an alert, a week-by-week checklist and a budget plan, in a site that runs in the browser, works offline and includes Dengue Drill, a 3D game scored on real outbreaks",
     ],
     techStack: ["Python", "LightGBM", "SHAP", "JavaScript", "Three.js", "Vite"],
     category: "Public Health",
-    role: "Team DiagNodes · PJDSC 2026 Champion",
+    role: "Team Lead & ML Engineer · Team DiagNodes",
     featured: true,
     demoUrl: "https://epilag.vercel.app",
     repoUrl: "https://github.com/Romeo-04/epilag",
@@ -643,7 +643,7 @@ export const achievementsData: Achievement[] = [
     event: "Philippine Junior Data Science Challenge",
     year: "2026",
     description:
-      "Won the Philippine Junior Data Science Challenge (PJDSC) 2026 with Team DiagNodes and EpiLag-PH, a dengue outbreak forecaster",
+      "Led Team DiagNodes to win the Philippine Junior Data Science Challenge (PJDSC) 2026 with EpiLag-PH, a dengue outbreak forecaster",
     tier: "gold",
   },
   {

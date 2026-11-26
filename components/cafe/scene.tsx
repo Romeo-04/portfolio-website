@@ -55,7 +55,7 @@ import { requestShadowUpdate, takeShadowUpdate } from "@/lib/cafe/shadows";
 import { STATIONS, cameraPose, stationYaw, type Vec3 } from "@/lib/cafe/stations";
 import { easeOutBack } from "@/lib/cafe/choreo";
 import { openProject } from "@/lib/cafe/project-sheet";
-import { getViewInset, subscribeViewInset } from "@/lib/cafe/view-inset";
+import { BASE_FOV, fovFor, getViewInset, getViewInsetY, subscribeViewInset } from "@/lib/cafe/view-inset";
 
 const CUP_HEIGHT = 0.4;
 const LIQUID_HEIGHT = CUP_HEIGHT * 0.9;
@@ -111,25 +111,37 @@ function Pacing({ rung, measure, onSlow }: { rung: number; measure: boolean; onS
 }
 
 /**
- * Shifts the rendered view right while a station panel is open, so the café
- * stays centred in the free space beside it, easing in and out.
+ * Shifts the rendered view while a station panel is open, so the café stays
+ * centred in the free space beside it (or above it, on phones), easing in
+ * and out. Also widens the view on portrait screens (see fovFor).
  */
 function ViewShift({ cut }: { cut: boolean }) {
-  const current = useRef(0);
+  const current = useRef({ x: 0, y: 0 });
   const invalidate = useThree((s) => s.invalidate);
   useEffect(() => subscribeViewInset(() => invalidate()), [invalidate]);
-  useFrame(({ camera, size }, dt) => {
-    const target = getViewInset();
-    const k = cut ? 1 : 1 - Math.exp(-6 * dt);
-    current.current += (target - current.current) * k;
-    if (Math.abs(target - current.current) < 0.5) current.current = target;
-    const cam = camera as PerspectiveCamera;
-    if (current.current === 0) {
-      if (cam.view?.enabled) cam.clearViewOffset();
-    } else {
-      cam.setViewOffset(size.width, size.height, -current.current, 0, size.width, size.height);
+  useFrame((state, dt) => {
+    const { size } = state;
+    const camera = state.camera as PerspectiveCamera;
+    // A resize re-renders, so the view widens or narrows on the same frame.
+    const fov = fovFor(size.width / size.height);
+    if (camera.fov !== fov) {
+      camera.fov = fov;
+      camera.updateProjectionMatrix();
     }
-    if (current.current !== target) invalidate();
+    const tx = getViewInset();
+    const ty = getViewInsetY();
+    const c = current.current;
+    const k = cut ? 1 : 1 - Math.exp(-6 * dt);
+    c.x += (tx - c.x) * k;
+    c.y += (ty - c.y) * k;
+    if (Math.abs(tx - c.x) < 0.5) c.x = tx;
+    if (Math.abs(ty - c.y) < 0.5) c.y = ty;
+    if (c.x === 0 && c.y === 0) {
+      if (camera.view?.enabled) camera.clearViewOffset();
+    } else {
+      camera.setViewOffset(size.width, size.height, -c.x, c.y, size.width, size.height);
+    }
+    if (c.x !== tx || c.y !== ty) invalidate();
   });
   return null;
 }
@@ -674,7 +686,7 @@ export default function CafeScene({
         // Neutral tone mapping keeps the palette's colours as painted; the
         // filmic curve greyed the pastels.
         gl={{ toneMapping: NeutralToneMapping }}
-        camera={{ fov: 50, position: [...STATIONS[0].camera.position] }}
+        camera={{ fov: BASE_FOV, position: [...STATIONS[0].camera.position] }}
         dpr={quality.dpr}
         onCreated={() => onReady?.()}
       >

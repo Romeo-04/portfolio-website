@@ -1,4 +1,5 @@
 import DrinkIllustration from "@/components/menu/drink-illustration";
+import MenuNav from "@/components/menu/menu-nav";
 import { ArrowRight, Code, Document, External, Mail } from "@/components/ui/icons";
 import {
   aboutData,
@@ -57,19 +58,33 @@ function Section({
   );
 }
 
-function Ticket({ project }: { project: Project }) {
+function Ticket({ project, withShot = false }: { project: Project; withShot?: boolean }) {
+  const shot = withShot ? project.screenshots?.[0] : undefined;
   return (
     <article id={`menu-${project.slug}`} className="menu-ticket">
-      <span aria-hidden className="menu-ticket-cup">
-        <DrinkIllustration project={project} size={36} />
-      </span>
+      {shot && (
+        // A pointer shortcut into the sheet; keyboard users have "Open project".
+        <button type="button" data-project={project.slug} tabIndex={-1} className="menu-ticket-shot">
+          {/* eslint-disable-next-line @next/next/no-img-element -- rendered in tests outside Next */}
+          <img src={shot.src} alt={shot.alt} width={shot.width} height={shot.height} loading="lazy" decoding="async" />
+        </button>
+      )}
+      {/* The cup sits beside the title only, so the text below gets the full width. */}
+      <div className="menu-ticket-head">
+        <span aria-hidden className="menu-ticket-cup">
+          <DrinkIllustration project={project} size={30} />
+        </span>
+        <div className="min-w-0">
+          <h3 className="menu-h3">{project.title}</h3>
+          <p className="menu-meta">
+            {project.role} · {project.category}
+          </p>
+        </div>
+      </div>
       <div className="min-w-0">
-        <h3 className="menu-h3">{project.title}</h3>
-        <p className="menu-meta">
-          {project.role} · {project.category}
-        </p>
-        <p className="menu-text mt-2">{project.pitch}</p>
-        <p className="menu-meta mt-2 normal-case tracking-normal">{project.techStack.join(" · ")}</p>
+        <p className="menu-text">{project.pitch}</p>
+        {/* No-break space before each dot so a wrapped line never starts with "·". */}
+        <p className="menu-meta mt-2">{project.techStack.join(" · ")}</p>
         {/* Highlights stay in the page for search and no-JS readers, folded away. */}
         <details className="menu-details">
           <summary>Highlights</summary>
@@ -106,14 +121,31 @@ export default function QuickOrderMenu({ specials }: { specials: GithubRepo[] })
   return (
     <div className="menu">
       <header id="menu-top" className="menu-header">
-        <p className="menu-label">Quick order</p>
+        {/* eslint-disable-next-line @next/next/no-img-element -- small portrait, rendered in tests outside Next */}
+        <img src="/portrait.webp" alt={personalInfo.name} width={96} height={96} decoding="async" className="menu-portrait" />
         <h1 className="font-display menu-h1">{personalInfo.name}</h1>
-        <p className="menu-role">{personalInfo.role}</p>
-        <p className="menu-text mt-2">{personalInfo.tagline}</p>
+        <p className="menu-role">
+          {personalInfo.role} · {personalInfo.school}
+        </p>
+        <p className="menu-text menu-tagline">{personalInfo.tagline}</p>
+        <p className="menu-status">
+          <span aria-hidden className="menu-status-dot" />
+          Open to {aboutData.currently.aimingFor.toLowerCase()}
+        </p>
+        <div className="menu-hero-actions">
+          <a href={`mailto:${personalInfo.email}`} className="menu-cta menu-cta-primary">
+            <Mail size={16} /> Email me
+          </a>
+          <a href={personalInfo.resumeUrl} target="_blank" rel="noopener noreferrer" className="menu-cta">
+            <Document size={16} /> Résumé
+          </a>
+        </div>
       </header>
 
+      <MenuNav />
+
       <Section id="menu-drinks" title="Signature Drinks" station="brew-bar">
-        {signature.map((p) => <Ticket key={p.slug} project={p} />)}
+        {signature.map((p) => <Ticket key={p.slug} project={p} withShot />)}
       </Section>
 
       <Section id="menu-shelf" title="The Shelf" station="brew-bar">
@@ -121,16 +153,12 @@ export default function QuickOrderMenu({ specials }: { specials: GithubRepo[] })
       </Section>
 
       <Section id="menu-about" title="About the Barista" station="menu-board">
-        <div className="menu-about">
-          {/* eslint-disable-next-line @next/next/no-img-element -- small portrait, rendered in tests outside Next */}
-          <img src="/portrait.webp" alt={personalInfo.name} width={80} height={80} loading="lazy" decoding="async" className="menu-portrait" />
-          <div className="grid gap-3">
-            {aboutData.bio.map((para) => (
-              <p key={para} className="menu-text">
-                {para}
-              </p>
-            ))}
-          </div>
+        <div className="grid gap-3">
+          {aboutData.bio.map((para) => (
+            <p key={para} className="menu-text">
+              {para}
+            </p>
+          ))}
         </div>
       </Section>
 
@@ -173,7 +201,7 @@ export default function QuickOrderMenu({ specials }: { specials: GithubRepo[] })
           {achievementsData.map((a) => (
             <li key={achievementName(a)}>
               <span className="menu-list-title">{achievementName(a)}</span>
-              <span className="menu-meta normal-case tracking-normal">
+              <span className="menu-meta">
                 {a.year} · {a.description}
               </span>
             </li>
@@ -181,7 +209,7 @@ export default function QuickOrderMenu({ specials }: { specials: GithubRepo[] })
           {certificationsData.map((c) => (
             <li key={c.title}>
               <span className="menu-list-title">{c.title}</span>
-              <span className="menu-meta normal-case tracking-normal">
+              <span className="menu-meta">
                 {c.issued ? `${c.issuer} · ${c.issued}` : c.issuer}
               </span>
             </li>
@@ -200,7 +228,7 @@ export default function QuickOrderMenu({ specials }: { specials: GithubRepo[] })
                   {r.displayName} <External size={14} />
                 </a>
                 {(r.description || r.language) && (
-                  <span className="menu-meta normal-case tracking-normal">
+                  <span className="menu-meta">
                     {[r.description, r.language].filter(Boolean).join(" · ")}
                   </span>
                 )}

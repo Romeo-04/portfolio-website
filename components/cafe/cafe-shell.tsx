@@ -168,7 +168,7 @@ export default function CafeShell({ children, specials }: { children: ReactNode;
         )}
         {caps?.phone && caps.webgl && (
           <button type="button" onClick={() => setEntered(true)} className="menu-enter">
-            Step inside the café <ArrowRight />
+            <Cup size={18} /> Step inside the café <ArrowRight />
           </button>
         )}
         <div className="menu-paper">{children}</div>

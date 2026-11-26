@@ -749,7 +749,7 @@ html.in-cafe::-webkit-scrollbar { display: none; }
   }
   .sheet-close:hover { background: var(--card); transform: rotate(90deg); }
   .sheet-close:active { transform: rotate(90deg) scale(0.92); }
-  :is(.sheet-action, .sheet-nav, .sheet-close, .sheet-shot, .sheet-thumb, .ticket-open, .menu-jump, .menu-link, .menu-enter, .menu-contact a):focus-visible {
+  :is(.sheet-action, .sheet-nav, .sheet-close, .sheet-shot, .sheet-thumb, .ticket-open, .menu-jump, .menu-link, .menu-enter, .menu-cta, .menu-contact a):focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
   }
@@ -771,7 +771,117 @@ html.in-cafe::-webkit-scrollbar { display: none; }
   /* Quick Order menu: the same paper and type as the phone, laid out as a
      single readable column (a drawer over the café, or the page itself). */
   .menu { color: var(--ink); font-family: var(--font-cafe); }
-  .menu-header { padding-bottom: var(--s5); text-align: center; }
+  /* Hero: the face, the name, what you're open to, and the two ways to act. */
+  .menu-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: var(--s5);
+    text-align: center;
+  }
+  .menu-portrait {
+    width: 96px;
+    height: 96px;
+    border-radius: 999px;
+    object-fit: cover;
+    background: var(--tint);
+    box-shadow: 0 0 0 4px var(--screen), 0 0 0 5px var(--line-strong), 0 8px 20px rgb(74 40 20 / 0.18);
+  }
+  .menu-header .menu-h1 { margin-top: var(--s4); }
+  .menu-tagline { max-width: 36ch; margin-top: var(--s2); }
+  .menu-status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s2);
+    margin-top: var(--s4);
+    padding: 6px var(--s3);
+    border-radius: 999px;
+    background: rgb(63 125 78 / 0.1);
+    font-size: 13px;
+    line-height: 1.4;
+    color: #2f5e3b;
+    text-align: left;
+  }
+  .menu-status-dot {
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: #3f9d58;
+    box-shadow: 0 0 0 3px rgb(63 157 88 / 0.22);
+  }
+  .menu-hero-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s2);
+    width: 100%;
+    max-width: 360px;
+    margin-top: var(--s5);
+  }
+  .menu-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s2);
+    min-height: 48px;
+    padding: 0 var(--s4);
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: var(--card);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--ink);
+    box-shadow: 0 1px 2px rgb(74 40 20 / 0.06);
+    transition: background 160ms ease, border-color 160ms ease, transform 160ms var(--ease-out);
+  }
+  .menu-cta:hover { background: var(--tint); }
+  .menu-cta:active { transform: scale(0.97); }
+  .menu-cta-primary {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--screen);
+    box-shadow: 0 1px 2px rgb(120 40 15 / 0.2), 0 6px 16px rgb(196 85 47 / 0.28);
+  }
+  .menu-cta-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+  /* Section chips that stick to the top of the menu. --menu-pad is the
+     padding of whatever holds the menu, so the bar runs edge to edge. */
+  .menu-nav {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    margin-inline: calc(-1 * var(--menu-pad, 24px));
+    padding: var(--s2) 0;
+    background: rgb(255 250 243 / 0.94);
+    backdrop-filter: blur(10px);
+    border-block: 1px solid var(--line);
+  }
+  .menu-nav-row {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-inline: var(--menu-pad, 24px);
+    scrollbar-width: none;
+    mask-image: linear-gradient(90deg, transparent, #000 var(--s4), #000 calc(100% - var(--s5)), transparent);
+  }
+  .menu-nav-row::-webkit-scrollbar { display: none; }
+  .menu-nav-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    padding: 0 14px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--ink-muted);
+    transition: background 200ms ease, color 200ms ease;
+  }
+  .menu-nav-chip:hover { color: var(--ink); background: var(--tint); }
+  .menu-nav-chip[aria-current] { background: var(--ink); color: var(--screen); }
+  .menu-nav-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .menu-section { scroll-margin-top: 53px; }
+  .menu-section:first-of-type { border-top: 0; }
   .menu-label {
     font-size: 12px;
     font-weight: 600;
@@ -814,12 +924,34 @@ html.in-cafe::-webkit-scrollbar { display: none; }
   }
   .menu-jump:hover { background: var(--tint); color: var(--ink); }
   .menu-jump:active { transform: scale(0.96); }
-  .menu-ticket { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: var(--s4); }
+  .menu-ticket { display: grid; gap: var(--s3); }
+  .menu-ticket-head { display: flex; align-items: center; gap: var(--s3); }
+  .menu-ticket-shot {
+    display: block;
+    margin-bottom: var(--s1);
+    overflow: hidden;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    background: var(--tint);
+    box-shadow: var(--shadow-card);
+    cursor: pointer;
+  }
+  .menu-ticket-shot img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    object-position: top;
+    transition: transform 400ms var(--ease-out);
+  }
+  .menu-ticket-shot:hover img { transform: scale(1.02); }
   .menu-ticket-cup {
     display: grid;
     place-items: center;
-    width: 48px;
-    height: 64px;
+    flex-shrink: 0;
+    width: 44px;
+    height: 52px;
     border-radius: 12px;
     background: var(--tint);
   }
@@ -867,8 +999,6 @@ html.in-cafe::-webkit-scrollbar { display: none; }
     text-underline-offset: 3px;
   }
   .menu-link:hover { color: var(--ink); text-decoration-color: currentColor; }
-  .menu-about { display: flex; gap: var(--s4); align-items: flex-start; }
-  .menu-portrait { flex-shrink: 0; width: 80px; height: 80px; border-radius: 16px; object-fit: cover; }
   .menu-chips { display: flex; flex-wrap: wrap; gap: 6px; }
   .menu-chip {
     padding: var(--s1) 10px;
@@ -933,15 +1063,17 @@ html.in-cafe::-webkit-scrollbar { display: none; }
     scrollbar-width: thin;
     scrollbar-color: rgb(43 26 16 / 0.2) transparent;
   }
+  .menu-drawer-scroll { --menu-pad: var(--s5); }
   .menu-drawer-scroll .menu-header { padding-top: var(--s5); }
+  .menu-drawer-scroll .menu-nav { border-top: 0; }
   .menu-drawer:focus { outline: none; }
 
   /* The menu as the page (phones, no WebGL). */
   .menu-page { max-width: 672px; margin-inline: auto; padding: var(--s5) var(--s4) var(--s7); }
-  .menu-paper { padding: var(--s5); border-radius: 24px; background: var(--screen); }
+  .menu-paper { --menu-pad: var(--s5); padding: var(--menu-pad); border-radius: 24px; background: var(--screen); }
   @media (min-width: 641px) {
     .menu-page { padding-top: var(--s7); }
-    .menu-paper { padding: var(--s6); }
+    .menu-paper { --menu-pad: var(--s6); }
   }
   .menu-enter {
     display: flex;
@@ -950,16 +1082,18 @@ html.in-cafe::-webkit-scrollbar { display: none; }
     justify-content: center;
     gap: var(--s2);
     min-height: 52px;
-    margin-bottom: var(--s4);
+    margin-bottom: var(--s3);
     border-radius: 999px;
-    background: var(--accent);
-    font-size: 16px;
+    border: 1px solid rgb(245 233 218 / 0.18);
+    background: rgb(245 233 218 / 0.08);
+    font-size: 15px;
     font-weight: 600;
-    color: var(--screen);
-    box-shadow: 0 8px 24px rgb(196 85 47 / 0.35);
-    transition: background 160ms ease, transform 160ms var(--ease-out);
+    color: #f5e9da;
+    transition: background 160ms ease, border-color 160ms ease, transform 160ms var(--ease-out);
   }
-  .menu-enter:hover { background: var(--accent-hover); }
+  /* The café is the extra, so it steps back for the hero's Email me. */
+  .menu-enter:hover { background: rgb(245 233 218 / 0.14); border-color: rgb(245 233 218 / 0.3); }
+  .menu-enter svg:first-child { color: #f0a77f; }
   .menu-enter:active { transform: scale(0.98); }
   .menu-closed {
     display: flex;
@@ -976,13 +1110,13 @@ html.in-cafe::-webkit-scrollbar { display: none; }
     .station-panel.is-visible .panel-inner > * { animation: none; }
     .station-panel { transition: opacity 200ms ease; transform: none; }
     .panel-project, .panel-project:hover { transform: none; }
-    .sheet-shot:hover img { transform: none; }
+    .sheet-shot:hover img, .menu-ticket-shot:hover img { transform: none; }
     .menu-drawer, .hud-nav, .hud-stamp { transition: none; }
     .hud-stamp.is-stamped, .secret-dialog[open], .secret-dialog[open]::backdrop { animation: none; }
     .intro { transition: opacity 200ms ease; }
     .intro.is-leaving { transform: none; }
     /* Press and hover feedback stays as colour only. */
-    :is(.hud-card, .hud-button, .hud-nav-item, .panel-fold, .panel-project, .panel-action, .panel-pill, .sheet-action, .sheet-nav, .sheet-close, .menu-jump, .menu-enter, .intro-skip, .menu-contact a):is(:hover, :active) {
+    :is(.hud-card, .hud-button, .hud-nav-item, .panel-fold, .panel-project, .panel-action, .panel-pill, .sheet-action, .sheet-nav, .sheet-close, .menu-jump, .menu-enter, .menu-cta, .intro-skip, .menu-contact a):is(:hover, :active) {
       transform: none !important;
     }
   }

@@ -69,7 +69,8 @@ function Ticket({ project }: { project: Project }) {
           {project.role} · {project.category}
         </p>
         <p className="menu-text mt-2">{project.pitch}</p>
-        <p className="menu-meta mt-2 normal-case tracking-normal">{project.techStack.join(" · ")}</p>
+        {/* No-break space before each dot so a wrapped line never starts with "·". */}
+        <p className="menu-meta mt-2">{project.techStack.join(" · ")}</p>
         {/* Highlights stay in the page for search and no-JS readers, folded away. */}
         <details className="menu-details">
           <summary>Highlights</summary>
@@ -173,7 +174,7 @@ export default function QuickOrderMenu({ specials }: { specials: GithubRepo[] })
           {achievementsData.map((a) => (
             <li key={achievementName(a)}>
               <span className="menu-list-title">{achievementName(a)}</span>
-              <span className="menu-meta normal-case tracking-normal">
+              <span className="menu-meta">
                 {a.year} · {a.description}
               </span>
             </li>
@@ -181,7 +182,7 @@ export default function QuickOrderMenu({ specials }: { specials: GithubRepo[] })
           {certificationsData.map((c) => (
             <li key={c.title}>
               <span className="menu-list-title">{c.title}</span>
-              <span className="menu-meta normal-case tracking-normal">
+              <span className="menu-meta">
                 {c.issued ? `${c.issuer} · ${c.issued}` : c.issuer}
               </span>
             </li>
@@ -200,7 +201,7 @@ export default function QuickOrderMenu({ specials }: { specials: GithubRepo[] })
                   {r.displayName} <External size={14} />
                 </a>
                 {(r.description || r.language) && (
-                  <span className="menu-meta normal-case tracking-normal">
+                  <span className="menu-meta">
                     {[r.description, r.language].filter(Boolean).join(" · ")}
                   </span>
                 )}

@@ -1229,8 +1229,16 @@ html.in-cafe::-webkit-scrollbar { display: none; }
   .scroll-cue-chevrons > span:nth-child(2) { margin-top: -6px; animation-delay: 200ms; }
 
   @media (max-width: 640px) {
-    /* The panel is a bottom sheet here, so the cue hangs in the sky under the HUD. */
-    .scroll-cue { top: 96px; bottom: auto; }
+    /* The panel is a bottom sheet here, so the cue stands on the pavement
+       just above it (the sheet is 46vh tall at the storefront). */
+    .scroll-cue { bottom: calc(46vh + 24px); }
+  }
+  /* Touch screens have no wheel: no mouse, and the cue says swipe. */
+  .scroll-cue-swipe { display: none; }
+  @media (hover: none) and (pointer: coarse) {
+    .scroll-cue-mouse,
+    .scroll-cue-wheel { display: none; }
+    .scroll-cue-swipe { display: inline; }
   }
 
   @media (prefers-reduced-motion: reduce) {

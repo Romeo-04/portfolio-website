@@ -52,10 +52,10 @@ import { setLoading } from "@/lib/cafe/loading";
 import { CAMERA_LAMBDA, dampVec3, distance3, shouldSnap } from "@/lib/cafe/damp";
 import { getProgress, subscribeProgress } from "@/lib/cafe/scroll";
 import { requestShadowUpdate, takeShadowUpdate } from "@/lib/cafe/shadows";
-import { STATIONS, cameraPose, stationYaw, type Vec3 } from "@/lib/cafe/stations";
+import { BASE_FOV, STATIONS, cameraPose, framingFor, stationYaw, type Vec3 } from "@/lib/cafe/stations";
 import { easeOutBack } from "@/lib/cafe/choreo";
 import { openProject } from "@/lib/cafe/project-sheet";
-import { getViewInset, subscribeViewInset } from "@/lib/cafe/view-inset";
+import { getViewInset, getViewLift, subscribeViewInset } from "@/lib/cafe/view-inset";
 
 const CUP_HEIGHT = 0.4;
 const LIQUID_HEIGHT = CUP_HEIGHT * 0.9;
@@ -111,25 +111,30 @@ function Pacing({ rung, measure, onSlow }: { rung: number; measure: boolean; onS
 }
 
 /**
- * Shifts the rendered view right while a station panel is open, so the café
- * stays centred in the free space beside it, easing in and out.
+ * Shifts the rendered view while a station panel is open, so the café stays
+ * centred in the free space beside it (or above it, on phones), easing in
+ * and out.
  */
 function ViewShift({ cut }: { cut: boolean }) {
-  const current = useRef(0);
+  const current = useRef({ x: 0, y: 0 });
   const invalidate = useThree((s) => s.invalidate);
   useEffect(() => subscribeViewInset(() => invalidate()), [invalidate]);
   useFrame(({ camera, size }, dt) => {
-    const target = getViewInset();
+    const tx = getViewInset();
+    const ty = getViewLift();
+    const c = current.current;
     const k = cut ? 1 : 1 - Math.exp(-6 * dt);
-    current.current += (target - current.current) * k;
-    if (Math.abs(target - current.current) < 0.5) current.current = target;
+    c.x += (tx - c.x) * k;
+    c.y += (ty - c.y) * k;
+    if (Math.abs(tx - c.x) < 0.5) c.x = tx;
+    if (Math.abs(ty - c.y) < 0.5) c.y = ty;
     const cam = camera as PerspectiveCamera;
-    if (current.current === 0) {
+    if (c.x === 0 && c.y === 0) {
       if (cam.view?.enabled) cam.clearViewOffset();
     } else {
-      cam.setViewOffset(size.width, size.height, -current.current, 0, size.width, size.height);
+      cam.setViewOffset(size.width, size.height, -c.x, c.y, size.width, size.height);
     }
-    if (current.current !== target) invalidate();
+    if (c.x !== tx || c.y !== ty) invalidate();
   });
   return null;
 }
@@ -137,8 +142,15 @@ function ViewShift({ cut }: { cut: boolean }) {
 function CameraRig({ cut }: { cut: boolean }) {
   const pos = useRef<Vec3 | null>(null);
   const look = useRef<Vec3 | null>(null);
-  useFrame(({ camera, invalidate }, dt) => {
-    const pose = cameraPose(getProgress(), { cut });
+  useFrame(({ camera, size, invalidate }, dt) => {
+    // Portrait screens get a wider lens and stand further back.
+    const framing = framingFor(size.width / size.height);
+    const cam = camera as PerspectiveCamera;
+    if (cam.fov !== framing.fov) {
+      cam.fov = framing.fov;
+      cam.updateProjectionMatrix();
+    }
+    const pose = cameraPose(getProgress(), { cut, pull: framing.pull });
     // Reduced motion cuts; the first frame and teleports (deep links,
     // menu jumps) snap; everything else eases toward the pose.
     if (cut || !pos.current || !look.current || shouldSnap(look.current, pose.target)) {
@@ -674,7 +686,7 @@ export default function CafeScene({
         // Neutral tone mapping keeps the palette's colours as painted; the
         // filmic curve greyed the pastels.
         gl={{ toneMapping: NeutralToneMapping }}
-        camera={{ fov: 50, position: [...STATIONS[0].camera.position] }}
+        camera={{ fov: BASE_FOV, position: [...STATIONS[0].camera.position] }}
         dpr={quality.dpr}
         onCreated={() => onReady?.()}
       >

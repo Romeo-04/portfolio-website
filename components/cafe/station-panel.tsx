@@ -13,7 +13,7 @@
 // sheet instead, since the visitor is already holding one.
 // ============================================================
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { SpecialItem } from "@/components/cafe/stations/specials";
 import DrinkIllustration from "@/components/menu/drink-illustration";
 import { TestimonialAvatar } from "@/components/cafe/testimonial-sheet";
@@ -34,7 +34,7 @@ import {
 import { openProject, originOf } from "@/lib/cafe/project-sheet";
 import { openTestimonial } from "@/lib/cafe/testimonial-sheet";
 import { getProgress, goTo, subscribeProgress } from "@/lib/cafe/scroll";
-import { setViewInset } from "@/lib/cafe/view-inset";
+import { setViewInset, setViewLift } from "@/lib/cafe/view-inset";
 import { ArrowRight, Code, Document, External, Mail, Minus, Phone } from "@/components/ui/icons";
 import { STATIONS, stationIndexAt, type StationId } from "@/lib/cafe/stations";
 
@@ -342,14 +342,39 @@ export default function StationPanel({ specials, reduced }: { specials: SpecialI
     [],
   );
 
-  // Make room for the panel: the 3D view centres in the space beside it.
-  // Phones get a bottom sheet instead, so the view stays put there.
+  // Make room for the panel: the 3D view centres in the space beside it,
+  // or, on phones, in the space above the bottom sheet.
   const open = !folded;
+  const sheetRef = useRef<HTMLElement>(null);
   useEffect(() => {
     const wide = window.matchMedia("(min-width: 641px)").matches;
     setViewInset(open && wide ? PANEL_SPACE / 2 : 0);
+    const sheet = sheetRef.current;
+    if (!open || wide || !sheet) {
+      setViewLift(0);
+      return;
+    }
+    const measure = () => {
+      // offsetTop ignores the sheet's entrance transform.
+      const top = sheet.offsetTop;
+      setViewLift(Math.max(0, Math.round((window.innerHeight - top) / 2)));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(sheet);
+    window.addEventListener("resize", measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+    };
   }, [open]);
-  useEffect(() => () => setViewInset(0), []);
+  useEffect(
+    () => () => {
+      setViewInset(0);
+      setViewLift(0);
+    },
+    [],
+  );
 
   const station = STATIONS[index];
   const { eyebrow, title, body } = content(station.id, specials, reduced);
@@ -365,7 +390,7 @@ export default function StationPanel({ specials, reduced }: { specials: SpecialI
   }
 
   return (
-    <section aria-label={`${station.label}: ${title}`} className="station-panel is-visible">
+    <section ref={sheetRef} aria-label={`${station.label}: ${title}`} className="station-panel is-visible">
       <div className="phone-screen">
         <div className="phone-status" aria-hidden>
           <span>9:41</span>

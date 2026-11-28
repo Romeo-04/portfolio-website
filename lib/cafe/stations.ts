@@ -37,6 +37,14 @@ export interface Station {
    * cutting through a wall.
    */
   camera: { position: Vec3; target: Vec3; via?: Vec3 };
+  /**
+   * The furthest a narrow (portrait) screen may pull the camera back from
+   * its target, where a wall or doorway sits close behind it. Unset: as far
+   * as framingFor allows.
+   */
+  maxPull?: number;
+  /** Where a portrait screen looks instead, eased in like the pull. */
+  portraitTarget?: Vec3;
 }
 
 export const STATIONS: readonly Station[] = [
@@ -75,6 +83,10 @@ export const STATIONS: readonly Station[] = [
     menuSection: "menu-roast-log",
     // Out through the middle of the roastery doorway (x -0.7..0.7, z -9.5).
     camera: { position: [0, 1.8, -9.9], target: [0, 1, -13.2], via: [0, 1.8, -8.6] },
+    // The camera already stands just past the doorway, so a phone looks
+    // up a little instead, to keep the sign above the bottom sheet.
+    maxPull: 1,
+    portraitTarget: [0, 1.6, -13.2],
   },
   {
     id: "specials",
@@ -155,13 +167,42 @@ function lerp3(a: Vec3, b: Vec3, t: number): Vec3 {
   ];
 }
 
+/** The camera's lens on a landscape screen. */
+export const BASE_FOV = 50;
+/** A tall phone (iPhone, about 0.46 wide per unit of height) gets the full portrait framing. */
+const PHONE_ASPECT = 0.46;
+const PORTRAIT_FOV = 66;
+const PORTRAIT_PULL = 1.45;
+
+/**
+ * Lens and camera distance for a screen shape. The stations are framed for
+ * landscape screens; a portrait one sees a much narrower slice, so it gets a
+ * wider lens and stands further back, easing in as the screen narrows.
+ */
+export function framingFor(aspect: number): { fov: number; pull: number } {
+  const t = clamp01((1 - aspect) / (1 - PHONE_ASPECT));
+  return { fov: BASE_FOV + (PORTRAIT_FOV - BASE_FOV) * t, pull: 1 + (PORTRAIT_PULL - 1) * t };
+}
+
+/** A station's camera, moved back along its line of sight by `pull`. */
+function pulled(station: Station, pull: number): Station["camera"] {
+  if (pull === 1) return station.camera;
+  const k = Math.min(pull, station.maxPull ?? pull);
+  const { position: p } = station.camera;
+  const t = station.portraitTarget
+    ? lerp3(station.camera.target, station.portraitTarget, (pull - 1) / (PORTRAIT_PULL - 1))
+    : station.camera.target;
+  return { ...station.camera, target: t, position: [t[0] + (p[0] - t[0]) * k, t[1] + (p[1] - t[1]) * k, t[2] + (p[2] - t[2]) * k] };
+}
+
 export function cameraPose(
   progress: number,
-  opts: { cut?: boolean } = {},
+  opts: { cut?: boolean; pull?: number } = {},
 ): { position: Vec3; target: Vec3 } {
   const i = stationIndexAt(progress);
-  const here = STATIONS[i].camera;
-  const next = STATIONS[i + 1]?.camera;
+  const pull = opts.pull ?? 1;
+  const here = pulled(STATIONS[i], pull);
+  const next = STATIONS[i + 1] && pulled(STATIONS[i + 1], pull);
   if (!next) return here;
 
   const local = stationProgress(progress, STATIONS[i].id);

@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   DWELL,
   STATIONS,
+  BASE_FOV,
   cameraPose,
+  framingFor,
   progressFromScroll,
   menuTargetForHash,
   resolveHash,
@@ -153,11 +155,52 @@ describe("stationYaw", () => {
   });
 });
 
+describe("framingFor", () => {
+  it("leaves landscape screens as framed", () => {
+    expect(framingFor(16 / 9)).toEqual({ fov: BASE_FOV, pull: 1 });
+    expect(framingFor(1)).toEqual({ fov: BASE_FOV, pull: 1 });
+  });
+
+  it("widens the lens and steps back as the screen narrows", () => {
+    const tablet = framingFor(0.75);
+    const phone = framingFor(390 / 844);
+    expect(tablet.fov).toBeGreaterThan(BASE_FOV);
+    expect(phone.fov).toBeGreaterThan(tablet.fov);
+    expect(phone.pull).toBeGreaterThan(tablet.pull);
+    expect(framingFor(0.3)).toEqual(framingFor(0.46));
+  });
+});
+
+describe("cameraPose on a phone", () => {
+  const pull = framingFor(0.46).pull;
+
+  it("stands further back from each station, looking at the same thing", () => {
+    for (const id of ["storefront", "brew-bar", "checkout"] as const) {
+      const station = STATIONS.find((s) => s.id === id)!;
+      const pose = cameraPose(stationAnchor(id), { pull });
+      expect(pose.target).toEqual(station.camera.target);
+      const far = Math.hypot(...pose.position.map((v, k) => v - pose.target[k]));
+      const near = Math.hypot(...station.camera.position.map((v, k) => v - station.camera.target[k]));
+      expect(far).toBeCloseTo(near * pull);
+    }
+  });
+
+  it("keeps the roastery camera past its doorway and looks up at the sign instead", () => {
+    const roastery = STATIONS.find((s) => s.id === "roastery")!;
+    const pose = cameraPose(stationAnchor("roastery"), { pull });
+    expect(pose.position[2]).toBeCloseTo(roastery.camera.position[2]);
+    expect(pose.target[1]).toBeGreaterThan(roastery.camera.target[1]);
+  });
+});
+
 describe("camera inside the shop", () => {
-  it("never leaves the room except through a doorway", () => {
+  it.each([
+    ["landscape", 1],
+    ["phone", framingFor(0.46).pull],
+  ])("never leaves the room except through a doorway (%s)", (_, pull) => {
     for (let i = 0; i <= 400; i++) {
       const p = i / 400;
-      const [x, y, z] = cameraPose(p).position;
+      const [x, y, z] = cameraPose(p, { pull }).position;
       if (z > 0) {
         // Street side: only the approach to the front door.
         expect(Math.abs(x)).toBeLessThan(0.6);

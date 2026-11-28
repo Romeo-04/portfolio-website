@@ -3,8 +3,8 @@
 // ============================================================
 // SCROLL CUE
 // ============================================================
-// The first-visit reminder at the storefront: "Scroll to order" with a
-// downward motion. It sits under the café (centred beside the station
+// The first-visit reminder at the storefront: "Scroll to order" ("Swipe"
+// on touch screens) with a downward motion. It sits under the café (centred beside the station
 // panel, following the view inset) and bows out for good on the first
 // scroll. Clicking it walks to the next station.
 // ============================================================
@@ -51,7 +51,10 @@ export default function ScrollCue({ reduced }: { reduced: boolean }) {
         <span aria-hidden className="scroll-cue-mouse">
           <span />
         </span>
-        Scroll to order
+        <span>
+          <span className="scroll-cue-wheel">Scroll</span>
+          <span className="scroll-cue-swipe">Swipe</span> to order
+        </span>
       </span>
       <span aria-hidden className="scroll-cue-chevrons">
         <span />

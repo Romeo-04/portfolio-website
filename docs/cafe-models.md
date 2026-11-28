@@ -26,13 +26,33 @@ replace a piece with your own model:
 
        export const MODELS: Partial<Record<ModelName, string>> = { room: "/models/room.glb" };
 
-   Names available: `room` (walls, floor, ceiling, lamps) and `brew-bar`
-   (counter and espresso machine). Animated or skinned meshes are shown in
-   their rest pose.
+   Names available: `room` (walls, floor, ceiling, lamps), `brew-bar`
+   (counter and espresso machine) and `barista-head`. Animated or skinned
+   meshes are shown in their rest pose.
 6. **Check** `npm run dev` → `http://localhost:3000`. If the file is missing or broken, the
    built-in piece shows and the console logs a `[cafe]` warning.
 
 Keep `.blend` source files out of the repo.
+
+## The barista's head
+
+`barista-head` replaces only the barista's head; the body stays built in.
+The head's origin is the neck joint, with the face looking down +z. The
+café finds the parts by object name, so keep these names:
+
+- `Face`, `Hair`, `EarL`, `EarR`: toon shaded, with an ink outline.
+- `EyeL`, `EyeR`: the blink scales each on its own vertical axis, so each
+  eye needs its origin at its centre.
+- `GlintL`, `GlintR`: hidden mid-blink.
+- `BrowL`/`BrowR`, `Mouth`, `Teeth`, `BlushL`/`BlushR`, and anything else
+  starting with Eye, Glint, Brow, Mouth, Teeth or Blush: drawn as flat
+  colour, unlit.
+
+The default optimize step merges meshes and materials, which loses those
+names, and its default simplification is too coarse for a head this small.
+Compress the head with:
+
+    npm run models:optimize -- barista-head.glb public/models/barista-head.glb --compress meshopt --simplify-error 0.002 --join false --palette false --flatten false --instance false
 
 ## Baked lighting (the biggest visual upgrade)
 

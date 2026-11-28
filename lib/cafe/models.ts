@@ -6,9 +6,11 @@
 // the procedural piece renders.
 // ============================================================
 
-export type ModelName = "room" | "brew-bar";
+export type ModelName = "room" | "brew-bar" | "barista-head";
 
-export const MODELS: Partial<Record<ModelName, string>> = {};
+export const MODELS: Partial<Record<ModelName, string>> = {
+  "barista-head": "/models/barista-head.glb",
+};
 
 export function modelSrc(
   name: ModelName,

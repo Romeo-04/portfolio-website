@@ -7,6 +7,8 @@
 // or the procedural fallback while there is no file, while it loads, or if
 // it fails to load. Meshopt compression only: no external Draco decoder.
 // The loader is its own chunk, fetched only once a model is registered.
+// A piece that needs its parts kept apart (to animate them) passes its own
+// renderer as children instead of the flattening default.
 // ============================================================
 
 import { Component, Suspense, lazy, type ReactNode } from "react";
@@ -27,14 +29,20 @@ class ModelBoundary extends Component<{ fallback: ReactNode; children: ReactNode
   }
 }
 
-export default function Model({ name, fallback }: { name: ModelName; fallback: ReactNode }) {
+export default function Model({
+  name,
+  fallback,
+  children,
+}: {
+  name: ModelName;
+  fallback: ReactNode;
+  children?: (src: string) => ReactNode;
+}) {
   const src = modelSrc(name);
   if (!src) return <>{fallback}</>;
   return (
     <ModelBoundary fallback={fallback}>
-      <Suspense fallback={fallback}>
-        <Loaded src={src} />
-      </Suspense>
+      <Suspense fallback={fallback}>{children ? children(src) : <Loaded src={src} />}</Suspense>
     </ModelBoundary>
   );
 }

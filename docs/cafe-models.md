@@ -44,9 +44,11 @@ café finds the parts by object name, so keep these names:
 - `EyeL`, `EyeR`: the blink scales each on its own vertical axis, so each
   eye needs its origin at its centre.
 - `GlintL`, `GlintR`: hidden mid-blink.
-- `BrowL`/`BrowR`, `Mouth`, `Teeth`, `BlushL`/`BlushR`, and anything else
-  starting with Eye, Glint, Brow, Mouth, Teeth or Blush: drawn as flat
-  colour, unlit.
+- `EyeLashL`/`EyeLashR`, `BrowL`/`BrowR`, `NoseLine`, `Mouth`, `Teeth`,
+  `Tongue`, `BlushL`/`BlushR`, and anything else starting with Eye, Glint,
+  Brow, Mouth, Teeth, Tongue, NoseLine or Blush: drawn as flat colour,
+  unlit. The lashes don't blink; they stay as the closed lid.
+- Anything else (such as `Nose`): toon shaded, without an outline.
 
 The default optimize step merges meshes and materials, which loses those
 names, and its default simplification is too coarse for a head this small.

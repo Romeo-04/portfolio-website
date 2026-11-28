@@ -4,10 +4,9 @@
 // THE BARISTA (Jhezra)
 // ============================================================
 // A stylised, game-like chibi of the site owner standing behind the brew
-// bar, modelled on the owner's photo: full wavy black hair with a fringe,
-// fair skin, almond eyes and an open smile, a white collared shirt and a
-// terracotta apron with a name tag. Built from primitives in the
-// shared toon style so it matches the café, and animated in code:
+// bar: a white collared shirt and a terracotta apron with a name tag, built
+// from primitives in the shared toon style, under a head modelled in
+// Blender on the owner's photo (see barista-head.tsx). Animated in code:
 // breathing, blinking, a head that follows the camera, and a wave when the
 // visitor reaches the brew bar. It only asks for frames at the brew bar, so
 // the on-demand canvas can rest elsewhere.
@@ -15,7 +14,9 @@
 
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
-import type { Group, Mesh } from "three";
+import type { Group, Object3D } from "three";
+import { BaristaHeadModel, PrimitiveHead, SKIN } from "@/components/cafe/barista-head";
+import Model from "@/components/cafe/model";
 import { Ink, Toon } from "@/components/cafe/kit";
 import { CHARCOAL, CREAM, TERRACOTTA, WHITE } from "@/components/cafe/palette";
 import { Label } from "@/components/cafe/text3d";
@@ -25,30 +26,7 @@ import { getProgress } from "@/lib/cafe/scroll";
 import { requestShadowUpdate } from "@/lib/cafe/shadows";
 import { stationIndexAt } from "@/lib/cafe/stations";
 
-const SKIN = "#f6d5bc";
-const HAIR = "#17141a";
 const PANTS = "#2f2f35";
-/** Almond eyes: wider than tall. Blinking scales this down. */
-const EYE_HEIGHT = 0.62;
-/** [x, y, z, radius] bumps that give the hair its fluffy, wavy volume. */
-const HAIR_TUFTS: [number, number, number, number][] = [
-  [-0.09, 0.2, 0.05, 0.1],
-  [0.08, 0.21, 0.03, 0.1],
-  [0, 0.22, -0.07, 0.11],
-  [-0.17, 0.08, 0.02, 0.09],
-  [0.17, 0.08, 0.02, 0.09],
-  [-0.15, 0.13, -0.1, 0.1],
-  [0.15, 0.13, -0.1, 0.1],
-];
-/** [x, tilt, length] for each lock of the fringe, swept a little to one side. */
-const FRINGE: [number, number, number][] = [
-  [-0.14, -0.4, 0.85],
-  [-0.085, -0.2, 1.0],
-  [-0.03, 0.08, 0.9],
-  [0.025, 0.3, 1.05],
-  [0.08, 0.42, 0.95],
-  [0.135, 0.55, 0.8],
-];
 
 /** Behind the counter in the gap between two cups, facing the customers (-x). */
 const POSITION: [number, number, number] = [6.35, 0, -2.5];
@@ -60,7 +38,8 @@ const BREW_BAR = 2;
 export default function Barista() {
   const body = useRef<Group>(null);
   const head = useRef<Group>(null);
-  const eyes = useRef<(Mesh | null)[]>([]);
+  const eyes = useRef<(Object3D | null)[]>([]);
+  const glints = useRef<(Object3D | null)[]>([]);
   const waveArm = useRef<Group>(null);
 
   useFrame(({ clock, camera, invalidate }) => {
@@ -72,7 +51,8 @@ export default function Barista() {
 
     // Blink every few seconds.
     const blink = time % 3.6 < 0.12 ? 0.1 : 1;
-    eyes.current.forEach((e) => e && (e.scale.y = EYE_HEIGHT * blink));
+    eyes.current.forEach((e) => e && (e.scale.y = blink));
+    glints.current.forEach((g) => g && (g.visible = blink === 1));
 
     // Head turns toward the camera, within a natural range.
     if (head.current) {
@@ -180,76 +160,11 @@ export default function Barista() {
           </mesh>
         ))}
 
-        {/* Head, hair and face: a soft oval face under full, wavy black hair. */}
+        {/* Head, hair and face, from Blender; primitives while it loads. */}
         <group ref={head} position={[0, 1.5, 0]}>
-          <mesh scale={[0.96, 1.08, 1]}>
-            <sphereGeometry args={[0.22, 28, 22]} />
-            <Toon color={SKIN} />
-            <Ink />
-          </mesh>
-          {[-1, 1].map((side) => (
-            <mesh key={side} position={[side * 0.205, -0.02, 0]} scale={[0.6, 1, 0.8]}>
-              <sphereGeometry args={[0.05, 10, 8]} />
-              <Toon color={SKIN} />
-            </mesh>
-          ))}
-          {/* Hair cap, tilted back so the face stays clear. */}
-          <mesh position={[0, 0.04, -0.02]} rotation={[-0.38, 0, 0]} scale={[1.1, 1.08, 1.1]}>
-            <sphereGeometry args={[0.225, 28, 16, 0, Math.PI * 2, 0, Math.PI * 0.56]} />
-            <Toon color={HAIR} />
-            <Ink />
-          </mesh>
-          {/* Volume: soft waves on the crown and over the ears. */}
-          {HAIR_TUFTS.map(([x, y, z, r], i) => (
-            <mesh key={i} position={[x, y, z]}>
-              <sphereGeometry args={[r, 14, 10]} />
-              <Toon color={HAIR} />
-            </mesh>
-          ))}
-          {/* Fringe: separate wavy locks falling to the brows. */}
-          {FRINGE.map(([x, tilt, length], i) => (
-            <mesh key={i} position={[x, 0.12, 0.2 - Math.abs(x) * 0.4]} rotation={[-0.4, x * 1.6, tilt]} scale={[0.4, length, 0.3]}>
-              <sphereGeometry args={[0.075, 12, 10]} />
-              <Toon color={HAIR} />
-            </mesh>
-          ))}
-          {/* Almond eyes with a glint, straight brows, open smile and blush. */}
-          {[-0.072, 0.072].map((x, i) => (
-            <group key={x} position={[x, 0.005, 0.198]}>
-              <mesh
-                ref={(m) => {
-                  eyes.current[i] = m;
-                }}
-                scale={[1.05, EYE_HEIGHT, 0.45]}
-              >
-                <sphereGeometry args={[0.028, 14, 12]} />
-                <meshBasicMaterial color="#1b1410" />
-              </mesh>
-              <mesh position={[0.009, 0.007, 0.014]}>
-                <sphereGeometry args={[0.006, 8, 6]} />
-                <meshBasicMaterial color="#ffffff" />
-              </mesh>
-              <mesh position={[0, 0.045, 0.006]} rotation-z={x < 0 ? 0.08 : -0.08}>
-                <boxGeometry args={[0.058, 0.009, 0.01]} />
-                <meshBasicMaterial color={HAIR} />
-              </mesh>
-            </group>
-          ))}
-          {/* Open smile: a half-moon mouth with a row of teeth. */}
-          <mesh position={[0, -0.08, 0.207]} rotation={[-0.2, 0, Math.PI]}>
-            <circleGeometry args={[0.042, 20, 0, Math.PI]} />
-            <meshBasicMaterial color="#7a3330" />
-          </mesh>
-          <mesh position={[0, -0.087, 0.209]} rotation-x={-0.2}>
-            <planeGeometry args={[0.062, 0.013]} />
-            <meshBasicMaterial color="#ffffff" />
-          </mesh>
-          {[-0.12, 0.12].map((x) => (
-            <mesh key={x} position={[x, -0.05, 0.165]} scale={[1, 0.6, 0.3]}>
-              <sphereGeometry args={[0.03, 10, 8]} />
-              <meshBasicMaterial color="#f2a090" transparent opacity={0.45} depthWrite={false} />
-            </mesh>
-          ))}
+          <Model name="barista-head" fallback={<PrimitiveHead eyes={eyes} glints={glints} />}>
+            {(src) => <BaristaHeadModel src={src} eyes={eyes} glints={glints} />}
+          </Model>
         </group>
       </group>
     </group>

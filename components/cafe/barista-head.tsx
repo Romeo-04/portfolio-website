@@ -4,15 +4,14 @@
 // THE BARISTA'S HEAD
 // ============================================================
 // The barista's head is a Blender model (public/models/barista-head.glb),
-// modelled on the owner's photo and the illustrated barista made from it:
-// a full, wavy mop of black hair whose fringe parts just left of centre and
-// hangs to the brows at the temples, a round face with a soft chin, ears
-// showing, dark almond eyes with a lash line, thin arched brows, a nose
-// stroke and a wide open smile with teeth and tongue. Its parts stay
-// separate so the barista can blink: EyeL and EyeR scale on their own
-// vertical axis, and the glints hide mid-blink. Skin and hair take the
-// café's toon shading and ink outline; the painted features (eyes, lashes,
-// brows, nose stroke, mouth, blush) stay unlit, flat colour, as drawn.
+// modelled on the owner's 1x1 photo: full wavy black hair with a fringe
+// of separate locks falling to the brows, sides over the ear tops, an oval
+// face with a soft jaw, almond eyes, straight brows, a small nose and an
+// open smile showing the upper teeth. Its parts stay separate so the
+// barista can blink: EyeL and EyeR scale on their own vertical axis, and
+// the glints hide mid-blink. Skin and hair take the café's toon shading
+// and ink outline; the painted features (eyes, brows, mouth, blush) stay
+// unlit, flat colour, as they were drawn.
 //
 // PrimitiveHead is the head built from primitives, shown while the model
 // loads or if it fails.
@@ -29,7 +28,7 @@ export const SKIN = "#f6d5bc";
 export const HAIR = "#17141a";
 
 /** Parts drawn as flat paint rather than lit surfaces. */
-const PAINTED = /^(Eye|Glint|Brow|Mouth|Teeth|Tongue|NoseLine|Blush)/;
+const PAINTED = /^(Eye|Glint|Brow|Mouth|Teeth|Blush)/;
 /** Parts that get the café's ink outline. */
 const OUTLINED = /^(Face|Hair|Ear)/;
 
